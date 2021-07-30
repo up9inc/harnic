@@ -30,10 +30,25 @@ class Entry:
         self.metadata = metadata
 
     def __repr__(self):
-        return self.request['url'].clean_url
+        return f"{self.request['method']} {self.request['url'].clean_url}"
+
+    def _key(self):
+        return self.request['method'], self.request['url'].clean_url
 
     def __hash__(self):
-        return hash(self.request['url'].clean_url)
+        return hash(self._key())
 
     def __eq__(self, other):
         return hash(self) == hash(other)
+
+
+# TODO: this may be a func?
+class EntryDiff:
+
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+        self.diff = self._get_diff()
+
+    def _get_diff(self):
+        pass
