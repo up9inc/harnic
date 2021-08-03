@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+  <title>Harnic</title>
+</head>
+<body>
+<div class="ui container">
+  <h1 class="ui dividing header">Harnic</h1>
+  <table class="ui fixed celled selectable table">
+    <thead>
+    <tr>
+      <th>{{hars[0].path}}</th>
+      <th>{{hars[1].path}}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for diff_record in records %}
+      {% set cell_class = {'delete': 'negative', 'insert': 'positive', 'equal': '', 'replace': ''} %}
+      <tr class="{{cell_class[diff_record.tag]}}">
+        <td>{{diff_record.pair[0] or ''}}</td>
+        <td>{{diff_record.pair[1] or ''}}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+<style type="text/css">
+    /* Some basic formatting */
+    .container {
+        padding: 3em 0em;
+    }
+
+    .ui.dividing.header,
+    .first {
+        margin-top: 3em;
+    }
+
+    h1,
+    h3 {
+        margin-top: 10em;
+    }
+</style>
+</body>
+</html>
