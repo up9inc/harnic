@@ -46,6 +46,18 @@
         width: 20% !important;
         font-weight: bold !important;
     }
+
+    .entry-detailed-info .insert{
+        color: green !important;
+    }
+
+    .entry-detailed-info .delete{
+        color: red !important;
+    }
+
+    .entry-detailed-info .modified{
+        color: orange !important;
+    }
 </style>
 <div class="ui container">
   <h1 class="ui dividing header">Harnic</h1>
@@ -58,8 +70,8 @@
     </thead>
     <tbody>
     {% for diff_record in records %}
-      {% set cell_class = {'delete': 'negative', 'insert': 'positive', 'equal': '', 'replace': ''} %}
-      <tr class="{{cell_class[diff_record.tag]}} title">
+      {% set cell_class = {'delete': 'negative', 'insert': 'positive', 'diff': 'warning', 'equal': ''} %}
+      <tr class="{{cell_class[diff_record.tag.value]}} title">
         {% set r1 = diff_record.pair[0] %}
         {% set r2 = diff_record.pair[1] %}
         <td>
@@ -77,42 +89,170 @@
       </tr>
       <div class="content">
         <tr>
-          {% if r1 %}
-          <td colspan="2" class="transition hidden">
-            <div class="ui top attached tabular menu">
-              <a class="item active" data-tab="first">Gerenal</a>
-              <a class="item" data-tab="second">Request</a>
-              <a class="item" data-tab="third">Response</a>
-              <a class="item" data-tab="fourth">Raw Data</a>
-            </div>
-            <div class="ui bottom attached tab segment active" data-tab="first">
-              <table class="ui very basic table entry-info">
-                <tbody>
-                  <tr>
-                    <td class="right aligned key">Started</td>
-                    <td>{{r1.request['_ts'] | ctime}}</td>
-                  </tr>
-                  <tr>
-                    <td class="right aligned key">Foo</td>
-                    <td>Bar</td>
-                  </tr>
-                  <tr>
-                    <td class="right aligned key">Foo</td>
-                    <td>Bar</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="ui bottom attached tab segment" data-tab="second">
-              Second
-            </div>
-            <div class="ui bottom attached tab segment" data-tab="third">
-              Third
-            </div>
-            <div class="ui bottom attached tab segment" data-tab="fourth">
-              Third
-            </div>
-          </td>
+          {% if diff_record.tag.value in ['insert', 'delete', 'equal'] %}
+            {% if diff_record.tag.value == 'insert' %}
+              {% set r = r2 %}
+            {% endif %}
+            {% if diff_record.tag.value == 'delete' %}
+              {% set r = r1 %}
+            {% endif %}
+            {% if diff_record.tag.value == 'equal' %}
+              {% set r = r1 %}
+            {% endif %}
+            <td colspan="2" class="transition hidden">
+              <div class="ui top attached tabular menu">
+                <a class="item active" data-tab="first">Gerenal</a>
+                <a class="item" data-tab="second">Request</a>
+                <a class="item" data-tab="third">Response</a>
+                <a class="item" data-tab="fourth">Raw Data</a>
+              </div>
+              <div class="ui bottom attached tab segment active" data-tab="first">
+                <table class="ui very basic table entry-info">
+                  <tbody>
+                    <tr>
+                      <td class="right aligned key">Started</td>
+                      <td>{{r.request['_ts'] | ctime}}</td>
+                    </tr>
+                    <tr>
+                      <td class="right aligned key">Foo</td>
+                      <td>Bar</td>
+                    </tr>
+                    <tr>
+                      <td class="right aligned key">Foo</td>
+                      <td>Bar</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="ui bottom attached tab segment" data-tab="second">
+                Second
+              </div>
+              <div class="ui bottom attached tab segment" data-tab="third">
+                Third
+              </div>
+              <div class="ui bottom attached tab segment" data-tab="fourth">
+                Third
+              </div>
+            </td>
+          {% elif diff_record.tag.value == 'diff' %}
+            <td colspan="1" class="transition hidden">
+              <div class="ui top attached tabular menu">
+                <a class="item active" data-tab="general">Gerenal</a>
+                <a class="item" data-tab="request">Request</a>
+                <a class="item" data-tab="third">Response</a>
+                <a class="item" data-tab="fourth">Raw Data</a>
+              </div>
+              <div class="ui bottom attached tab segment active" data-tab="general">
+                <table class="ui very basic table entry-info">
+                  <tbody>
+                    <tr>
+                      <td class="right aligned key">Started</td>
+                      <td>{{r1.request['_ts'] | ctime}}</td>
+                    </tr>
+                    <tr>
+                      <td class="right aligned key">Foo</td>
+                      <td>Bar</td>
+                    </tr>
+                    <tr>
+                      <td class="right aligned key">Foo</td>
+                      <td>Bar</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="ui bottom attached tab segment" data-tab="request">
+                <div class="ui list">
+                  <div class="item">
+                    <div><b>Method:</b> {{r1.request['method']}}</div>
+                  </div>
+                  <div>
+                    <div><b>Query params:</b></div>
+                    <div class="list">
+                      {% for key, values in r1.request['url'].query_params.items() %}
+                        <div class="item"><b>{{key}}</b>: {{values|join(', ')}}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div>
+                    <div><b>Headers:</b></div>
+                    <div class="list">
+                      {% for key, values in r1.request['headers'].items() %}
+                        <div class="item"><b>{{key}}</b>: {{values|join(', ')}}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+                </div>
+              </div>
+              <div class="ui bottom attached tab segment" data-tab="third">
+                Third
+              </div>
+              <div class="ui bottom attached tab segment" data-tab="fourth">
+                Third
+              </div>
+            </td>
+            <td colspan="1" class="transition hidden">
+              <div class="ui top attached tabular menu">
+                <a class="item active" data-tab="general">Gerenal</a>
+                <a class="item" data-tab="request">Request</a>
+                <a class="item" data-tab="third">Response</a>
+                <a class="item" data-tab="fourth">Raw Data</a>
+              </div>
+              <div class="ui bottom attached tab segment active" data-tab="general">
+                <table class="ui very basic table entry-info">
+                  <tbody>
+                    <tr>
+                      <td class="right aligned key">Started</td>
+                      <td>{{r2.request['_ts'] | ctime}}</td>
+                    </tr>
+                    <tr>
+                      <td class="right aligned key">Foo</td>
+                      <td>Bar</td>
+                    </tr>
+                    <tr>
+                      <td class="right aligned key">Foo</td>
+                      <td>Bar</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="ui bottom attached tab segment entry-detailed-info" data-tab="request">
+                <div class="ui list">
+                  <div class="item">
+                    <div><b>Method:</b> {{r2.request['method']}}</div>
+                  </div>
+                  <div>
+                    <div><b>Query params:</b></div>
+                    <div class="list">
+                      {% for key, values in r2.request['url'].query_params.items() %}
+                        <div class="item"><b>{{key}}</b>: {{values|join(', ')}}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div>
+                    <div><b>Headers:</b></div>
+                    <div class="list">
+                      {% for key, values in r2.request['headers'].items() %}
+                        {% if key in diff_record.diff.fields['request']['headers'].diff.added %}
+                          {% set span_class = 'delete' %}
+                        {% elif key in diff_record.diff.fields['request']['headers'].diff.removed %}
+                          {% set span_class = 'insert' %}
+                        {% elif key in diff_record.diff.fields['request']['headers'].diff.modified.keys() %}
+                          {% set span_class = 'modified' %}
+                        {% endif %}
+                        <div class="item {{span_class}}"><b>{{key}}:</b> {{values|join(', ')}}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+                </div>
+              <div class="ui bottom attached tab segment" data-tab="third">
+                Third
+              </div>
+              <div class="ui bottom attached tab segment" data-tab="fourth">
+                Third
+              </div>
+            </td>
           {% endif %}
         </tr>
       </div>

@@ -1,7 +1,7 @@
 from collections import namedtuple, defaultdict
 
 Comparison = namedtuple('Comparison', ['equal', 'diff'])
-DictDiff = namedtuple('DictDiff', ['added', 'removed', 'modified', 'same'], defaults=[set(), set(), set(), dict()])
+DictDiff = namedtuple('DictDiff', ['added', 'removed', 'modified', 'same'], defaults=[set(), set(), dict(), set()])
 
 
 def dict_compare(d1, d2):

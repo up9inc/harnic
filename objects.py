@@ -30,6 +30,7 @@ class Entry:
         self.request = request
         self.response = response
         self.metadata = metadata
+        self._clean()
 
     def __repr__(self):
         return f"{self.request['method']} {self.request['url'].clean_url}"
@@ -42,6 +43,14 @@ class Entry:
 
     def __eq__(self, other):
         return hash(self) == hash(other)
+
+    def _clean(self):
+        request_headers = self.request.get('headers')
+        if request_headers:
+            self.request['headers'] = headers_list_to_map(request_headers)
+        response_headers = self.response.get('headers')
+        if response_headers:
+            self.response['headers'] = headers_list_to_map(response_headers)
 
 
 # TODO: this may be a func?
@@ -63,8 +72,8 @@ class EntryDiff:
 
         qs_cmp = dict_compare(self.a.request['url'].query_params,
                               self.b.request['url'].query_params)
-        headers_cmp = dict_compare(headers_list_to_map(self.a.request['headers']),
-                                   headers_list_to_map(self.b.request['headers']))
+        headers_cmp = dict_compare(self.a.request['headers'],
+                                   self.b.request['headers'])
         fields['request']['query_params'] = qs_cmp
         fields['request']['headers'] = headers_cmp
 
