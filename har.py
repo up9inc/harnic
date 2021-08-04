@@ -39,14 +39,14 @@ class HAR:
             if tag == 'equal':
                 for i, j in zip(range(i1, i2), range(j1, j2)):
                     pair = (i_entries[i], j_entries[j])
-                    dr = DiffRecord(pair, EntryDiff(*pair).diff, tag)
+                    dr = DiffRecord(pair, EntryDiff(*pair), tag)
                     result.append(dr)
             elif tag == 'replace':
                 for i in range(i1, i2):
-                    dr = DiffRecord((i_entries[i], None), None, tag)
+                    dr = DiffRecord((i_entries[i], None), None, 'delete')
                     result.append(dr)
                 for j in range(j1, j2):
-                    dr = DiffRecord((None, j_entries[j]), None, tag)
+                    dr = DiffRecord((None, j_entries[j]), None, 'insert')
                     result.append(dr)
             elif tag == 'delete':
                 for i in range(i1, i2):

@@ -1,6 +1,8 @@
 import copy
 from urllib.parse import urlparse, parse_qs, urlencode
 
+from comparisons import dict_compare, headers_list_to_map
+
 
 class Url:
 
@@ -48,7 +50,23 @@ class EntryDiff:
     def __init__(self, a, b):
         self.a = a
         self.b = b
-        self.diff = self._get_diff()
+        self.equal = None
+        self.fields = self._get_diff()
+
+    @property
+    def query_params(self):
+        return dict_compare(a.request['url'].query_params)
 
     def _get_diff(self):
-        pass
+        # method and url are not handled here as long as they are part of the entry hash
+        fields = {'request': {}, 'response': {}}
+
+        qs_cmp = dict_compare(self.a.request['url'].query_params,
+                              self.b.request['url'].query_params)
+        headers_cmp = dict_compare(headers_list_to_map(self.a.request['headers']),
+                                   headers_list_to_map(self.b.request['headers']))
+        fields['request']['query_params'] = qs_cmp
+        fields['request']['headers'] = headers_cmp
+
+        self.equal = all(c.equal for c in [qs_cmp, headers_cmp])
+        return fields

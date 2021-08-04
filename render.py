@@ -8,6 +8,7 @@ from har import HAR
 def timectime(s):
     return time.ctime(s)  # datetime.datetime.fromtimestamp(s)
 
+
 env = Environment(
     loader=FileSystemLoader("templates"),
     autoescape=select_autoescape()
@@ -15,13 +16,13 @@ env = Environment(
 env.filters['ctime'] = timectime
 
 
-def render_diff(hars, records):
+def render_diff(hars, records, output_name='index.html'):
     template = env.get_template("index.html")
     context = {
         'hars': hars,
         'records': records,
     }
-    template.stream(**context).dump('index.html')
+    template.stream(**context).dump(output_name)
 
 
 if __name__ == '__main__':
