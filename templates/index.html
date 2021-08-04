@@ -3,32 +3,31 @@
 <head>
   <meta charset="utf-8"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
   <title>Harnic</title>
 </head>
 <body>
-<div class="ui container">
-  <h1 class="ui dividing header">Harnic</h1>
-  <table class="ui fixed celled selectable table">
-    <thead>
-    <tr>
-      <th>{{hars[0].path}}</th>
-      <th>{{hars[1].path}}</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for diff_record in records %}
-      {% set cell_class = {'delete': 'negative', 'insert': 'positive', 'equal': '', 'replace': ''} %}
-      <tr class="{{cell_class[diff_record.tag]}}">
-        <td>{{diff_record.pair[0] or ''}}</td>
-        <td>{{diff_record.pair[1] or ''}}</td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-</div>
 <style type="text/css">
     /* Some basic formatting */
+    @media only screen and (min-width: 1900px) {
+      .ui.container {
+        width: 1720px;
+      }
+
+      .ui.grid.container {
+        width: calc( 1720px  +  2rem ) !important;
+      }
+
+      .ui.relaxed.grid.container {
+        width: calc( 1720px  +  3rem ) !important;
+      }
+
+      .ui.very.relaxed.grid.container {
+        width: calc( 1720px  +  5rem ) !important;
+      }
+    }
+
     .container {
         padding: 3em 0em;
     }
@@ -42,6 +41,92 @@
     h3 {
         margin-top: 10em;
     }
+
+    .entry-info .key{
+        width: 20% !important;
+        font-weight: bold !important;
+    }
 </style>
+<div class="ui container">
+  <h1 class="ui dividing header">Harnic</h1>
+  <table class="ui fixed celled selectable accordion table">
+    <thead>
+    <tr>
+      <th>{{hars[0].path}}</th>
+      <th>{{hars[1].path}}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for diff_record in records %}
+      {% set cell_class = {'delete': 'negative', 'insert': 'positive', 'equal': '', 'replace': ''} %}
+      <tr class="{{cell_class[diff_record.tag]}} title">
+        {% set r1 = diff_record.pair[0] %}
+        {% set r2 = diff_record.pair[1] %}
+        <td>
+          {% if r1 %}
+            <div class="ui basic mini label">{{r1.request['method']}}</div>
+            {{r1.request['url']}}
+          {% endif %}
+        </td>
+        <td>
+          {% if r2 %}
+            <div class="ui basic mini label">{{r2.request['method']}}</div>
+            {{r2.request['url']}}
+          {% endif %}
+        </td>
+      </tr>
+      <div class="content">
+        <tr>
+          {% if r1 %}
+          <td colspan="2" class="transition hidden">
+            <div class="ui top attached tabular menu">
+              <a class="item active" data-tab="first">Gerenal</a>
+              <a class="item" data-tab="second">Request</a>
+              <a class="item" data-tab="third">Response</a>
+              <a class="item" data-tab="fourth">Raw Data</a>
+            </div>
+            <div class="ui bottom attached tab segment active" data-tab="first">
+              <table class="ui very basic table entry-info">
+                <tbody>
+                  <tr>
+                    <td class="right aligned key">Started</td>
+                    <td>{{r1.request['_ts'] | ctime}}</td>
+                  </tr>
+                  <tr>
+                    <td class="right aligned key">Foo</td>
+                    <td>Bar</td>
+                  </tr>
+                  <tr>
+                    <td class="right aligned key">Foo</td>
+                    <td>Bar</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="ui bottom attached tab segment" data-tab="second">
+              Second
+            </div>
+            <div class="ui bottom attached tab segment" data-tab="third">
+              Third
+            </div>
+            <div class="ui bottom attached tab segment" data-tab="fourth">
+              Third
+            </div>
+          </td>
+          {% endif %}
+        </tr>
+      </div>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+<script>
+  $('.ui.accordion')
+    .accordion({
+      exclusive: false
+    })
+  ;
+  $('.menu .item').tab();
+</script>
 </body>
 </html>

@@ -25,8 +25,8 @@ class HAR:
 
     def compare(self, other):
         # TODO: static can be junk
-        i_entries, j_entries = self.entries[:5], other.entries[:5]
-        # i_entries, j_entries = self.entries, other.entries
+        # i_entries, j_entries = self.entries[:5], other.entries[:5]
+        i_entries, j_entries = self.entries, other.entries
         sm = difflib.SequenceMatcher(None, i_entries, j_entries)
         opcodes = list(sm.get_opcodes())  # TODO: abuse iterator?
         sm.records = self._process_cmp_opcodes(opcodes, i_entries, j_entries)

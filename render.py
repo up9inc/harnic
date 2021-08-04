@@ -1,12 +1,18 @@
+import time
+
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from har import HAR
 
 
+def timectime(s):
+    return time.ctime(s)  # datetime.datetime.fromtimestamp(s)
+
 env = Environment(
     loader=FileSystemLoader("templates"),
     autoescape=select_autoescape()
 )
+env.filters['ctime'] = timectime
 
 
 def render_diff(hars, records):
