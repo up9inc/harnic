@@ -20,14 +20,13 @@ def har_compare(har1, har2):
     # i_entries, j_entries = self.entries[:5], other.entries[:5]
     i_entries, j_entries = har1.entries, har2.entries
     sm = difflib.SequenceMatcher(None, i_entries, j_entries)
-    opcodes = list(sm.get_opcodes())  # TODO: abuse iterator?
-    sm.records = _build_har_diff_records(opcodes, i_entries, j_entries)
+    sm.records = _build_har_diff_records(sm.get_opcodes(), i_entries, j_entries)
     return sm
 
 
 def _build_har_diff_records(opcodes, i_entries, j_entries):
     result = []
-    for permutation in opcodes:  # permutation(tag, i1, i2, j1, j2)
+    for permutation in opcodes:
         tag, i1, i2, j1, j2 = permutation
         if tag == 'equal':
             for i, j in zip(range(i1, i2), range(j1, j2)):

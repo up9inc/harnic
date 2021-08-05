@@ -62,10 +62,6 @@ class EntryDiff:
         self.equal = None
         self.fields = self._get_diff()
 
-    @property
-    def query_params(self):
-        return dict_compare(a.request['url'].query_params)
-
     def _get_diff(self):
         # method and url are not handled here as long as they are part of the entry hash
         fields = {'request': {}, 'response': {}}
