@@ -1,7 +1,7 @@
 import unittest
 
-from compare import har_compare
-from har import HAR
+from harnic.compare import har_compare
+from harnic.har import HAR
 
 
 class TestHarnic(unittest.TestCase):

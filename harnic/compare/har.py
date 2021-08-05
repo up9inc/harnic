@@ -2,7 +2,7 @@ import difflib
 from collections import namedtuple
 from enum import Enum
 
-from harnic.objects import EntryDiff
+from harnic.compare import EntryDiff
 
 HARDiffRecord = namedtuple('HARDiffRecord', ['pair', 'diff', 'tag'])
 
