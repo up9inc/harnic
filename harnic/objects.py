@@ -1,7 +1,7 @@
 import copy
 from urllib.parse import urlparse, parse_qs, urlencode
 
-from utils import headers_list_to_map, dict_compare, headers_compare
+from harnic.utils import headers_list_to_map, dict_compare, headers_compare
 
 
 class Url:
