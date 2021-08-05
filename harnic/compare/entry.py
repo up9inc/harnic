@@ -1,10 +1,9 @@
 from functools import partial
 
 from harnic.compare.utils import dict_compare, scalars_compare
-from harnic.constants import HEADER_NOT_STRICT_KEYS, CONTENT_NOT_STRICT_KEYS
+from harnic.constants import SOFT_HEADER_KEYS
 
-headers_compare = partial(dict_compare, exceptions=HEADER_NOT_STRICT_KEYS)
-content_compare = partial(dict_compare, exceptions=CONTENT_NOT_STRICT_KEYS)
+headers_compare = partial(dict_compare, exceptions=SOFT_HEADER_KEYS)
 
 
 # TODO: may this be a func?
@@ -31,8 +30,8 @@ class EntryDiff:
                                                        self.b.response['status'])
         fields['response']['headers'] = headers_compare(self.a.response['headers'],
                                                         self.b.response['headers'])
-        fields['response']['content'] = content_compare(self.a.response['content'],
-                                                        self.b.response['content'])
+        fields['response']['content'] = dict_compare(self.a.response['content'],
+                                                     self.b.response['content'])
 
         self.equal = all(all(cmp.equal for cmp in criteria.values()) for criteria in fields.values())
         return fields
