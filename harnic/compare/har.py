@@ -4,7 +4,8 @@ from enum import Enum
 
 from harnic.compare import EntryDiff
 
-HARDiffRecord = namedtuple('HARDiffRecord', ['pair', 'diff', 'tag'])
+DiffRecord = namedtuple('DiffRecord', ['pair', 'diff', 'tag'])
+Pair = namedtuple('Pair', ['a', 'b'])
 
 
 class PermTag(Enum):
@@ -30,23 +31,23 @@ def _build_har_diff_records(opcodes, i_entries, j_entries):
         tag, i1, i2, j1, j2 = permutation
         if tag == 'equal':
             for i, j in zip(range(i1, i2), range(j1, j2)):
-                pair = (i_entries[i], j_entries[j])
+                pair = Pair(i_entries[i], j_entries[j])
                 entry_diff = EntryDiff(*pair)
-                dr = HARDiffRecord(pair, entry_diff, PermTag.EQUAL if entry_diff.equal else PermTag.DIFF)
+                dr = DiffRecord(pair, entry_diff, PermTag.EQUAL if entry_diff.equal else PermTag.DIFF)
                 result.append(dr)
         elif tag == 'replace':
             for i in range(i1, i2):
-                dr = HARDiffRecord((i_entries[i], None), None, PermTag.DELETE)
+                dr = DiffRecord(Pair(i_entries[i], None), None, PermTag.DELETE)
                 result.append(dr)
             for j in range(j1, j2):
-                dr = HARDiffRecord((None, j_entries[j]), None, PermTag.INSERT)
+                dr = DiffRecord(Pair(None, j_entries[j]), None, PermTag.INSERT)
                 result.append(dr)
         elif tag == 'delete':
             for i in range(i1, i2):
-                dr = HARDiffRecord((i_entries[i], None), None, PermTag(tag))
+                dr = DiffRecord(Pair(i_entries[i], None), None, PermTag(tag))
                 result.append(dr)
         elif tag == 'insert':
             for j in range(j1, j2):
-                dr = HARDiffRecord((None, j_entries[j]), None, PermTag(tag))
+                dr = DiffRecord(Pair(None, j_entries[j]), None, PermTag(tag))
                 result.append(dr)
     return result

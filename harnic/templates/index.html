@@ -186,7 +186,7 @@
                     <div><b>Query params:</b></div>
                     <div class="list">
                       {% for key, values in r1.request['url'].query_params.items() %}
-                        {% if key in diff_record.diff.fields['request']['query_params'].diff.removed %}
+                        {% if key in diff_record.diff.comparisons['request']['query_params'].diff.removed %}
                           {% set r1_req_qs_class = 'delete' %}
                         {% endif %}
                         <div class="item {{r1_req_qs_class}}"><b>{{key}}</b>: {{values|join(', ')}}</div>
@@ -197,7 +197,7 @@
                     <div><b>Headers:</b></div>
                     <div class="list">
                       {% for key, values in r1.request['headers'].items() %}
-                        {% if key in diff_record.diff.fields['request']['headers'].diff.removed %}
+                        {% if key in diff_record.diff.comparisons['request']['headers'].diff.removed %}
                           {% set r1_req_header_class = 'delete' %}
                         {% endif %}
                         <div class="item {{r1_req_header_class}}"><b>{{key}}</b>: {{values|join(', ')}}</div>
@@ -218,7 +218,7 @@
                     <div><b>Headers:</b></div>
                     <div class="list">
                       {% for key, values in r1.response['headers'].items() %}
-                        {% if key in diff_record.diff.fields['response']['headers'].diff.removed %}
+                        {% if key in diff_record.diff.comparisons['response']['headers'].diff.removed %}
                           {% set r1_resp_header_class = 'delete' %}
                         {% endif %}
                         <div class="item {{r1_resp_header_class}}"><b>{{key}}:</b> {{values|join(', ')}}</div>
@@ -229,7 +229,7 @@
                     <div><b>Content:</b></div>
                     <div class="list">
                       {% for key, value in r1.response['content'].items() %}
-                        {% if key in diff_record.diff.fields['response']['content'].diff.removed %}
+                        {% if key in diff_record.diff.comparisons['response']['content'].diff.removed %}
                           {% set r1_resp_content_class = 'delete' %}
                         {% endif %}
                         <div class="item {{r1_resp_content_class}}"><b>{{key}}:</b> {{value}}</div>
@@ -256,7 +256,7 @@
                   <div class="item">
                     <div><b>Method:</b> {{r2.request['method']}}</div>
                   </div>
-                  {% if not diff_record.diff.fields['request']['bodySize'].equal %}
+                  {% if not diff_record.diff.comparisons['request']['bodySize'].equal %}
                     {% set span_class = 'modified' %}
                   {% endif %}
                   <div class="item {{span_class}}">
@@ -266,9 +266,9 @@
                     <div><b>Query params:</b></div>
                     <div class="list">
                       {% for key, values in r2.request['url'].query_params.items() %}
-                        {% if key in diff_record.diff.fields['request']['query_params'].diff.added %}
+                        {% if key in diff_record.diff.comparisons['request']['query_params'].diff.added %}
                           {% set r2_req_qs_class = 'insert' %}
-                        {% elif key in diff_record.diff.fields['request']['query_params'].diff.modified.keys() %}
+                        {% elif key in diff_record.diff.comparisons['request']['query_params'].diff.modified.keys() %}
                           {% set r2_req_qs_class = 'modified' %}
                         {% endif %}
                         <div class="item {{r2_req_qs_class}}"><b>{{key}}</b>: {{values|join(', ')}}</div>
@@ -279,9 +279,9 @@
                     <div><b>Headers:</b></div>
                     <div class="list">
                       {% for key, values in r2.request['headers'].items() %}
-                        {% if key in diff_record.diff.fields['request']['headers'].diff.added %}
+                        {% if key in diff_record.diff.comparisons['request']['headers'].diff.added %}
                           {% set r2_req_header_class = 'insert' %}
-                        {% elif key in diff_record.diff.fields['request']['headers'].diff.modified.keys() %}
+                        {% elif key in diff_record.diff.comparisons['request']['headers'].diff.modified.keys() %}
                           {% set r2_req_header_class = 'modified' %}
                         {% endif %}
                         <div class="item {{r2_req_header_class}}"><b>{{key}}:</b> {{values|join(', ')}}</div>
@@ -295,7 +295,7 @@
                   <div class="item">
                     <div><b>Recieved:</b> {{r2.response['_ts'] | ctime}}</div>
                   </div>
-                  {% if not diff_record.diff.fields['response']['status'].equal %}
+                  {% if not diff_record.diff.comparisons['response']['status'].equal %}
                     {% set span_class = 'modified' %}
                   {% endif %}
                   <div class="item {{span_class}}">
@@ -305,9 +305,9 @@
                     <div><b>Headers:</b></div>
                     <div class="list">
                       {% for key, values in r2.response['headers'].items() %}
-                        {% if key in diff_record.diff.fields['response']['headers'].diff.added %}
+                        {% if key in diff_record.diff.comparisons['response']['headers'].diff.added %}
                           {% set r2_resp_header_class = 'insert' %}
-                        {% elif key in diff_record.diff.fields['response']['headers'].diff.modified.keys() %}
+                        {% elif key in diff_record.diff.comparisons['response']['headers'].diff.modified.keys() %}
                           {% set r2_resp_header_class = 'modified' %}
                         {% endif %}
                         <div class="item {{r2_resp_header_class}}"><b>{{key}}:</b> {{values|join(', ')}}</div>
@@ -318,9 +318,9 @@
                     <div><b>Content:</b></div>
                     <div class="list">
                       {% for key, value in r2.response['content'].items() %}
-                        {% if key in diff_record.diff.fields['response']['content'].diff.added %}
+                        {% if key in diff_record.diff.comparisons['response']['content'].diff.added %}
                           {% set r2_resp_content_class = 'insert' %}
-                        {% elif key in diff_record.diff.fields['response']['content'].diff.modified.keys() %}
+                        {% elif key in diff_record.diff.comparisons['response']['content'].diff.modified.keys() %}
                           {% set r2_resp_content_class = 'modified' %}
                         {% endif %}
                         <div class="item {{r2_resp_content_class}}"><b>{{key}}:</b> {{value}}</div>

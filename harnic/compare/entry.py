@@ -13,25 +13,25 @@ class EntryDiff:
         self.a = a
         self.b = b
         self.equal = None
-        self.fields = self._get_diff()
+        self.comparisons = self._get_diff()
 
     def _get_diff(self):
         # method and url are not handled here as long as they are part of the entry hash
-        fields = {'request': {}, 'response': {}}
+        comparisons = {'request': {}, 'response': {}}
 
-        fields['request']['bodySize'] = scalars_compare(self.a.request['bodySize'],
-                                                        self.b.request['bodySize'])
-        fields['request']['query_params'] = dict_compare(self.a.request['url'].query_params,
-                                                         self.b.request['url'].query_params)
-        fields['request']['headers'] = headers_compare(self.a.request['headers'],
-                                                       self.b.request['headers'])
+        comparisons['request']['bodySize'] = scalars_compare(self.a.request['bodySize'],
+                                                             self.b.request['bodySize'])
+        comparisons['request']['query_params'] = dict_compare(self.a.request['url'].query_params,
+                                                              self.b.request['url'].query_params)
+        comparisons['request']['headers'] = headers_compare(self.a.request['headers'],
+                                                            self.b.request['headers'])
 
-        fields['response']['status'] = scalars_compare(self.a.response['status'],
-                                                       self.b.response['status'])
-        fields['response']['headers'] = headers_compare(self.a.response['headers'],
-                                                        self.b.response['headers'])
-        fields['response']['content'] = dict_compare(self.a.response['content'],
-                                                     self.b.response['content'])
+        comparisons['response']['status'] = scalars_compare(self.a.response['status'],
+                                                            self.b.response['status'])
+        comparisons['response']['headers'] = headers_compare(self.a.response['headers'],
+                                                             self.b.response['headers'])
+        comparisons['response']['content'] = dict_compare(self.a.response['content'],
+                                                          self.b.response['content'])
 
-        self.equal = all(all(cmp.equal for cmp in criteria.values()) for criteria in fields.values())
-        return fields
+        self.equal = all(all(cmp.equal for cmp in criteria.values()) for criteria in comparisons.values())
+        return comparisons
