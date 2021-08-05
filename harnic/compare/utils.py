@@ -15,3 +15,8 @@ def dict_compare(d1, d2, exceptions=()):
     equal = {k: v for k, v in d1.items() if k not in exceptions} == \
             {k: v for k, v in d2.items() if k not in exceptions}
     return Comparison(equal, d1 == d2, DictDiff(added, removed, modified, same))
+
+
+def scalars_compare(s1, s2):
+    equal = strict_equal = s1 == s2
+    return Comparison(equal, strict_equal, None)

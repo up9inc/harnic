@@ -46,8 +46,8 @@ class Entry:
 
     def _clean(self):
         request_headers = self.request.get('headers')
-        if request_headers:
+        if request_headers is not None:
             self.request['headers'] = headers_list_to_map(request_headers)
         response_headers = self.response.get('headers')
-        if response_headers:
+        if response_headers is not None:
             self.response['headers'] = headers_list_to_map(response_headers)
