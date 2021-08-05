@@ -2,6 +2,7 @@ import time
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+from compare import har_compare
 from har import HAR
 
 
@@ -28,6 +29,6 @@ def render_diff(hars, records, output_name='index.html'):
 if __name__ == '__main__':
     h1 = HAR('hars/e-maxx.ru/1.har')
     h2 = HAR('hars/e-maxx.ru/2.har')
-    diff = h1.compare(h2)
+    diff = har_compare(h1, h2)
 
     render_diff((h1, h2), diff.records)

@@ -1,7 +1,7 @@
 import copy
 from urllib.parse import urlparse, parse_qs, urlencode
 
-from comparisons import dict_compare, headers_list_to_map
+from utils import headers_list_to_map, dict_compare
 
 
 class Url:

@@ -1,7 +1,17 @@
-from collections import namedtuple, defaultdict
+from collections import defaultdict, namedtuple
 
 Comparison = namedtuple('Comparison', ['equal', 'diff'])
 DictDiff = namedtuple('DictDiff', ['added', 'removed', 'modified', 'same'], defaults=[set(), set(), dict(), set()])
+
+
+def headers_list_to_map(headers):
+    result = defaultdict(list)
+    for header in headers:
+        name, value = header['name'], header['value']
+        result[name].append(value)
+    for value in result.values():
+        value.sort()
+    return result
 
 
 def dict_compare(d1, d2):
@@ -15,13 +25,3 @@ def dict_compare(d1, d2):
     modified = {key: (d1[key], d2[key]) for key in shared_keys if d1[key] != d2[key]}  # TODO: depends on keys order
     same = set(key for key in shared_keys if d1[key] == d2[key])  # TODO: same
     return Comparison(False, DictDiff(added, removed, modified, same))
-
-
-def headers_list_to_map(headers):
-    result = defaultdict(list)
-    for header in headers:
-        name, value = header['name'], header['value']
-        result[name].append(value)
-    for value in result.values():
-        value.sort()
-    return result

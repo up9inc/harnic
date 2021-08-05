@@ -142,3 +142,5 @@ cython_debug/
 
 # MacOs
 .DS_Store
+
+/index.html
