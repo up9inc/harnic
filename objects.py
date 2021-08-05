@@ -1,7 +1,7 @@
 import copy
 from urllib.parse import urlparse, parse_qs, urlencode
 
-from utils import headers_list_to_map, dict_compare
+from utils import headers_list_to_map, dict_compare, headers_compare
 
 
 class Url:
@@ -68,7 +68,7 @@ class EntryDiff:
 
         qs_cmp = dict_compare(self.a.request['url'].query_params,
                               self.b.request['url'].query_params)
-        headers_cmp = dict_compare(self.a.request['headers'],
+        headers_cmp = headers_compare(self.a.request['headers'],
                                    self.b.request['headers'])
         fields['request']['query_params'] = qs_cmp
         fields['request']['headers'] = headers_cmp
