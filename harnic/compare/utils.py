@@ -7,9 +7,9 @@ DictDiff = namedtuple('DictDiff', ['added', 'removed', 'modified', 'same'], defa
 def dict_compare(d1, d2, exceptions=()):
     d1_keys = set(d1.keys())
     d2_keys = set(d2.keys())
-    shared_keys = d1_keys.intersection(d2_keys)
-    added = d1_keys - d2_keys
-    removed = d2_keys - d1_keys
+    shared_keys = d2_keys.intersection(d1_keys)
+    added = d2_keys - d1_keys
+    removed = d1_keys - d2_keys
     modified = {key: (d1[key], d2[key]) for key in shared_keys if d1[key] != d2[key]}  # TODO: depends on keys order
     same = set(key for key in shared_keys if d1[key] == d2[key])  # TODO: same
     equal = {k: v for k, v in d1.items() if k not in exceptions} == \

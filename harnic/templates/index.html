@@ -255,13 +255,17 @@
                     <div class="list">
                       {% for key, values in r2.request['url'].query_params.items() %}
                         {% if key in diff_record.diff.fields['request']['query_params'].diff.added %}
-                          {% set span_class = 'delete' %}
-                        {% elif key in diff_record.diff.fields['request']['query_params'].diff.removed %}
                           {% set span_class = 'insert' %}
                         {% elif key in diff_record.diff.fields['request']['query_params'].diff.modified.keys() %}
                           {% set span_class = 'modified' %}
                         {% endif %}
                         <div class="item {{span_class}}"><b>{{key}}</b>: {{values|join(', ')}}</div>
+                      {% endfor %}
+                      {% for key, values in r1.request['url'].query_params.items() %}
+                        {% if key in diff_record.diff.fields['request']['query_params'].diff.removed and key not in r2.request['query_params'].keys() %}
+                          {% set span_class = 'delete' %}
+                          <div class="item {{span_class}}"><b>{{key}}</b>: {{values|join(', ')}}</div>
+                        {% endif %}
                       {% endfor %}
                     </div>
                   </div>
@@ -270,13 +274,17 @@
                     <div class="list">
                       {% for key, values in r2.request['headers'].items() %}
                         {% if key in diff_record.diff.fields['request']['headers'].diff.added %}
-                          {% set span_class = 'delete' %}
-                        {% elif key in diff_record.diff.fields['request']['headers'].diff.removed %}
                           {% set span_class = 'insert' %}
                         {% elif key in diff_record.diff.fields['request']['headers'].diff.modified.keys() %}
                           {% set span_class = 'modified' %}
                         {% endif %}
                         <div class="item {{span_class}}"><b>{{key}}:</b> {{values|join(', ')}}</div>
+                      {% endfor %}
+                      {% for key, values in r1.request['headers'].items() %}
+                        {% if key in diff_record.diff.fields['request']['headers'].diff.removed and key not in r2.request['headers'].keys() %}
+                          {% set span_class = 'delete' %}
+                          <div class="item {{span_class}}"><b>{{key}}:</b> {{values|join(', ')}}</div>
+                        {% endif %}
                       {% endfor %}
                     </div>
                   </div>
@@ -298,13 +306,17 @@
                     <div class="list">
                       {% for key, values in r2.response['headers'].items() %}
                         {% if key in diff_record.diff.fields['response']['headers'].diff.added %}
-                          {% set span_class = 'delete' %}
-                        {% elif key in diff_record.diff.fields['response']['headers'].diff.removed %}
                           {% set span_class = 'insert' %}
                         {% elif key in diff_record.diff.fields['response']['headers'].diff.modified.keys() %}
                           {% set span_class = 'modified' %}
                         {% endif %}
                         <div class="item {{span_class}}"><b>{{key}}:</b> {{values|join(', ')}}</div>
+                      {% endfor %}
+                      {% for key, values in r1.response['headers'].items() %}
+                        {% if key in diff_record.diff.fields['response']['headers'].diff.removed and key not in r2.response['headers'].keys() %}
+                          {% set span_class = 'delete' %}
+                          <div class="item {{span_class}}"><b>{{key}}:</b> {{values|join(', ')}}</div>
+                        {% endif %}
                       {% endfor %}
                     </div>
                   </div>
@@ -313,13 +325,17 @@
                     <div class="list">
                       {% for key, value in r2.response['content'].items() %}
                         {% if key in diff_record.diff.fields['response']['content'].diff.added %}
-                          {% set span_class = 'delete' %}
-                        {% elif key in diff_record.diff.fields['response']['content'].diff.removed %}
                           {% set span_class = 'insert' %}
                         {% elif key in diff_record.diff.fields['response']['content'].diff.modified.keys() %}
                           {% set span_class = 'modified' %}
                         {% endif %}
                         <div class="item {{span_class}}"><b>{{key}}:</b> {{value}}</div>
+                      {% endfor %}
+                      {% for key, value in r1.response['content'].items() %}
+                        {% if key in diff_record.diff.fields['response']['content'].diff.removed and key not in r2.response['content'].keys() %}
+                          {% set span_class = 'delete' %}
+                          <div class="item {{span_class}}"><b>{{key}}:</b> {{value}}</div>
+                        {% endif %}
                       {% endfor %}
                     </div>
                   </div>
