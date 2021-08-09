@@ -21,3 +21,6 @@ STRICT_REGULAR_HEADERS = {
     'accept', 'content-type',
 }
 SOFT_HEADER_KEYS.update(REGULAR_HEADERS - STRICT_REGULAR_HEADERS)
+
+CONTENT_SKIP_TYPES = ('image/png', 'image/jpg', 'image/jpeg', 'image/gif')
+CONTENT_LONG_SKIP_TYPES = ('text/css', 'text/javascript', 'text/html')

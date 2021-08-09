@@ -1,4 +1,6 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, pre_dump
+
+from harnic.constants import CONTENT_LONG_SKIP_TYPES, CONTENT_SKIP_TYPES
 
 
 class UrlSchema(Schema):
@@ -35,3 +37,12 @@ class ResponseSchema(MessageSchema):
     http_version = fields.String()
     content = fields.Raw()
     redirect_url = fields.Url()
+
+    @pre_dump
+    def clear_content(self, in_data, **kwargs):
+        content = in_data['content']
+        if content['size'] > 2500 and any(skip_type in content['mimeType'] for skip_type in CONTENT_LONG_SKIP_TYPES):
+            in_data['content']['text'] = "Data is too big to display"
+        elif any(skip_type in content['mimeType'] for skip_type in CONTENT_SKIP_TYPES):
+            in_data['content']['text'] = f"Raw '{content['mimeType']}' data not displayed"
+        return in_data

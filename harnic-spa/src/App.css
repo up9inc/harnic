@@ -1,3 +1,41 @@
+/*#root {
+  background-color: rgb(17, 22, 41);
+}
+
+.ui.header {
+  color:  rgba(255, 255, 255, .87);
+}
+
+.ui table {
+  border: none !important;
+}
+
+.ui.table thead th {
+  background-color: rgb(26, 31, 49);
+  color: white;
+}
+
+.ui .segment {
+  background-color: rgb(95, 123, 240);
+  color: white;
+}
+
+.ui.selection.dropdown {
+  background-color: rgba(0, 0, 0, 0.25)
+}
+*/
+.ui.table td.warning, .ui.table tr.warning {
+    background: rgba(246, 157, 80, 0.2) !important;
+}
+
+.ui.table td.positive, .ui.table tr.positive {
+    background: rgba(70, 149, 74, 0.2) !important;
+}
+
+.ui.table td.negative, .ui.table tr.negative {
+    background: rgba(201, 60, 55, 0.2) !important;
+}
+
 /* Some basic formatting */
 @media only screen and (min-width: 1900px) {
   .ui.container {
@@ -69,3 +107,17 @@ h3 {
 .entry-data {
   vertical-align: top;
 }
+
+.raw-content {
+  background-color: rgba(1, 1, 1, 0.045) !important;
+  white-space: pre;
+}
+
+.content-diff-added {
+  background-color: rgba(70, 149, 74, 0.2);
+}
+
+.content-diff-removed {
+  background-color: rgba(201, 60, 55, 0.2);
+}
+

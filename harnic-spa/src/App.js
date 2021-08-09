@@ -8,6 +8,7 @@ import {
   Tab,
   List,
   Dropdown,
+  Image,
 } from 'semantic-ui-react'
 
 import logo from './logo.svg';
@@ -73,6 +74,31 @@ const RequestData = ({ request, diff }) => {
 
 
 const ResponseData = ({ response, diff }) => {
+  const getDiffStringClass = string => {
+    let cls = 'content-diff-';
+    if (string.startsWith('+')) {
+        cls += 'added';
+    } else if (string.startsWith('-')) {
+        cls += 'removed';
+      }
+    return cls;
+  };
+
+  const renderTextDiff = () => (
+    <div className="raw-content">
+      <code>
+        {diff['content'].diff.modified['text'].map((i,key) => (
+          <div key={key} className={getDiffStringClass(i)}>{i}</div>
+        ))}
+      </code>
+    </div>
+  )
+
+  if ('text' in response.content && 'text' in diff['content'].diff.modified) {
+    const textModified = true;
+    delete response.content['text'];
+  }
+
   return (
     <List>
       <List.Item>
@@ -100,7 +126,10 @@ const ResponseData = ({ response, diff }) => {
                 <b>{key}</b>:&nbsp;
                 <span className={calculateDiffClass(diff, 'content', key)}>{value}</span>
               </List.Item>
-          )}          
+          )}
+          <List.Item>
+            {renderTextDiff()}
+          </List.Item>      
         </List>
       </List.Item>
     </List> 
@@ -116,7 +145,7 @@ const DiffRecordRow = ({ record }) => {
     display: isOpen ? "table-row" : "none"
   };
 
-  const rowClassMap = {'delete': 'negative', 'insert': 'positive', 'diff': 'warning', 'equal': ''};
+  const rowClassMap = {'delete': 'negative', 'insert': 'positive', 'diff': 'warning', 'equal': 'normal'};
   const reqMethodClassMap = {'get': 'blue', 'post': 'green', 'delete': 'red', 'patch': 'orange'};
 
   const aPanes = record.pair.a ? [
@@ -244,9 +273,9 @@ const FilterDropdown = ({setFilterType}) => {
       ),
     },
     {
-      key: 3,
+      key: 4,
       text: 'Modified',
-      value: 3,
+      value: 4,
       content: (
         <Header
           icon='exchange'
@@ -268,7 +297,7 @@ class App extends Component {
       filterName: null,
       records: [],
     }
-    fetch('./data.json').then(response => {
+    fetch('./data1.json').then(response => {
           return response.json();
         }).then(data => {
           this.setState({
@@ -306,6 +335,7 @@ class App extends Component {
 
     return (
       <Container>
+        <Image src={logo} size='small' />
         <Header as='h1' dividing>Harnic</Header>
         <FilterDropdown setFilterType={this.setFilterType}/>
         <Table fixed celled selectable>

@@ -1,4 +1,7 @@
 from collections import namedtuple
+from difflib import ndiff
+
+from harnic.constants import CONTENT_LONG_SKIP_TYPES, CONTENT_SKIP_TYPES
 
 Comparison = namedtuple('Comparison', ['equal', 'strict_equal', 'diff'])
 DictDiff = namedtuple('DictDiff', ['added', 'removed', 'modified', 'same'], defaults=[set(), set(), dict(), set()])
@@ -20,3 +23,26 @@ def dict_compare(d1, d2, exceptions=()):
 def scalars_compare(s1, s2):
     equal = strict_equal = s1 == s2
     return Comparison(equal, strict_equal, None)
+
+
+def content_compare(c1, c2):
+    cmp = dict_compare(c1, c2)
+
+    # TODO: bad
+    for c in (c1, c2):
+        if c['size'] > 2500 and any(skip_type in c['mimeType'] for skip_type in CONTENT_LONG_SKIP_TYPES):
+            return cmp
+        elif any(skip_type in c['mimeType'] for skip_type in CONTENT_SKIP_TYPES):
+            return cmp
+
+    if 'text' in cmp.diff.modified.keys():
+        try:
+            diff = list(ndiff(c1['text'].splitlines(keepends=True), c2['text'].splitlines(keepends=True)))
+        except KeyError:
+            pass
+        else:
+            modified = {'text': diff}
+            diff_rep = cmp.diff._replace(modified=modified)
+            cmp_rep = cmp._replace(diff=diff_rep)
+            return cmp_rep
+    return cmp

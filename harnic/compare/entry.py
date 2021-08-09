@@ -1,6 +1,6 @@
 from functools import partial
 
-from harnic.compare.utils import dict_compare, scalars_compare
+from harnic.compare.utils import dict_compare, scalars_compare, content_compare
 from harnic.constants import SOFT_HEADER_KEYS
 
 headers_compare = partial(dict_compare, exceptions=SOFT_HEADER_KEYS)
@@ -30,8 +30,8 @@ class EntryDiff:
                                                             self.b.response['status'])
         comparisons['response']['headers'] = headers_compare(self.a.response['headers'],
                                                              self.b.response['headers'])
-        comparisons['response']['content'] = dict_compare(self.a.response['content'],
-                                                          self.b.response['content'])
+        comparisons['response']['content'] = content_compare(self.a.response['content'],
+                                                             self.b.response['content'])
 
         self.equal = all(all(cmp.equal for cmp in criteria.values()) for criteria in comparisons.values())
         return comparisons
