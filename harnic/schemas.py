@@ -42,7 +42,7 @@ class ResponseSchema(MessageSchema):
     def clear_content(self, in_data, **kwargs):
         content = in_data['content']
         if content['size'] > 2500 and any(skip_type in content['mimeType'] for skip_type in CONTENT_LONG_SKIP_TYPES):
-            in_data['content']['text'] = "Data is too big to display"
+            in_data['content']['text'] = None
         elif any(skip_type in content['mimeType'] for skip_type in CONTENT_SKIP_TYPES):
-            in_data['content']['text'] = f"Raw '{content['mimeType']}' data not displayed"
+            in_data['content']['text'] = None
         return in_data

@@ -9,6 +9,7 @@ import {
   List,
   Dropdown,
   Image,
+  Statistic,
 } from 'semantic-ui-react'
 
 import logo from './logo.svg';
@@ -94,9 +95,12 @@ const ResponseData = ({ response, diff }) => {
     </div>
   )
 
-  if ('text' in response.content && 'text' in diff['content'].diff.modified) {
-    const textModified = true;
-    delete response.content['text'];
+  let textModified = false;
+  if ('text' in response.content &&
+      diff &&
+      'text' in diff['content'].diff.modified &&
+      diff['content'].diff.modified['text'] !== null) {
+    textModified = true;
   }
 
   return (
@@ -121,15 +125,20 @@ const ResponseData = ({ response, diff }) => {
       <List.Item>
         <div><b>Content:</b></div>
         <List>
-          {Object.entries(response.content).map(([key, value]) => 
+          {Object.entries(response.content).map(([key, value]) => (
+              key === 'text' && textModified ? null :
               <List.Item key={key}>
                 <b>{key}</b>:&nbsp;
-                <span className={calculateDiffClass(diff, 'content', key)}>{value}</span>
+                <span className={calculateDiffClass(diff, 'content', key)}>
+                  {key === 'text' && value === null ? 'Raw data too big' : value}
+                </span>
               </List.Item>
-          )}
-          <List.Item>
-            {renderTextDiff()}
-          </List.Item>      
+          ))}
+          {textModified &&
+            <List.Item>
+              {renderTextDiff()}
+            </List.Item>
+          }
         </List>
       </List.Item>
     </List> 
@@ -290,6 +299,26 @@ const FilterDropdown = ({setFilterType}) => {
 }
 
 
+const Statistics = () => (
+  <div className="statistics">
+    <Statistic.Group>
+      <Statistic>
+        <Statistic.Value>22</Statistic.Value>
+        <Statistic.Label>Faves</Statistic.Label>
+      </Statistic>
+      <Statistic>
+        <Statistic.Value>31,200</Statistic.Value>
+        <Statistic.Label>Views</Statistic.Label>
+      </Statistic>
+      <Statistic>
+        <Statistic.Value>22</Statistic.Value>
+        <Statistic.Label>Members</Statistic.Label>
+      </Statistic>
+    </Statistic.Group>
+  </div>
+)
+
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -337,6 +366,7 @@ class App extends Component {
       <Container>
         <Image src={logo} size='small' />
         <Header as='h1' dividing>Harnic</Header>
+        <Statistics />
         <FilterDropdown setFilterType={this.setFilterType}/>
         <Table fixed celled selectable>
           <Table.Header>
@@ -349,48 +379,6 @@ class App extends Component {
           <Table.Body>
               {records.map(record => 
                 record && <DiffRecordRow record={record}/>           
-                // <Fragment>
-                //   <Table.Row className={rowClassMap[record.tag]}>
-                    // <Table.Cell>
-                    //   {record.pair.a && 
-                    //     <Fragment>
-                    //       <Label
-                    //         size='mini'
-                    //         color={reqMethodClassMap[record.pair.a.request.method.toLowerCase()]}
-                    //         basic
-                    //       >
-                    //         {record.pair.a.request.method}
-                    //       </Label>&nbsp;&nbsp;
-                    //       {truncate(record.pair.a.request.url.url, 150)}
-                    //     </Fragment>
-                    //   }
-                    // </Table.Cell>
-                    // <Table.Cell>
-                    //   {record.pair.b && 
-                    //     <Fragment>
-                    //       <Label
-                    //         size='mini'
-                    //         color={reqMethodClassMap[record.pair.b.request.method.toLowerCase()]}
-                    //         basic
-                    //       >
-                    //         {record.pair.b.request.method}
-                    //       </Label>&nbsp;&nbsp;
-                    //       {truncate(record.pair.b.request.url.url, 150)}
-                    //     </Fragment>
-                    //   }
-                    // </Table.Cell>
-                //   </Table.Row>
-                //   <Table.Row style={toggleStyle}>
-                //     <Table.Cell colSpan={2}>
-                //       Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quidem quod
-                //       nam delectus voluptatum rem iure vero, eligendi repellat veniam
-                //       voluptatem veritatis dolores, enim animi tempore dolorem nulla fuga
-                //       minus repudiandae aliquam! Perferendis aut tempore provident, error
-                //       quidem nesciunt atque? Soluta aliquam quisquam deserunt, facere
-                //       voluptas odio commodi architecto asperiores sapiente.
-                //     </Table.Cell>
-                //   </Table.Row>
-                // </Fragment>
               )}
           </Table.Body>      
         </Table>

@@ -31,9 +31,9 @@ def content_compare(c1, c2):
     # TODO: bad
     for c in (c1, c2):
         if c['size'] > 2500 and any(skip_type in c['mimeType'] for skip_type in CONTENT_LONG_SKIP_TYPES):
-            return cmp
+            return cmp._replace(diff=cmp.diff._replace(modified={**cmp.diff.modified, 'text': None}))
         elif any(skip_type in c['mimeType'] for skip_type in CONTENT_SKIP_TYPES):
-            return cmp
+            return cmp._replace(diff=cmp.diff._replace(modified={**cmp.diff.modified, 'text': None}))
 
     if 'text' in cmp.diff.modified.keys():
         try:
@@ -41,8 +41,5 @@ def content_compare(c1, c2):
         except KeyError:
             pass
         else:
-            modified = {'text': diff}
-            diff_rep = cmp.diff._replace(modified=modified)
-            cmp_rep = cmp._replace(diff=diff_rep)
-            return cmp_rep
+            return cmp._replace(diff=cmp.diff._replace(modified={**cmp.diff.modified, 'text': diff}))
     return cmp
