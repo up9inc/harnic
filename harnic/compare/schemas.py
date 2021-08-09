@@ -29,4 +29,7 @@ class PairSchema(Schema):
 class DiffRecordSchema(Schema):
     pair = fields.Nested('PairSchema')
     diff = fields.Nested('EntryDiffSchema')
-    tag = fields.String()
+    tag = fields.Method("get_diff_tag")
+
+    def get_diff_tag(self, object):
+        return object.tag.value

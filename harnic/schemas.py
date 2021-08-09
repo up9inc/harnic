@@ -15,7 +15,7 @@ class EntrySchema(Schema):
 
 class MessageSchema(Schema):
     cookies = fields.List(fields.Dict())
-    # headers = fields.List(fields.Mapping())
+    headers = fields.Dict(keys=fields.String(), values=fields.List(fields.String()))
     headers_size = fields.Integer()
     body_size = fields.Integer()
     comment = fields.String()

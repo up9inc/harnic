@@ -1,0 +1,71 @@
+/* Some basic formatting */
+@media only screen and (min-width: 1900px) {
+  .ui.container {
+    width: 1720px;
+  }
+
+  .ui.grid.container {
+    width: calc( 1720px  +  2rem ) !important;
+  }
+
+  .ui.relaxed.grid.container {
+    width: calc( 1720px  +  3rem ) !important;
+  }
+
+  .ui.very.relaxed.grid.container {
+    width: calc( 1720px  +  5rem ) !important;
+  }
+}
+
+.container {
+    padding: 3em 0em;
+}
+
+.ui.dividing.header,
+.first {
+    margin-top: 3em;
+}
+
+h1,
+h3 {
+    margin-top: 10em;
+}
+
+.entry-info .key{
+    width: 20% !important;
+    font-weight: bold !important;
+}
+
+.entry-data .insert{
+    color: green !important;
+}
+
+.entry-data .delete{
+    color: red !important;
+}
+
+.entry-data .modified{
+    color: orange !important;
+}
+
+.example-enter {
+  opacity: 0.01;
+}
+
+.example-enter.example-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.example-leave {
+  opacity: 1;
+}
+
+.example-leave.example-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
+}
+
+.entry-data {
+  vertical-align: top;
+}
