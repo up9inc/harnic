@@ -1,5 +1,5 @@
-import React, { Component, Fragment, useState } from 'react'
-import 'semantic-ui-css/semantic.min.css'
+import React, { Component, Fragment, useState } from 'react';
+import 'semantic-ui-css/semantic.min.css';
 import {
   Container,
   Header,
@@ -10,7 +10,9 @@ import {
   Dropdown,
   Image,
   Statistic,
-} from 'semantic-ui-react'
+} from 'semantic-ui-react';
+import { DateTime } from "luxon";
+
 
 import logo from './logo.svg';
 import './App.css';
@@ -40,7 +42,7 @@ const RequestData = ({ request, diff }) => {
     <pre className="har-data">
       <List>
         <List.Item>
-          <div><b>Started:</b><span className="har-data-value">{request._ts}</span></div>
+          <div><b>Started:</b><span className="har-data-value">{DateTime.fromSeconds(request._ts).toISO()}</span></div>
         </List.Item>
         <List.Item>
           <div><b>Method:</b><span className="har-data-value">{request.method}</span></div>
@@ -109,7 +111,7 @@ const ResponseData = ({ response, diff }) => {
     <pre className="har-data">
       <List>
         <List.Item>
-          <div><b>Recieved:</b><span className="har-data-value">{response._ts}</span></div>
+          <div><b>Recieved:</b><span className="har-data-value">{DateTime.fromSeconds(response._ts).toISO()}</span></div>
         </List.Item>
         <List.Item>
           <div><b>Status:</b><span className="har-data-value">{response.status}</span></div>
