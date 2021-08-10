@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields, pre_dump
 
+from harnic.compare.har import PermTag
 from harnic.constants import CONTENT_LONG_SKIP_TYPES, CONTENT_SKIP_TYPES
 
 
@@ -19,7 +20,7 @@ class MessageSchema(Schema):
     cookies = fields.List(fields.Dict())
     headers = fields.Dict(keys=fields.String(), values=fields.List(fields.String()))
     headers_size = fields.Integer()
-    body_size = fields.Integer()
+    bodySize = fields.Integer()
     comment = fields.String()
 
 
@@ -46,3 +47,23 @@ class ResponseSchema(MessageSchema):
         elif any(skip_type in content['mimeType'] for skip_type in CONTENT_SKIP_TYPES):
             in_data['content']['text'] = None
         return in_data
+
+
+class StatsSchema(Schema):
+    equal = fields.Method("get_equal")
+    diff = fields.Method("get_diff")
+    insert = fields.Method("get_insert")
+    delete = fields.Method("get_delete")
+    ratio = fields.Float()
+
+    def get_equal(self, object):
+        return object[PermTag.EQUAL]
+
+    def get_diff(self, object):
+        return object[PermTag.DIFF]
+
+    def get_insert(self, object):
+        return object[PermTag.INSERT]
+
+    def get_delete(self, object):
+        return object[PermTag.DELETE]

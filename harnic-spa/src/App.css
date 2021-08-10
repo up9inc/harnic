@@ -39,7 +39,7 @@
 /* Some basic formatting */
 @media only screen and (min-width: 1900px) {
   .ui.container {
-    width: 1720px;
+    width: 1720px !important;
   }
 
   .ui.grid.container {
@@ -75,15 +75,15 @@ h3 {
 }
 
 .entry-data .insert{
-    color: green !important;
+    color: rgb(70, 149, 74) !important;
 }
 
 .entry-data .delete{
-    color: red !important;
+    color: rgb(201, 60, 55) !important;
 }
 
 .entry-data .modified{
-    color: orange !important;
+    color: rgb(246, 157, 80) !important;
 }
 
 .example-enter {
@@ -125,3 +125,25 @@ h3 {
   margin: 2em 0;
 }
 
+.header-container .item {
+  display: inline-block;
+}
+
+.page-header {
+  margin-left: 5em;
+  font-size: 1.5em !important;
+  text-align: right;
+  vertical-align: middle;
+}
+
+.har-data {
+  white-space: -moz-pre-wrap !important;
+  white-space: -o-pre-wrap !important;
+  white-space: pre-wrap !important;
+  word-wrap: break-word;
+}
+
+.har-data-value {
+  margin-left: 1.1em;
+  background-color: rgba(0, 0, 0, 0.035);
+}

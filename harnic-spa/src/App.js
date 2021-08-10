@@ -37,39 +37,41 @@ const calculateDiffClass = (diff, criteria, key) => {
 
 const RequestData = ({ request, diff }) => {
   return (
-    <List>
-      <List.Item>
-        <div><b>Started:</b> {request._ts}</div>
-      </List.Item>
-      <List.Item>
-        <div><b>Method:</b> {request.method}</div>
-      </List.Item>
-      <List.Item>
-        <div><b>Body size:</b> {request.bodySize}</div>
-      </List.Item>
-      <List.Item>
-        <div><b>Query params:</b></div>
-        <List>
-          {Object.entries(request.url.query_params).map(([key, values]) =>
-              <List.Item key={key}>
-                <b>{key}</b>:&nbsp;
-                <span className={calculateDiffClass(diff, 'query_params', key)}>{values.join(', ')}</span>
-              </List.Item>
-          )}
-        </List>
-      </List.Item>
-      <List.Item>
-        <div><b>Headers:</b></div>
-        <List>
-          {Object.entries(request.headers).map(([key, values]) => 
-              <List.Item key={key}>
-                <b>{key}</b>:&nbsp;
-                <span className={calculateDiffClass(diff, 'headers', key)}>{values.join(', ')}</span>
-              </List.Item>
-          )}
-        </List>
-      </List.Item>
-    </List>
+    <pre className="har-data">
+      <List>
+        <List.Item>
+          <div><b>Started:</b><span className="har-data-value">{request._ts}</span></div>
+        </List.Item>
+        <List.Item>
+          <div><b>Method:</b><span className="har-data-value">{request.method}</span></div>
+        </List.Item>
+        <List.Item>
+          <div><b>Body size:</b><span className="har-data-value">{request.bodySize}</span></div>
+        </List.Item>
+        <List.Item>
+          <div><b>Query params:</b></div>
+          <List>
+            {Object.entries(request.url.query_params).map(([key, values]) =>
+                <List.Item key={key}>
+                  <b>{key}</b>:
+                  <span className={`har-data-value ${calculateDiffClass(diff, 'query_params', key)}`}>{values.join(', ')}</span>
+                </List.Item>
+            )}
+          </List>
+        </List.Item>
+        <List.Item>
+          <div><b>Headers:</b></div>
+          <List>
+            {Object.entries(request.headers).map(([key, values]) => 
+                <List.Item key={key}>
+                  <b>{key}</b>:
+                  <span className={`har-data-value ${calculateDiffClass(diff, 'headers', key)}`}>{values.join(', ')}</span>
+                </List.Item>
+            )}
+          </List>
+        </List.Item>
+      </List>
+    </pre>
   );
 };
 
@@ -104,44 +106,46 @@ const ResponseData = ({ response, diff }) => {
   }
 
   return (
-    <List>
-      <List.Item>
-        <div><b>Recieved:</b> {response._ts}</div>
-      </List.Item>
-      <List.Item>
-        <div><b>Status:</b> {response.status}</div>
-      </List.Item>
-      <List.Item>
-        <div><b>Headers:</b></div>
-        <List>
-          {Object.entries(response.headers).map(([key, values]) => 
-              <List.Item key={key}>
-                <b>{key}</b>:&nbsp;
-                <span className={calculateDiffClass(diff, 'headers', key)}>{values.join(', ')}</span>
+    <pre className="har-data">
+      <List>
+        <List.Item>
+          <div><b>Recieved:</b><span className="har-data-value">{response._ts}</span></div>
+        </List.Item>
+        <List.Item>
+          <div><b>Status:</b><span className="har-data-value">{response.status}</span></div>
+        </List.Item>
+        <List.Item>
+          <div><b>Headers:</b></div>
+          <List>
+            {Object.entries(response.headers).map(([key, values]) => 
+                <List.Item key={key}>
+                  <b>{key}</b>:
+                  <span className={`har-data-value ${calculateDiffClass(diff, 'headers', key)}`}>{values.join(', ')}</span>
+                </List.Item>
+            )}          
+          </List>
+        </List.Item>
+        <List.Item>
+          <div><b>Content:</b></div>
+          <List>
+            {Object.entries(response.content).map(([key, value]) => (
+                key === 'text' && textModified ? null :
+                <List.Item key={key}>
+                  <b>{key}</b>:
+                  <span className={`har-data-value ${calculateDiffClass(diff, 'content', key)}`}>
+                    {key === 'text' && value === null ? 'Raw data too big' : value}
+                  </span>
+                </List.Item>
+            ))}
+            {textModified &&
+              <List.Item>
+                {renderTextDiff()}
               </List.Item>
-          )}          
-        </List>
-      </List.Item>
-      <List.Item>
-        <div><b>Content:</b></div>
-        <List>
-          {Object.entries(response.content).map(([key, value]) => (
-              key === 'text' && textModified ? null :
-              <List.Item key={key}>
-                <b>{key}</b>:&nbsp;
-                <span className={calculateDiffClass(diff, 'content', key)}>
-                  {key === 'text' && value === null ? 'Raw data too big' : value}
-                </span>
-              </List.Item>
-          ))}
-          {textModified &&
-            <List.Item>
-              {renderTextDiff()}
-            </List.Item>
-          }
-        </List>
-      </List.Item>
-    </List> 
+            }
+          </List>
+        </List.Item>
+      </List>
+    </pre>
   );
 };
 
@@ -257,8 +261,21 @@ const FilterDropdown = ({setFilterType}) => {
     },
     {
       key: 2,
-      text: 'Added',
+      text: 'Diff',
       value: 2,
+      content: (
+        <Header
+          icon='exchange'
+          content='Diff'
+          subheader='Shows only differences between two hars'
+          onClick={() => setFilterType('diff')}
+        />
+      ),
+    },  
+    {
+      key: 3,
+      text: 'Added',
+      value: 3,
       content: (
         <Header
           icon='plus'
@@ -269,9 +286,9 @@ const FilterDropdown = ({setFilterType}) => {
       ),
     },
     {
-      key: 3,
+      key: 4,
       text: 'Removed',
-      value: 3,
+      value: 4,
       content: (
         <Header
           icon='minus'
@@ -282,12 +299,12 @@ const FilterDropdown = ({setFilterType}) => {
       ),
     },
     {
-      key: 4,
+      key: 5,
       text: 'Modified',
-      value: 4,
+      value: 5,
       content: (
         <Header
-          icon='exchange'
+          icon='list'
           content='Modifed'
           subheader='Shows all modified records'
           onClick={() => setFilterType('modified')}          
@@ -299,20 +316,28 @@ const FilterDropdown = ({setFilterType}) => {
 }
 
 
-const Statistics = () => (
+const Statistics = ({stats}) => (
   <div className="statistics">
-    <Statistic.Group>
+    <Statistic.Group widths='5'>
       <Statistic>
-        <Statistic.Value>22</Statistic.Value>
-        <Statistic.Label>Faves</Statistic.Label>
+        <Statistic.Value>{(stats.ratio*100).toFixed(1)}%</Statistic.Value>
+        <Statistic.Label>Match ratio</Statistic.Label>
       </Statistic>
       <Statistic>
-        <Statistic.Value>31,200</Statistic.Value>
-        <Statistic.Label>Views</Statistic.Label>
+        <Statistic.Value>{stats.equal}</Statistic.Value>
+        <Statistic.Label>Matched</Statistic.Label>
       </Statistic>
       <Statistic>
-        <Statistic.Value>22</Statistic.Value>
-        <Statistic.Label>Members</Statistic.Label>
+        <Statistic.Value>{stats.diff}</Statistic.Value>
+        <Statistic.Label>Differ</Statistic.Label>
+      </Statistic>
+      <Statistic>
+        <Statistic.Value>{stats.insert}</Statistic.Value>
+        <Statistic.Label>Added</Statistic.Label>
+      </Statistic>
+      <Statistic>
+        <Statistic.Value>{stats.delete}</Statistic.Value>
+        <Statistic.Label>Removed</Statistic.Label>
       </Statistic>
     </Statistic.Group>
   </div>
@@ -324,13 +349,17 @@ class App extends Component {
     super(props);
     this.state = {
       filterName: null,
+      hars: [],
       records: [],
+      stats: {},
     }
     fetch('./data1.json').then(response => {
           return response.json();
         }).then(data => {
           this.setState({
-            records: data,
+            hars: data.hars,
+            records: data.records,
+            stats: data.stats,
           })
         }).catch(err => {
           console.log("Error Reading data " + err);
@@ -350,13 +379,17 @@ class App extends Component {
       records = records.filter(record => record.pair.b == null)
     } else if (filter === 'modified') {
       records = records.filter(record => record.diff && !record.diff.equal)
+    } else if (filter === 'diff') {
+      records = records.filter(record => !record.diff || (record.diff && !record.diff.equal))
     };
     return records;
   }
 
   render() {
     let {
-      records
+      hars,
+      records,
+      stats
     } = this.state;
     if (this.state.filterName) {
       records = this.filterRecords();
@@ -364,15 +397,21 @@ class App extends Component {
 
     return (
       <Container>
-        <Image src={logo} size='small' />
-        <Header as='h1' dividing>Harnic</Header>
-        <Statistics />
+        <Container className="header-container">
+          <div className="item">
+            <Image src={logo} size='small' wrapped />
+          </div>
+          <div className="item header page-header">
+            <Header size='huge'>Traffic comparison tool</Header>
+          </div>
+        </Container>
+        {Object.keys(stats).length !== 0 && <Statistics stats={stats} />}
         <FilterDropdown setFilterType={this.setFilterType}/>
         <Table fixed celled selectable>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>Har1</Table.HeaderCell>
-              <Table.HeaderCell>Har2</Table.HeaderCell>
+              <Table.HeaderCell>{hars.length && hars[0]}</Table.HeaderCell>
+              <Table.HeaderCell>{hars.length && hars[1]}</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
 
