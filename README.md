@@ -1,7 +1,7 @@
-# UP9 Traffic Comparison tool
+# UP9 Traffic Comparison Tool
 
 
-### Future ideas
+### Future Ideas
 
 ---
 
