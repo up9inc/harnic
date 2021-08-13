@@ -1,5 +1,6 @@
 # UP9 Traffic Comparison Tool
 
+Run: ```docker run -it -v `pwd`:/hars gcr.io/mimetic-card-241611/harnic/develop file1.har file2.har```
 
 ### Future Ideas
 
