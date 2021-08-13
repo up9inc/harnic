@@ -147,3 +147,11 @@ h3 {
   margin-left: 0.75em;
   background-color: rgba(1, 1, 1, 0.043);
 }
+
+.raw-content .inner-line-diff.added {
+    background: rgba(70, 149, 74, 0.4) !important;  
+}
+
+.raw-content .inner-line-diff.removed {
+    background: rgba(201, 60, 55, 0.4) !important;
+}

@@ -12,6 +12,7 @@ import {
   Statistic,
 } from 'semantic-ui-react';
 import { DateTime } from "luxon";
+import regexifyString from "regexify-string";
 
 
 import logo from './logo.svg';
@@ -78,22 +79,49 @@ const RequestData = ({ request, diff }) => {
 };
 
 
-const ResponseData = ({ response, diff }) => {
-  const getDiffStringClass = string => {
-    let cls = 'content-diff-';
-    if (string.startsWith('+')) {
-        cls += 'added';
-    } else if (string.startsWith('-')) {
-        cls += 'removed';
+const ResponseData = ({ response, diff, initialEntry }) => {
+  const cmpIdx = initialEntry ? 0 : 1;
+
+  const getDiffStringClass = (string, key) => {
+    let cls = '';
+    if (diff['content'].diff.modified['text'][2][key]){
+      if (cmpIdx === 0) {
+        cls = 'content-diff-removed'; 
+      } else {
+        cls = 'content-diff-added'; 
       }
+    }
     return cls;
+  };
+
+  const getDiffString = string => {
+    const wholeLineRegex = /^\u0000[\+\^-](.+?)\u0001$/g;
+    const regex = /\u0000[\+\^-](.+?)\u0001/g;
+    if (string.match(wholeLineRegex)) {
+      return <>{' ' + string.slice(2)}</>;
+    }
+    string = regexifyString({
+        pattern: regex,
+        decorator: (match, index) => {
+          const cls = initialEntry ? "inner-line-diff removed" : "inner-line-diff added";
+          return (
+            <span className={cls}>
+              {/*excludes wrappers ^\0(+|-|^){} to {}\1 */}
+              {match.slice(2, -1)}
+            </span>
+          );
+        },
+        input: string,
+    });
+
+    return string;
   };
 
   const renderTextDiff = () => (
     <div className="raw-content">
       <code>
-        {diff['content'].diff.modified['text'].map((i,key) => (
-          <div key={key} className={getDiffStringClass(i)}>{i}</div>
+        {diff['content'].diff.modified['text'][cmpIdx].map((i,key) => (
+          <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
         ))}
       </code>
     </div>
@@ -140,7 +168,7 @@ const ResponseData = ({ response, diff }) => {
                 </List.Item>
             ))}
             {textModified &&
-              <List.Item>
+              <List.Item key='text'>
                 {renderTextDiff()}
               </List.Item>
             }
@@ -177,6 +205,7 @@ const DiffRecordRow = ({ record }) => {
         <ResponseData
           response={record.pair.a.response}
           diff={record.diff && record.diff.comparisons.response}
+          initialEntry={true}
         />      
       </Tab.Pane>
     )},
@@ -198,6 +227,7 @@ const DiffRecordRow = ({ record }) => {
         <ResponseData
           response={record.pair.b.response}
           diff={record.diff && record.diff.comparisons.response}
+          initialEntry={false}
         />      
       </Tab.Pane>
     )},

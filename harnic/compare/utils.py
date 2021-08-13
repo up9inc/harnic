@@ -1,10 +1,23 @@
 from collections import namedtuple
-from difflib import ndiff
+from difflib import _mdiff
 
 from harnic.constants import CONTENT_LONG_SKIP_TYPES, CONTENT_SKIP_TYPES
 
 Comparison = namedtuple('Comparison', ['equal', 'strict_equal', 'diff'])
 DictDiff = namedtuple('DictDiff', ['added', 'removed', 'modified', 'same'], defaults=[set(), set(), dict(), set()])
+
+
+def split_diff(fromlines, tolines, **kwargs):
+    diffs = _mdiff(fromlines, tolines, **kwargs)
+
+    # Collects mdiff output into separate lists
+    fromlist, tolist, flaglist = [], [], []
+    # pull from/to data and flags from mdiff style iterator
+    for fromdata, todata, flag in diffs:
+        fromlist.append(fromdata[1])
+        tolist.append(todata[1])
+        flaglist.append(flag)
+    return fromlist, tolist, flaglist
 
 
 def dict_compare(d1, d2, exceptions=()):
@@ -37,7 +50,7 @@ def content_compare(c1, c2):
 
     if 'text' in cmp.diff.modified.keys():
         try:
-            diff = list(ndiff(c1['text'].splitlines(keepends=True), c2['text'].splitlines(keepends=True)))
+            diff = split_diff(c1['text'].splitlines(), c2['text'].splitlines())
         except KeyError:
             pass
         else:
