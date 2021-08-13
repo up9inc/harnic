@@ -1,0 +1,21 @@
+language: minimal
+branches:
+  only:
+    - develop
+    - master
+git:
+  depth: false
+services:
+  - docker
+install:
+  - PROJECT_NAME=harnic
+  - echo "Extracting scripts from git..." && CURRENT_DIR=$(pwd) && cd .. && git clone git@github.com:up9inc/env-config.git && cd env-config && cd $CURRENT_DIR
+before_script:
+  - ../env-config/devops/ci/authenticate_gcr.sh
+  - sed -ri s/-image_label-/${TRAVIS_BRANCH}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_COMMIT}/ Dockerfile
+script:
+  - stty cols 120
+  - travis_fold start "docker_build" && ../env-config/devops/ci/build_docker.sh ${PROJECT_NAME} && travis_fold end "docker_build"
+#  - travis_fold start "tests" && docker run -v `pwd`:/tmp/src:ro -it --env CODECOV_TOKEN=${CODECOV_TOKEN} --env TRAVIS_BRANCH=${TRAVIS_BRANCH} --env TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST} --env TRAVIS_EVENT_TYPE=${TRAVIS_EVENT_TYPE} --env TRAVIS_COMMIT=${TRAVIS_COMMIT} --env TRAVIS_JOB_ID=${TRAVIS_JOB_ID} --env CI=true --env TRAVIS=true --entrypoint /tmp/src/tests/dockerized_tests.sh gcr.io/${GCP_PROJECT_NAME}/${PROJECT_NAME}/${TRAVIS_BRANCH}:${TRAVIS_BUILD_NUMBER} && travis_fold end "tests"
+after_success:
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then travis_fold start "docker_push" && ../env-config/devops/ci/push_docker.sh ${PROJECT_NAME} && travis_fold end "docker_push"; fi
