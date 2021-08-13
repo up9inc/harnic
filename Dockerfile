@@ -1,6 +1,9 @@
 # set base image (host OS)
 FROM python:3.8
 
+# env var to tell the version
+ENV IMG_LABEL="-image_label-"
+
 # set the working directory in the container
 WORKDIR /code
 
