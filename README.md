@@ -11,6 +11,7 @@ Run from directory with HAR files: ```docker run -it -v `pwd`:/hars gcr.io/mimet
 - Count partial matches in match ratio
 - Ignore dynamic values/IDs in HTML/XML/JSON
 - Maybe some rules to ignore dynamic patterns inside body?
+- Maybe ignore inner differences of error responses
 
 
 **Frontend**:
