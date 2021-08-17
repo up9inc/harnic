@@ -5,6 +5,7 @@ WORKDIR /app
 COPY harnic-spa harnic-spa
 WORKDIR /app/harnic-spa
 
+RUN npm install
 RUN npm run build
 
 
