@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 
 import dateutil.parser
 
-from objects import Url, Entry
+from harnic.objects import Url, Entry
 
 logging = logging.getLogger(__name__)
 

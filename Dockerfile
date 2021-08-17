@@ -19,6 +19,7 @@ WORKDIR /app
 
 # copy the dependencies file to the working directory
 COPY --from=frontend /app/harnic-spa harnic-spa
+ENV SPA_LOCATION=/app/harnic-spa
 COPY harnic harnic
 COPY requirements.txt .
 COPY setup.py .
@@ -27,4 +28,6 @@ COPY setup.py .
 RUN pip install -r requirements.txt
 RUN pip install -e .
 
-ENTRYPOINT ["python", "harnic/main.py"]
+WORKDIR /hars
+
+ENTRYPOINT ["python", "-m", "harnic"]

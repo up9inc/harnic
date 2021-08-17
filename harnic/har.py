@@ -1,4 +1,4 @@
-from reader import load
+from harnic.reader import load
 
 
 class HAR:

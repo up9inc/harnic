@@ -1,11 +1,14 @@
 import argparse
 import logging
 import os
+import shutil
 import sys
+from distutils.dir_util import copy_tree
 
 from harnic.compare import har_compare
 from harnic.har import HAR
 from harnic.render import render_diff_to_json
+from harnic.utils import SPA_BASE
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -15,7 +18,6 @@ handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-
 
 my_parser = argparse.ArgumentParser()
 
@@ -33,11 +35,13 @@ h1 = HAR(args.from_file)
 h2 = HAR(args.to_file)
 diff = har_compare(h1, h2)
 
-render_diff_to_json((h1, h2), diff.records, diff.stats)
+out_dir = 'diff_' + os.path.basename(args.from_file) + '_' + os.path.basename(args.to_file)
+copy_tree(SPA_BASE + "/build", out_dir)
 
-# lol
-with open('harnic-spa/build/data.js', 'w+') as file_js, open('harnic-spa/build/data.json') as file_json:
+diffjson = render_diff_to_json((h1, h2), diff.records, diff.stats)
+
+with open(out_dir + '/data.js', 'w+') as file_js:
     file_js.write('window.globalData = ')
-    file_js.writelines(l for l in file_json)
+    file_js.write(diffjson)
     file_js.write(';')
 logger.info('Comparison artifacts generated')
