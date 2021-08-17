@@ -8,6 +8,12 @@ docker cp harnic:/app/harnic-spa/build build
 docker rm harnic
 ```
 
+If you want to build the image yourself you can do it with:
+
+```
+docker build -t harnic .
+```
+
 ### Future Ideas
 
 ---
