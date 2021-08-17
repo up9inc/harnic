@@ -382,21 +382,10 @@ class App extends Component {
     super(props);
     this.state = {
       filterName: null,
-      hars: [],
-      records: [],
-      stats: {},
-    }
-    fetchLocal('./data.json').then(response => {
-          return response.json();
-        }).then(data => {
-          this.setState({
-            hars: data.hars,
-            records: data.records,
-            stats: data.stats,
-          })
-        }).catch(err => {
-          console.log("Error Reading data " + err);
-        });
+      hars: window.globalData.hars,
+      records: window.globalData.records,
+      stats: window.globalData.stats,
+    };
   };
 
   setFilterType = (filterName) => {

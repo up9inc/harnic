@@ -46,3 +46,8 @@ if __name__ == '__main__':
 
     # render_diff((h1, h2), diff.records)
     render_diff_to_json((h1, h2), diff.records, diff.stats)
+
+    with open('harnic-spa/build/data.js', 'w+') as file_js, open('harnic-spa/build/data.json') as file_json:
+        file_js.write('window.globalData = ')
+        file_js.writelines(l for l in file_json)
+        file_js.write(';')
