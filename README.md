@@ -1,8 +1,13 @@
 # UP9 Traffic Comparison Tool
 
+Make sure your image is latest:
+```shell
+docker pull gcr.io/mimetic-card-241611/harnic/develop
+```
+
 Run from directory with HAR files substituting `FILE1` and `FILE2` with your file names:
 
-```
+```shell
 docker run -it -v `pwd`:/hars gcr.io/mimetic-card-241611/harnic/develop FILE1 FILE2
 ```
 
@@ -39,3 +44,4 @@ docker rm harnic
 
 - Apply prismjs to content bodies: https://betterstack.dev/blog/code-highlighting-in-react-using-prismjs/
 - Add D3.js graphics
+- if whole header is missing/added - color its name, too
