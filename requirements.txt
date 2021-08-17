@@ -3,3 +3,4 @@ MarkupSafe==2.0.1
 marshmallow==3.13.0
 python-dateutil==2.8.2
 six==1.16.0
+tqdm==4.62.1

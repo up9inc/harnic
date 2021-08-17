@@ -35,7 +35,7 @@ def render_diff_to_json(hars, records, stats):
         'records': DiffRecordSchema().dump(records, many=True),
         'stats': StatsSchema().dump(stats)
     }
-    with open('../harnic-spa/public/data1.json', 'w') as file:
+    with open('harnic-spa/public/data.json', 'w+') as file:
         json.dump(result, file)
 
 

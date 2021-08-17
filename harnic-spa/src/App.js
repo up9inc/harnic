@@ -19,6 +19,7 @@ import logo from './logo.svg';
 import './App.css';
 import {
   truncate,
+  fetchLocal,
 } from './utils.js';
 
 
@@ -385,7 +386,7 @@ class App extends Component {
       records: [],
       stats: {},
     }
-    fetch('./data1.json').then(response => {
+    fetchLocal('./data.json').then(response => {
           return response.json();
         }).then(data => {
           this.setState({

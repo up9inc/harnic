@@ -1,32 +1,29 @@
-# set base image (host OS)
-FROM python:3.8
+FROM node:14 as frontend
+
+WORKDIR /app
+
+COPY harnic-spa harnic-spa
+WORKDIR /app/harnic-spa
+
+RUN npm run build
+
+
+FROM python:3.8 as backend
 
 # env var to tell the version
 ENV IMG_LABEL="-image_label-"
 
 # set the working directory in the container
-WORKDIR /code
+WORKDIR /app
 
 # copy the dependencies file to the working directory
+COPY --from=frontend /app/harnic-spa harnic-spa
+COPY harnic harnic
 COPY requirements.txt .
 COPY setup.py .
 
 # install dependencies
-
 RUN pip install -r requirements.txt
 RUN pip install -e .
 
-# copy the content of the local src directory to the working directory
-#COPY . .
-#
-#
-#FROM node:13.12.0-alpine as build
-#
-#ENV PATH /harnic-spa/node_modules/.bin:$PATH
-#
-#RUN npm ci --silent
-#RUN npm install react-scripts@3.4.1 -g --silent
-#
-#RUN npm run build
-
-CMD ["tail", "-f", "/dev/null"]
+ENTRYPOINT ["python", "harnic/main.py"]

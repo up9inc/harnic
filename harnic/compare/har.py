@@ -2,6 +2,8 @@ import difflib
 from collections import namedtuple
 from enum import Enum
 
+from tqdm import tqdm
+
 from harnic.compare import EntryDiff
 
 DiffRecord = namedtuple('DiffRecord', ['pair', 'diff', 'tag'])
@@ -33,7 +35,7 @@ def _build_har_diff(opcodes, i_entries, j_entries):
         PermTag.INSERT: 0,
         PermTag.DELETE: 0,
     }
-    for permutation in opcodes:
+    for permutation in tqdm(opcodes):
         tag, i1, i2, j1, j2 = permutation
         if tag == 'equal':
             for i, j in zip(range(i1, i2), range(j1, j2)):
