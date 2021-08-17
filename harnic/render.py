@@ -1,11 +1,11 @@
 import json
+import os
 import time
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from compare import har_compare
-from har import HAR
-from harnic.compare import DiffRecordSchema
+from harnic.compare import DiffRecordSchema, har_compare
+from harnic.har import HAR
 from harnic.schemas import StatsSchema
 
 
@@ -35,8 +35,8 @@ def render_diff_to_json(hars, records, stats):
         'records': DiffRecordSchema().dump(records, many=True),
         'stats': StatsSchema().dump(stats)
     }
-    with open('harnic-spa/public/data.json', 'w+') as file:
-        json.dump(result, file)
+
+    return json.dumps(result)
 
 
 if __name__ == '__main__':
@@ -45,9 +45,12 @@ if __name__ == '__main__':
     diff = har_compare(h1, h2)
 
     # render_diff((h1, h2), diff.records)
-    render_diff_to_json((h1, h2), diff.records, diff.stats)
+    with open('harnic-spa/public/data.json', 'w+') as file:
+        result = render_diff_to_json((h1, h2), diff.records, diff.stats)
+        json.dump(result, file)
 
-    with open('harnic-spa/build/data.js', 'w+') as file_js, open('harnic-spa/build/data.json') as file_json:
+    with open(os.path.dirname(__file__) + '/../../harnic-spa/build/data.js', 'w+') as file_js, open(
+            os.path.dirname(__file__) + '/../../harnic-spa/public/data.json') as file_json:
         file_js.write('window.globalData = ')
         file_js.writelines(l for l in file_json)
         file_js.write(';')
