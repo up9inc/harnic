@@ -1,6 +1,12 @@
 # UP9 Traffic Comparison Tool
 
-Run from directory with HAR files: ```docker run -it -v `pwd`:/hars gcr.io/mimetic-card-241611/harnic/develop file1.har file2.har```
+Run from directory with HAR files substituting `FILE1` and `FILE2` with your file names:
+
+```
+docker run -it --name harnic -v `$PWD`:/hars harnic FILE1 FILE2
+docker cp harnic:/app/harnic-spa/build build
+docker rm harnic
+```
 
 ### Future Ideas
 
