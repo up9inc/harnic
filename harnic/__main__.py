@@ -8,7 +8,7 @@ from distutils.dir_util import copy_tree
 from harnic.compare import har_compare
 from harnic.har import HAR
 from harnic.render import render_diff_to_json
-from harnic.utils import SPA_BASE, format_stats
+from harnic.utils import SPA_BASE, format_diff_stats
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -45,4 +45,4 @@ with open(out_dir + '/data.js', 'w+') as file_js:
     file_js.write(diffjson)
     file_js.write(';')
 logger.info('Comparison artifacts generated: %r', out_dir)
-logger.info(f'\n\nComparison stats:\n{format_stats(diff.stats)}')
+logger.info(f'\n\nComparison stats:\n{format_diff_stats(diff.stats)}')

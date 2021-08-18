@@ -13,6 +13,7 @@ import {
 } from 'semantic-ui-react';
 import { DateTime } from "luxon";
 import regexifyString from "regexify-string";
+import _ from 'lodash';
 
 
 import logo from './logo.svg';
@@ -434,8 +435,8 @@ class App extends Component {
         <Table fixed celled selectable>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>{hars.length && hars[0]}</Table.HeaderCell>
-              <Table.HeaderCell>{hars.length && hars[1]}</Table.HeaderCell>
+              <Table.HeaderCell>{hars[0]}:&nbsp;&nbsp;{stats.from_count} entries</Table.HeaderCell>
+              <Table.HeaderCell>{hars[1]}:&nbsp;&nbsp;{stats.to_count} entries</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
 

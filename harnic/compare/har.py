@@ -23,13 +23,16 @@ def har_compare(har1, har2):
     # i_entries, j_entries = self.entries[:5], other.entries[:5]
     i_entries, j_entries = har1.entries, har2.entries
     sm = difflib.SequenceMatcher(None, i_entries, j_entries)
-    sm.records, sm.stats = _build_har_diff(sm.get_opcodes(), i_entries, j_entries)
+    sm.records, sm.stats = _build_har_diff(sm.get_opcodes(), har1, har2)
     return sm
 
 
-def _build_har_diff(opcodes, i_entries, j_entries):
+def _build_har_diff(opcodes, har1, har2):
+    i_entries, j_entries = har1.entries, har2.entries
     records = []
     stats = {
+        'from_count': len(har1.entries),
+        'to_count': len(har2.entries),
         PermTag.EQUAL: 0,
         PermTag.DIFF: 0,
         PermTag.INSERT: 0,
