@@ -183,7 +183,9 @@ const ResponseData = ({ response, diff, initialEntry }) => {
 
 const DiffRecordRow = ({ record }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(1);
   const handleToggle = () => setIsOpen(!isOpen);
+  const handleTabChange = (e, { activeIndex }) => setActiveIndex(activeIndex);
 
   const toggleStyle = {
     display: isOpen ? "table-row" : "none"
@@ -212,7 +214,7 @@ const DiffRecordRow = ({ record }) => {
     )},
   ] : [];
 
-  const ADiffTab = () => <Tab panes={aPanes} />;
+  const ADiffTab = () => <Tab panes={aPanes} activeIndex={activeIndex} onTabChange={handleTabChange} />;
 
   const bPanes = record.pair.b ? [
     { menuItem: 'Request', render: () => (
@@ -234,7 +236,7 @@ const DiffRecordRow = ({ record }) => {
     )},
   ] : [];
 
-  const BDiffTab = () => <Tab panes={bPanes} />;
+  const BDiffTab = () => <Tab panes={bPanes} activeIndex={activeIndex} onTabChange={handleTabChange} />;
 
   return (
     <>
@@ -289,26 +291,39 @@ const FilterDropdown = ({setFilterType}) => {
       text: 'All',
       value: 1,
       content: (
-        <Header icon='list' content='All' subheader='Shows all compared hars records' onClick={() => setFilterType('')}/>
+        <Header icon='table' content='All' subheader='Shows all compared hars records' onClick={() => setFilterType('')}/>
       ),
     },
     {
       key: 2,
-      text: 'Diff',
+      text: 'Changes',
       value: 2,
       content: (
         <Header
-          icon='exchange'
-          content='Diff'
-          subheader='Shows only differences between two hars'
-          onClick={() => setFilterType('diff')}
+          icon='list'
+          content='Changes'
+          subheader='Shows all records except those that are equal'
+          onClick={() => setFilterType('diff')}          
         />
       ),
     },  
     {
       key: 3,
-      text: 'Added',
+      text: 'Modified entries',
       value: 3,
+      content: (
+        <Header
+          icon='exchange'
+          content='Modifed'
+          subheader='Shows only modified records'
+          onClick={() => setFilterType('modified')}
+        />
+      ),
+    },  
+    {
+      key: 4,
+      text: 'Added',
+      value: 4,
       content: (
         <Header
           icon='plus'
@@ -319,9 +334,9 @@ const FilterDropdown = ({setFilterType}) => {
       ),
     },
     {
-      key: 4,
+      key: 5,
       text: 'Removed',
-      value: 4,
+      value: 5,
       content: (
         <Header
           icon='minus'
@@ -330,20 +345,7 @@ const FilterDropdown = ({setFilterType}) => {
           onClick={() => setFilterType('removed')}          
         />
       ),
-    },
-    {
-      key: 5,
-      text: 'Modified',
-      value: 5,
-      content: (
-        <Header
-          icon='list'
-          content='Modifed'
-          subheader='Shows all modified records'
-          onClick={() => setFilterType('modified')}          
-        />
-      ),
-    },    
+    },  
   ];
   return <Dropdown selection fluid options={options} placeholder='Filter' />;
 }
@@ -362,7 +364,7 @@ const Statistics = ({stats}) => (
       </Statistic>
       <Statistic>
         <Statistic.Value>{stats.diff}</Statistic.Value>
-        <Statistic.Label>Differ</Statistic.Label>
+        <Statistic.Label>Diffs</Statistic.Label>
       </Statistic>
       <Statistic>
         <Statistic.Value>{stats.insert}</Statistic.Value>
