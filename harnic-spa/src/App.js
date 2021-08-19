@@ -9,7 +9,9 @@ import {
   List,
   Dropdown,
   Image,
+  Icon,
   Statistic,
+  Popup,
 } from 'semantic-ui-react';
 import { DateTime } from "luxon";
 import regexifyString from "regexify-string";
@@ -34,6 +36,9 @@ const calculateDiffClass = (diff, criteria, key) => {
       keyClass = 'insert';
     } else if (Object.keys(keyDiff.modified).includes(key)) {
       keyClass = 'modified';
+      if (keyDiff.modified[key] && (keyDiff.modified[key][2] === true)) {
+        keyClass = 'soft-modified';
+      };
     };
   };
   return keyClass;
@@ -70,7 +75,15 @@ const RequestData = ({ request, diff }) => {
             {Object.entries(request.headers).map(([key, values]) => 
                 <List.Item key={key}>
                   <b>{key}</b>:
-                  <span className={`har-data-value ${calculateDiffClass(diff, 'headers', key)}`}>{values.join(', ')}</span>
+                  <span className={`har-data-value ${calculateDiffClass(diff, 'headers', key)}`}>
+                    {values.join(', ')}
+                  </span>&nbsp;
+                  {calculateDiffClass(diff, 'headers', key) == 'soft-modified' &&
+                    <Popup
+                      trigger={<Icon name='info' className='diff-label' />}
+                      content='This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable'
+                    />
+                  }                  
                 </List.Item>
             )}
           </List>
@@ -152,7 +165,15 @@ const ResponseData = ({ response, diff, initialEntry }) => {
             {Object.entries(response.headers).map(([key, values]) => 
                 <List.Item key={key}>
                   <b>{key}</b>:
-                  <span className={`har-data-value ${calculateDiffClass(diff, 'headers', key)}`}>{values.join(', ')}</span>
+                  <span className={`har-data-value ${calculateDiffClass(diff, 'headers', key)}`}>
+                    {values.join(', ')}
+                  </span>&nbsp;
+                  {calculateDiffClass(diff, 'headers', key) == 'soft-modified' &&
+                    <Popup
+                      trigger={<Icon name='info' className='diff-label' />}
+                      content='This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable'
+                    />
+                  }
                 </List.Item>
             )}          
           </List>

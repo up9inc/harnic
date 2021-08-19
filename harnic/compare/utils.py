@@ -20,16 +20,23 @@ def split_diff(fromlines, tolines, **kwargs):
     return fromlist, tolist, flaglist
 
 
-def dict_compare(d1, d2, exceptions=()):
+def dict_compare(d1, d2, exceptions=(), exculde_values=False):
     d1_keys = set(d1.keys())
     d2_keys = set(d2.keys())
     shared_keys = d2_keys.intersection(d1_keys)
     added = d2_keys - d1_keys
     removed = d1_keys - d2_keys
-    modified = {key: (d1[key], d2[key]) for key in shared_keys if d1[key] != d2[key]}  # TODO: depends on keys order
+    modified = {
+        key: (d1[key], d2[key], True if exculde_values else key in exceptions)
+        for key in shared_keys
+        if d1[key] != d2[key]
+    }  # TODO: depends on keys order
     same = set(key for key in shared_keys if d1[key] == d2[key])  # TODO: same
-    equal = {k: v for k, v in d1.items() if k not in exceptions} == \
-            {k: v for k, v in d2.items() if k not in exceptions}
+    if exculde_values:
+        equal = d1.keys() == d2.keys()
+    else:
+        equal = {k: v for k, v in d1.items() if k not in exceptions} == \
+                {k: v for k, v in d2.items() if k not in exceptions}
     return Comparison(equal, d1 == d2, DictDiff(added, removed, modified, same))
 
 

@@ -82,8 +82,13 @@ h3 {
     color: rgb(201, 60, 55) !important;
 }
 
-.entry-data .modified{
+.entry-data .modified, .entry-data .soft-modified{
     color: rgb(246, 157, 80) !important;
+}
+
+.entry-data .diff-label{
+    color: rgb(246, 157, 80) !important;
+    display: inline;
 }
 
 .example-enter {

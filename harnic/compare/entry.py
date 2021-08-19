@@ -3,7 +3,7 @@ from functools import partial
 from harnic.compare.utils import dict_compare, scalars_compare, content_compare
 from harnic.constants import SOFT_HEADER_KEYS
 
-headers_compare = partial(dict_compare, exceptions=SOFT_HEADER_KEYS)
+headers_compare = partial(dict_compare, exceptions=SOFT_HEADER_KEYS, exculde_values=True)
 
 
 # TODO: may this be a func?
