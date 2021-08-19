@@ -45,3 +45,16 @@ docker rm harnic
 - Apply prismjs to content bodies: https://betterstack.dev/blog/code-highlighting-in-react-using-prismjs/
 - Add D3.js graphics
 - if whole header is missing/added - color its name, too
+
+
+**Issues**:
+- equal -> matched
+  diffs -> modified
+  in namings
+- Decode base64
+- Add response status code to entry _hash()
+- If k: v fully added or removed paint key also
+- Open request tab by default
+- Strict diff only text in content, other key values are soft
+- Add content.text word wrap
+- Diff FORMATED json
