@@ -74,21 +74,22 @@ h3 {
     font-weight: bold !important;
 }
 
-.entry-data .insert{
+.entry-data .insert {
     color: rgb(70, 149, 74) !important;
 }
 
-.entry-data .delete{
+.entry-data .delete {
     color: rgb(201, 60, 55) !important;
 }
 
-.entry-data .modified, .entry-data .soft-modified{
+.entry-data .modified {
     color: rgb(246, 157, 80) !important;
 }
 
-.entry-data .diff-label{
+.entry-data .diff-label {
     color: rgb(246, 157, 80) !important;
     display: inline !important;
+    opacity: 0.6;
 }
 
 .example-enter {
