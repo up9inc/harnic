@@ -33,3 +33,9 @@ class DiffRecordSchema(Schema):
 
     def get_diff_tag(self, object):
         return object.tag.value
+
+
+class DiffCompactSerializer(Schema):
+    index = fields.Dict(keys=fields.UUID(), values=fields.Nested('DiffRecordSchema'))
+    original_records = fields.List(fields.UUID())
+    reordered_records = fields.List(fields.UUID())
