@@ -1,6 +1,6 @@
 from marshmallow import Schema, fields
 
-from harnic.schemas import EntrySchema
+from harnic.schemas import EntrySchema, StatsSchema
 
 
 class DictDiffSchema(Schema):
@@ -39,3 +39,8 @@ class DiffCompactSchema(Schema):
     index = fields.Dict(keys=fields.UUID(), values=fields.Nested('DiffRecordSchema'))
     original_records = fields.List(fields.UUID())
     reordered_records = fields.List(fields.UUID())
+
+
+class DiffStatsSchema(Schema):
+    original = fields.Nested(StatsSchema)
+    with_reorders = fields.Nested(StatsSchema)
