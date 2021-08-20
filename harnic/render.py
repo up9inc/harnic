@@ -3,7 +3,7 @@ import os
 
 from harnic.compare import har_compare
 from harnic.compare.har import create_compact_records_index
-from harnic.compare.schemas import DiffCompactSerializer
+from harnic.compare.schemas import DiffCompactSchema
 from harnic.har import HAR
 
 
@@ -14,7 +14,7 @@ def render_diff_to_json(hars, diff, format='compact'):
 
     if format == 'compact':
         compact_index = create_compact_records_index(diff)
-        result['diff'] = DiffCompactSerializer().dump(compact_index)
+        result['diff'] = DiffCompactSchema().dump(compact_index)
     else:
         raise NotImplementedError()
 
