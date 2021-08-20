@@ -8,10 +8,11 @@ from harnic.compare import EntryDiff
 
 
 class DiffRecord:
-    def __init__(self, pair, diff, tag):
+    def __init__(self, pair, diff, tag, reordering=None):
         self.pair = pair
         self.diff = diff
         self.tag = tag
+        self.reordering = reordering
         self.id = uuid.uuid4()
 
 
@@ -44,7 +45,6 @@ class PermTag(Enum):
 
 def har_compare(har1, har2):
     # TODO: static can be junk
-    # i_entries, j_entries = self.entries[:5], other.entries[:5]
     i_entries, j_entries = har1.entries, har2.entries
     sm = difflib.SequenceMatcher(None, i_entries, j_entries)
     sm.records, sm.reorders, sm.stats = _build_har_diff(sm.get_opcodes(), har1, har2)
@@ -106,17 +106,22 @@ def _build_har_diff(opcodes, har1, har2):
 
 def _calculate_reorders(records):
     entry_reorders = {}
-    record_reorders = {}
+    record_reorders = []
     for record in records:
         if record.tag not in (PermTag.INSERT, PermTag.DELETE):
             continue
         entry = record.pair.partial_entry
         assert entry
         if entry in entry_reorders:
-            record_reorders[entry_reorders[entry][0]] = {
+            if record.tag == PermTag.INSERT:
+                pair = (entry_reorders[entry][1], entry)
+            else:  # tag == PermTag.DELETE
+                pair = (entry, entry_reorders[entry][1])
+            record_reorders.append({
+                'from': entry_reorders[entry][0],
                 'to': record.id,
-                'entry_diff': EntryDiff(entry, entry_reorders[entry][1])
-            }
+                'entry_diff': EntryDiff(*pair)
+            })
         else:
             entry_reorders[entry] = (record.id, entry)
 
@@ -128,9 +133,44 @@ def _calculate_reorders_stats(reorders, stats):
     num_reorders = len(reorders)
     stats[PermTag.INSERT] -= num_reorders
     stats[PermTag.DELETE] -= num_reorders
-    for reorder in reorders.values():
+    for reorder in reorders:
         tag_selector = PermTag.EQUAL if reorder['entry_diff'].equal else PermTag.DIFF
         stats[tag_selector] += 1
     stats['ratio'] = 2.0 * stats[PermTag.EQUAL] / (stats['from_count'] + stats['to_count'])
 
     return stats
+
+
+def create_records_index(diff):
+    reordering_records = [
+        DiffRecord(
+            Pair(reordering['entry_diff'].a, reordering['entry_diff'].b),
+            reordering['entry_diff'],
+            PermTag.EQUAL if reordering['entry_diff'].equal else PermTag.DIFF,
+            reordering
+        )
+        for reordering in diff.reorders
+    ]
+    reorders_index = {r.id: r for r in reordering_records}
+    reorders_index_reverse_lookup = {r.reordering['from']: r for r in reordering_records}
+    original_index = {r.id: r for r in diff.records}
+    index = {**original_index, **reorders_index}
+    original_records = [record.id for record in diff.records]
+    reordered_records = []
+
+    # helps to clean reordered_records from destinations
+    destinations = [r['to'] for r in diff.reorders]
+
+    for record in diff.records:
+        if record.id in reorders_index_reverse_lookup:
+            reordered_records.append(reorders_index_reverse_lookup[record.id])
+        elif record.id in destinations:
+            continue
+        else:
+            reordered_records.append(record)
+
+    return {
+        'index': index,
+        'original_records': original_records,
+        'reordered_records': reordered_records,
+    }
