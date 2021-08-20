@@ -122,6 +122,7 @@ def _calculate_reorders(records):
                 'to': record.id,
                 'entry_diff': EntryDiff(*pair)
             })
+            entry_reorders.pop(entry)
         else:
             entry_reorders[entry] = (record.id, entry)
 
@@ -141,7 +142,7 @@ def _calculate_reorders_stats(reorders, stats):
     return stats
 
 
-def create_records_index(diff):
+def create_compact_records_index(diff):
     reordering_records = [
         DiffRecord(
             Pair(reordering['entry_diff'].a, reordering['entry_diff'].b),
@@ -151,23 +152,27 @@ def create_records_index(diff):
         )
         for reordering in diff.reorders
     ]
-    reorders_index = {r.id: r for r in reordering_records}
     reorders_index_reverse_lookup = {r.reordering['from']: r for r in reordering_records}
+
+    reorders_index = {r.id: r for r in reordering_records}
     original_index = {r.id: r for r in diff.records}
     index = {**original_index, **reorders_index}
+
     original_records = [record.id for record in diff.records]
     reordered_records = []
 
     # helps to clean reordered_records from destinations
     destinations = [r['to'] for r in diff.reorders]
 
+    assert len(reordering_records) == len(reorders_index_reverse_lookup) == len(destinations)  # sanity check
+
     for record in diff.records:
         if record.id in reorders_index_reverse_lookup:
-            reordered_records.append(reorders_index_reverse_lookup[record.id])
+            reordered_records.append(reorders_index_reverse_lookup[record.id].id)
         elif record.id in destinations:
             continue
         else:
-            reordered_records.append(record)
+            reordered_records.append(record.id)
 
     return {
         'index': index,
