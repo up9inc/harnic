@@ -1,5 +1,13 @@
 # UP9 Traffic Comparison Tool
 
+Understand regressions by comparing your API traffic snapshots. 
+Before promoting release and/or merging yet another PR, review the changes in API traffic. To spot unexpected change in service communications.
+Compare the traffic from automated service tests against a baseline. 
+Compare against traffic from stable version or previous release.
+
+Alternative case is front-end development, where you can spot the change in frontend communications.
+
+
 Make sure your image is latest:
 ```shell
 docker pull gcr.io/mimetic-card-241611/harnic/develop
