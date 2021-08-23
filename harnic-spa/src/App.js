@@ -304,10 +304,10 @@ const DiffRecordRow = ({ record }) => {
 
       <Table.Row style={toggleStyle}>
         <Table.Cell colSpan={1} className="entry-data">
-          {record.pair.a && <ADiffTab />}
+          {record.pair.a && isOpen && <ADiffTab />}
         </Table.Cell>
         <Table.Cell colSpan={1} className="entry-data">
-          {record.pair.b && <BDiffTab />}
+          {record.pair.b && isOpen && <BDiffTab />}
         </Table.Cell>        
       </Table.Row>
     </>
@@ -499,7 +499,7 @@ class App extends Component {
               <FilterDropdown setFilterType={this.setFilterType}/>
             </Grid.Column>
           </Grid.Row>
-        </Grid>     
+        </Grid>
         <Table fixed celled selectable>
           <Table.Header>
             <Table.Row>
@@ -509,9 +509,12 @@ class App extends Component {
           </Table.Header>
 
           <Table.Body>
-              {records.map(record => 
-                record && <DiffRecordRow record={record}/>           
-              )}
+            {records.map(record => (
+              <DiffRecordRow
+                key={record.id}
+                record={record}
+              />
+            ))}
           </Table.Body>      
         </Table>
       </Container>
