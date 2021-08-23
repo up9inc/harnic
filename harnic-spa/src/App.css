@@ -165,3 +165,7 @@ h3 {
 .reorders-toogle {
   padding-top: .625em;
 }
+
+.reordering-icon {
+  float: right;
+}

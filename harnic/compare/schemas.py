@@ -29,10 +29,16 @@ class PairSchema(Schema):
 class DiffRecordSchema(Schema):
     pair = fields.Nested('PairSchema')
     diff = fields.Nested('EntryDiffSchema')
-    tag = fields.Method("get_diff_tag")
+    tag = fields.Method('get_diff_tag')
+    is_reordering = fields.Method('get_is_reordering')
 
     def get_diff_tag(self, object):
         return object.tag.value
+
+    def get_is_reordering(self, object):
+        if object.reordering:
+            return True
+        return False
 
 
 class DiffCompactSchema(Schema):

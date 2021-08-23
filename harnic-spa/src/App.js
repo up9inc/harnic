@@ -285,6 +285,7 @@ const DiffRecordRow = ({ record }) => {
               {truncate(record.pair.a.request.url.url, 150)}
             </>
           }
+          {record.is_reordering && <Icon name='exchange' className='reordering-icon' />}
         </Table.Cell>
         <Table.Cell>
           {record.pair.b && 

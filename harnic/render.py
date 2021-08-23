@@ -27,7 +27,7 @@ if __name__ == '__main__':
     h2 = HAR('hars/e-maxx.ru/2.har')
     diff = har_compare(h1, h2)
 
-    with open(os.path.dirname(__file__) + '/../harnic-spa/public/data1 .json', 'w+') as file:
+    with open(os.path.dirname(__file__) + '/../harnic-spa/public/data1.json', 'w+') as file:
         result = render_diff_to_json((h1, h2), diff)
         file.write(result)
 
