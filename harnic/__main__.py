@@ -38,7 +38,7 @@ diff = har_compare(h1, h2)
 out_dir = 'diff_' + os.path.basename(args.from_file) + '_' + os.path.basename(args.to_file)
 copy_tree(SPA_BASE + "/build", out_dir)
 
-diffjson = render_diff_to_json((h1, h2), diff.records, diff.stats)
+diffjson = render_diff_to_json((h1, h2), diff)
 
 with open(out_dir + '/data.js', 'w+') as file_js:
     file_js.write('window.globalData = ')
