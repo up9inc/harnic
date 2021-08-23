@@ -166,6 +166,10 @@ h3 {
   padding-top: .625em;
 }
 
+.reordering-desc-icon {
+  margin-left: 0.5em !important;
+}
+
 .reordering-icon {
   float: right;
 }

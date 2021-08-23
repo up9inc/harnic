@@ -495,6 +495,11 @@ class App extends Component {
           <Grid.Row>
             <Grid.Column width={2} className='reorders-toogle'>
               <Checkbox toggle label='Allow reorders' onChange={this.toogleReordered}/>
+              <Popup
+                trigger={<Icon name='info' className='reordering-desc-icon' />}
+                content='Fixes ordering of the same entries if they were mismatched due to different response time deltas.
+                This is mostly caused by the nature of async requests. Those fixed entries have a special icon.'
+              />
             </Grid.Column>
             <Grid.Column width={14}>
               <FilterDropdown setFilterType={this.setFilterType}/>
