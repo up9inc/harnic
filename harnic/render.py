@@ -27,12 +27,12 @@ if __name__ == '__main__':
     h2 = HAR('hars/e-maxx.ru/2.har')
     diff = har_compare(h1, h2)
 
-    with open(os.path.dirname(__file__) + '/../harnic-spa/public/data1.json', 'w+') as file:
+    with open(os.path.dirname(__file__) + '/../harnic-spa/public/data.json', 'w+') as file:
         result = render_diff_to_json((h1, h2), diff)
         file.write(result)
 
-    with open(os.path.dirname(__file__) + '/../harnic-spa/public/data1.js', 'w+') as file_js, open(
-            os.path.dirname(__file__) + '/../harnic-spa/public/data1.json') as file_json:
+    with open(os.path.dirname(__file__) + '/../harnic-spa/public/data.js', 'w+') as file_js, open(
+            os.path.dirname(__file__) + '/../harnic-spa/public/data.json') as file_json:
         file_js.write('window.globalData = ')
         file_js.writelines(l for l in file_json)
         file_js.write(';')
