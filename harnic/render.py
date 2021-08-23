@@ -1,17 +1,23 @@
 import json
 import os
 
-from harnic.compare import DiffRecordSchema, har_compare
+from harnic.compare import har_compare
+from harnic.compare.har import create_compact_records_index
+from harnic.compare.schemas import DiffCompactSchema, DiffStatsSchema
 from harnic.har import HAR
-from harnic.schemas import StatsSchema
 
 
-def render_diff_to_json(hars, records, stats):
+def render_diff_to_json(hars, diff, format='compact'):
     result = {
         'hars': [hars[0].path, hars[1].path],
-        'records': DiffRecordSchema().dump(records, many=True),
-        'stats': StatsSchema().dump(stats)
     }
+
+    if format == 'compact':
+        compact_index = create_compact_records_index(diff)
+        result['diff'] = DiffCompactSchema().dump(compact_index)
+    else:
+        raise NotImplementedError()
+    result['stats'] = DiffStatsSchema().dump(diff.stats)
 
     return json.dumps(result)
 
@@ -22,7 +28,7 @@ if __name__ == '__main__':
     diff = har_compare(h1, h2)
 
     with open(os.path.dirname(__file__) + '/../harnic-spa/public/data.json', 'w+') as file:
-        result = render_diff_to_json((h1, h2), diff.records, diff.stats)
+        result = render_diff_to_json((h1, h2), diff)
         file.write(result)
 
     with open(os.path.dirname(__file__) + '/../harnic-spa/public/data.js', 'w+') as file_js, open(
