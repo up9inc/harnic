@@ -16,6 +16,9 @@ import {
   Icon,
   Statistic,
   Popup,
+  Checkbox,
+  Segment,
+  Grid
 } from 'semantic-ui-react';
 import {
   DateTime
@@ -375,7 +378,7 @@ const FilterDropdown = ({setFilterType}) => {
       ),
     },  
   ];
-  return <Dropdown selection fluid options={options} placeholder='Filter' />;
+  return <Dropdown selection fluid floating options={options} placeholder='Filter' />;
 }
 
 
@@ -417,13 +420,23 @@ class App extends Component {
 
     let original_records = original_uuids.map(rUuid => index[rUuid]);
     let reordered_records = reordered_uuids.map(rUuid => index[rUuid]);
+
+    let original_stats = window.globalData.stats.original;
+    let reordered_stats = window.globalData.stats.with_reorders;
+
     this.state = {
       filterName: null,
       hars: window.globalData.hars,
+
       original_records: original_records,
       reordered_records: reordered_records,
       records: original_records,
-      stats: window.globalData.stats.original,
+
+      original_stats: original_stats,
+      reordered_stats: reordered_stats,
+      stats: original_stats,
+
+      showReordered: false,
     };
   };
 
@@ -446,15 +459,25 @@ class App extends Component {
     return records;
   }
 
+  toogleReordered = () => {
+    this.setState(prevState => ({
+      showReordered: !prevState.showReordered,
+      records: prevState.showReordered ? this.state.original_records : this.state.reordered_records,
+      stats: prevState.showReordered ? this.state.original_stats : this.state.reordered_stats,
+    }));
+  }
+
   render() {
     let {
       hars,
       records,
-      stats
+      stats,
+      filterName,
+      showReordered,
     } = this.state;
-    if (this.state.filterName) {
+    if (filterName) {
       records = this.filterRecords();
-    }
+    };
 
     return (
       <Container>
@@ -467,7 +490,16 @@ class App extends Component {
           </div>
         </Container>
         {Object.keys(stats).length !== 0 && <Statistics stats={stats} />}
-        <FilterDropdown setFilterType={this.setFilterType}/>
+        <Grid>
+          <Grid.Row>
+            <Grid.Column width={2} className='reorders-toogle'>
+              <Checkbox toggle label='Allow reorders' onChange={this.toogleReordered}/>
+            </Grid.Column>
+            <Grid.Column width={14}>
+              <FilterDropdown setFilterType={this.setFilterType}/>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>     
         <Table fixed celled selectable>
           <Table.Header>
             <Table.Row>

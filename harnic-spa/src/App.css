@@ -161,3 +161,7 @@ h3 {
 .raw-content .inner-line-diff.removed {
     background: rgba(201, 60, 55, 0.4) !important;
 }
+
+.reorders-toogle {
+  padding-top: .625em;
+}
