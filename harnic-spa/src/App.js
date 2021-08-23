@@ -1,4 +1,8 @@
-import React, { Component, Fragment, useState } from 'react';
+import React, {
+  Component,
+  Fragment,
+  useState
+} from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import {
   Container,
@@ -13,7 +17,9 @@ import {
   Statistic,
   Popup,
 } from 'semantic-ui-react';
-import { DateTime } from "luxon";
+import {
+  DateTime
+} from "luxon";
 import regexifyString from "regexify-string";
 import _ from 'lodash';
 
@@ -404,11 +410,20 @@ const Statistics = ({stats}) => (
 class App extends Component {
   constructor(props) {
     super(props);
+
+    const index = window.globalData.diff.index;
+    const original_uuids = window.globalData.diff.original_records;
+    const reordered_uuids = window.globalData.diff.reordered_records;
+
+    let original_records = original_uuids.map(rUuid => index[rUuid]);
+    let reordered_records = reordered_uuids.map(rUuid => index[rUuid]);
     this.state = {
       filterName: null,
       hars: window.globalData.hars,
-      records: window.globalData.records,
-      stats: window.globalData.stats,
+      original_records: original_records,
+      reordered_records: reordered_records,
+      records: original_records,
+      stats: window.globalData.stats.original,
     };
   };
 
