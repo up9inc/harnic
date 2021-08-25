@@ -51,7 +51,6 @@ docker rm harnic
 - Decode base64
 - Add response status code to entry _hash()
 - If k: v fully added or removed paint key also
-- Open request tab by default
 - Strict diff only text in content, other key values are soft
 - Add content.text word wrap
 - Diff FORMATED json
