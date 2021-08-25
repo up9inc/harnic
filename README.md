@@ -49,6 +49,5 @@ docker rm harnic
 
 **Issues**:
 - Decode base64
-- If k: v fully added or removed paint key also
 - Strict diff only text in content, other key values are soft
 - Diff FORMATED json

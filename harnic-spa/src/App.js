@@ -70,31 +70,40 @@ const RequestData = ({ request, diff }) => {
         <List.Item>
           <div><b>Query params:</b></div>
           <List>
-            {Object.entries(request.url.query_params).map(([key, values]) =>
-                <List.Item key={key}>
+            {Object.entries(request.url.query_params).map(([key, values]) => {
+              const diffClass = calculateDiffClass(diff, 'query_params', key);
+              const diffIsNew = diffClass === 'insert' || diffClass === 'delete';
+              return (
+                <List.Item key={key} className={diffIsNew && diffClass}>
                   <b>{key}</b>:
-                  <span className={`har-data-value ${calculateDiffClass(diff, 'query_params', key)}`}>{values.join(', ')}</span>
+                  <span className={`har-data-value ${diffClass}`}>{values.join(', ')}</span>
                 </List.Item>
-            )}
+              );
+            })}
           </List>
         </List.Item>
         <List.Item>
           <div><b>Headers:</b></div>
           <List>
-            {Object.entries(request.headers).map(([key, values]) => 
-                <List.Item key={key}>
+            {Object.entries(request.headers).map(([key, values]) => {
+              const diffClass = calculateDiffClass(diff, 'headers', key);
+              const diffIsNew = diffClass === 'insert' || diffClass === 'delete';
+              const diffIsSoft = diffClass === 'soft-modified';
+              return (
+                <List.Item key={key} className={diffIsNew && diffClass}>
                   <b>{key}</b>:
-                  <span className={`har-data-value ${calculateDiffClass(diff, 'headers', key)}`}>
+                  <span className={`har-data-value ${diffClass}`}>
                     {values.join(', ')}
                   </span>&nbsp;
-                  {calculateDiffClass(diff, 'headers', key) == 'soft-modified' &&
+                  {diffIsSoft &&
                     <Popup
                       trigger={<Icon name='info' className='diff-label' />}
                       content='This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable'
                     />
                   }                  
                 </List.Item>
-            )}
+              );
+            })}
           </List>
         </List.Item>
       </List>
