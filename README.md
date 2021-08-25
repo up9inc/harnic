@@ -48,9 +48,6 @@ docker rm harnic
 
 
 **Issues**:
-- equal -> matched
-  diffs -> modified
-  in namings
 - Decode base64
 - Add response status code to entry _hash()
 - If k: v fully added or removed paint key also
