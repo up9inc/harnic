@@ -52,5 +52,4 @@ docker rm harnic
 - Add response status code to entry _hash()
 - If k: v fully added or removed paint key also
 - Strict diff only text in content, other key values are soft
-- Add content.text word wrap
 - Diff FORMATED json
