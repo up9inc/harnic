@@ -36,7 +36,7 @@ class Entry:
         return f"{self.request['method']} {self.request['url'].clean_url}"
 
     def _key(self):
-        return self.request['method'], self.request['url'].clean_url
+        return self.request['method'], self.request['url'].clean_url, self.response['status']
 
     def __hash__(self):
         return hash(self._key())
