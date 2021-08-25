@@ -396,7 +396,7 @@ const Statistics = ({stats}) => (
       </Statistic>
       <Statistic>
         <Statistic.Value>{stats.diff}</Statistic.Value>
-        <Statistic.Label>Diffs</Statistic.Label>
+        <Statistic.Label>Modified</Statistic.Label>
       </Statistic>
       <Statistic>
         <Statistic.Value>{stats.insert}</Statistic.Value>

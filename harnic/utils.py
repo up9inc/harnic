@@ -24,7 +24,7 @@ def format_diff_stats(stats):
 
     rename_key_table = {
         PermTag.EQUAL: 'Matched',
-        PermTag.DIFF: 'Diffs',
+        PermTag.DIFF: 'Modified',
         PermTag.INSERT: 'Added',
         PermTag.DELETE: 'Removed',
     }
