@@ -214,7 +214,7 @@ const ResponseData = ({ response, diff, initialEntry }) => {
 
 const DiffRecordRow = ({ record }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(1);
+  const [activeIndex, setActiveIndex] = useState(0);
   const handleToggle = () => setIsOpen(!isOpen);
   const handleTabChange = (e, { activeIndex }) => setActiveIndex(activeIndex);
 
