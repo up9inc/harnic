@@ -33,7 +33,8 @@ docker rm harnic
 ---
 
 **Backend**:
-- Allow Reorder
+- Handle ldjson files
+- Write top level KPIs to a separate json artifact
 - Count partial matches in match ratio
 - Ignore dynamic values/IDs in HTML/XML/JSON
 - Maybe some rules to ignore dynamic patterns inside body?
