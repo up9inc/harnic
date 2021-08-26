@@ -1,9 +1,12 @@
 import base64
 import codecs
 import copy
+import json
+from json import JSONDecodeError
 from urllib.parse import urlparse, parse_qs, urlencode
 
-from harnic.utils import headers_list_to_map, _is_ctype_ignored
+from harnic.constants import JSON_INDENT, JSON_CTYPES
+from harnic.utils import headers_list_to_map, is_ctype_media, is_ctype_ignored
 
 
 class Url:
@@ -33,7 +36,6 @@ class Entry:
         self.response = response
         self.metadata = metadata
         self._clean()
-        self._handle_encodings()
 
     def __repr__(self):
         return f"{self.request['method']} {self.request['url'].clean_url}"
@@ -55,8 +57,25 @@ class Entry:
         if response_headers is not None:
             self.response['headers'] = headers_list_to_map(response_headers)
 
-    def _handle_encodings(self):
+        self._clean_request()
+        self._clean_response()
+
+    def _clean_request(self):
+        request = self.request
+        if is_ctype_media(request.get('postData', {}).get('mimeType')):
+            request['raw_body'] = request['postData'].get('text')
+            request['postData']['text'] = None
+            return
+
         self._handle_request_encoding()
+
+    def _clean_response(self):
+        response = self.response
+        if is_ctype_media(response.get('content', {}).get('mimeType')):
+            response['raw_body'] = response['content'].get('text')
+            response['content']['text'] = None
+            return
+
         self._handle_response_encoding()
 
     def _handle_request_encoding(self):
@@ -65,28 +84,48 @@ class Entry:
         if not post_data:
             return
 
-        if post_data.get('encoding') == 'base64' or \
+        if post_data.get('mimeType') in JSON_CTYPES and post_data.get('text'):
+            try:
+                json_object = json.loads(post_data['text'])
+            except JSONDecodeError:
+                pass
+            else:
+                json_formatted_str = json.dumps(json_object, indent=2)
+                request['postData']['text'] = json_formatted_str
+        elif post_data.get('encoding') == 'base64' or \
                 post_data.get('comment') == 'base64':  # our tappers' custom encoding
             try:
                 decoded = base64.b64decode(post_data['text'].encode('utf8'))
-                request['raw_body'] = request['postData']['text']
-                request['postData']['text'] = str(decoded, 'utf8')
             except UnicodeDecodeError:
                 pass
+            else:
+                request['raw_body'] = request['postData']['text']
+                request['postData']['text'] = str(decoded, 'utf8')
 
     def _handle_response_encoding(self):
         response = self.response
         if response['content'].get('compressed') == "base64+gzip":  # our custom compression
             decoded = base64.b64decode(response['content']['text'])
-            response['raw_body'] = codecs.decode(decoded, 'zlib').decode('utf-8')
+            response['raw_body'] = response['content']['text']
+            response['content']['text'] = codecs.decode(decoded, 'zlib').decode('utf-8')
         elif 'text' in response['content']:
             response['raw_body'] = response['content']['text']
 
-        if response['content'].get('encoding') == "base64" \
-                and response.get('raw_body') is not None and not _is_ctype_ignored(response['content']['mimeType']):
+        if response['content'].get('mimeType') in JSON_CTYPES and response['content'].get('text'):
+            try:
+                json_object = json.loads(response['content']['text'])
+            except JSONDecodeError:
+                pass
+            else:
+                json_formatted_str = json.dumps(json_object, indent=JSON_INDENT)
+                response['content']['text'] = json_formatted_str
+
+        elif response['content'].get('encoding') == "base64" \
+                and response.get('raw_body') is not None and not is_ctype_ignored(response['content']['mimeType']):
             try:
                 decoded = base64.b64decode(response['raw_body'])
-                response['raw_body'] = response['content']['text']
-                response['content']['text'] = str(decoded, 'utf8')
             except UnicodeDecodeError:
                 pass
+            else:
+                response['raw_body'] = response['content']['text']
+                response['content']['text'] = str(decoded, 'utf8')

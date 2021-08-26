@@ -1,7 +1,7 @@
 from collections import namedtuple
 from difflib import _mdiff
 
-from harnic.constants import CONTENT_LONG_SKIP_TYPES, CONTENT_SKIP_TYPES
+from harnic.constants import CONTENT_LONG_SKIP_TYPES
 
 Comparison = namedtuple('Comparison', ['equal', 'strict_equal', 'diff'])
 DictDiff = namedtuple('DictDiff', ['added', 'removed', 'modified', 'same'], defaults=[set(), set(), dict(), set()])
@@ -54,8 +54,6 @@ def content_compare(c1, c2):
     # TODO: bad
     for c in (c1, c2):
         if c['size'] > 2500 and any(skip_type in c['mimeType'] for skip_type in CONTENT_LONG_SKIP_TYPES):
-            return cmp._replace(diff=cmp.diff._replace(modified={**cmp.diff.modified, 'text': None}))
-        elif any(skip_type in c['mimeType'] for skip_type in CONTENT_SKIP_TYPES):
             return cmp._replace(diff=cmp.diff._replace(modified={**cmp.diff.modified, 'text': None}))
 
     if 'text' in cmp.diff.modified.keys():

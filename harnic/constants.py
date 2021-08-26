@@ -22,7 +22,17 @@ STRICT_REGULAR_HEADERS = {
 }
 SOFT_HEADER_KEYS.update(REGULAR_HEADERS - STRICT_REGULAR_HEADERS)
 
-CONTENT_SKIP_TYPES = ('image/png', 'image/jpg', 'image/jpeg', 'image/gif')
+CONTENT_MEDIA_TYPES_SPECIAL = (
+    'application/pdf',
+    'application/font-woff2',
+    'application/font-woff',
+    'application/x-font-woff',
+    'application/vnd.apple.mpegurl',
+    'application/x-mpegurl',
+
+)
 CONTENT_LONG_SKIP_TYPES = ('text/css', 'text/javascript', 'application/javascript', 'text/html')
+
+JSON_CTYPES = ('application/json', 'application/x-amz-json-1.1', 'application/reports+json')
 
 JSON_INDENT = 2

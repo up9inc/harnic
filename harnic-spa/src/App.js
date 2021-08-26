@@ -224,7 +224,7 @@ const ResponseData = ({ response, diff, initialEntry }) => {
                 <List.Item key={key} className={diffIsNew && diffClass}>
                   <b>{key}</b>:
                   <span className={`har-data-value ${diffClass}`}>
-                    {key === 'text' && value === null ? 'Raw data too big' : value}
+                    {key === 'text' && value === null ? 'Content skipped' : value}
                   </span>&nbsp;
                   {diffIsSoft &&
                     <Popup

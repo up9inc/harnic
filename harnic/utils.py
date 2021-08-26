@@ -4,6 +4,7 @@ from collections import defaultdict
 from tabulate import tabulate
 
 from harnic.compare.har import PermTag
+from harnic.constants import CONTENT_MEDIA_TYPES_SPECIAL
 
 SPA_BASE = os.getenv('SPA_LOCATION', 'harnic-spa')
 
@@ -18,7 +19,7 @@ def headers_list_to_map(headers):
     return result
 
 
-def _is_ctype_ignored(ctype):
+def is_ctype_ignored(ctype):
     ctype = ctype and ctype.split(';')[0].strip()
     if ctype in (
             "application/javascript", "application/x-javascript", 'text/css', 'application/font-woff2',
@@ -29,6 +30,18 @@ def _is_ctype_ignored(ctype):
             or (ctype and ctype.startswith("text/javascript")):
         return True
 
+    return False
+
+
+def is_ctype_media(ctype):
+    ctype = ctype and ctype.split(';')[0].strip()
+    if not ctype:
+        return False
+    if ctype.startswith('image/') or \
+            ctype.startswith('font/') or \
+            ctype.startswith('video/') or \
+            ctype in CONTENT_MEDIA_TYPES_SPECIAL:
+        return True
     return False
 
 
