@@ -18,9 +18,23 @@ def headers_list_to_map(headers):
     return result
 
 
+def _is_ctype_ignored(ctype):
+    ctype = ctype and ctype.split(';')[0].strip()
+    if ctype in (
+            "application/javascript", "application/x-javascript", 'text/css', 'application/font-woff2',
+            'application/font-woff', 'application/x-font-woff', 'application/pdf') \
+            or (ctype and ctype.startswith("image/")) \
+            or (ctype and ctype.startswith("font/")) \
+            or (ctype and ctype.startswith("video/")) \
+            or (ctype and ctype.startswith("text/javascript")):
+        return True
+
+    return False
+
+
 def format_diff_stats(stats):
     def get_match_ratio(ratio):
-        return "{:.2f}%".format(ratio* 100)
+        return "{:.2f}%".format(ratio * 100)
 
     rename_key_table = {
         PermTag.EQUAL: 'Matched',
