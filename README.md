@@ -49,6 +49,5 @@ docker rm harnic
 
 **Issues**:
 - Decode base64
-- Strict diff only text in content, other key values are soft
 - Diff FORMATED json
 - Change seq matcher match score from 0.7 to 0.5

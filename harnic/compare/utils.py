@@ -46,7 +46,10 @@ def scalars_compare(s1, s2):
 
 
 def content_compare(c1, c2):
-    cmp = dict_compare(c1, c2)
+    # All content keys except 'text' are soft
+    keys = set(c1.keys()).union(set(c2.keys()))
+    keys.discard('text')
+    cmp = dict_compare(c1, c2, exceptions=keys)
 
     # TODO: bad
     for c in (c1, c2):

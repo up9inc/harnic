@@ -73,10 +73,19 @@ const RequestData = ({ request, diff }) => {
             {Object.entries(request.url.query_params).map(([key, values]) => {
               const diffClass = calculateDiffClass(diff, 'query_params', key);
               const diffIsNew = diffClass === 'insert' || diffClass === 'delete';
+              const diffIsSoft = diffClass === 'soft-modified';
               return (
                 <List.Item key={key} className={diffIsNew && diffClass}>
                   <b>{key}</b>:
-                  <span className={`har-data-value ${diffClass}`}>{values.join(', ')}</span>
+                  <span className={`har-data-value ${diffClass}`}>
+                    {values.join(', ')}
+                  </span>&nbsp;
+                  {diffIsSoft &&
+                    <Popup
+                      trigger={<Icon name='info' className='diff-label' />}
+                      content='This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable'
+                    />
+                  }                  
                 </List.Item>
               );
             })}
@@ -180,34 +189,52 @@ const ResponseData = ({ response, diff, initialEntry }) => {
         <List.Item>
           <div><b>Headers:</b></div>
           <List>
-            {Object.entries(response.headers).map(([key, values]) => 
-                <List.Item key={key}>
+            {Object.entries(response.headers).map(([key, values]) => {
+              const diffClass = calculateDiffClass(diff, 'headers', key);
+              const diffIsNew = diffClass === 'insert' || diffClass === 'delete';
+              const diffIsSoft = diffClass === 'soft-modified';
+              return (
+                <List.Item key={key} className={diffIsNew && diffClass}>
                   <b>{key}</b>:
-                  <span className={`har-data-value ${calculateDiffClass(diff, 'headers', key)}`}>
+                  <span className={`har-data-value ${diffClass}`}>
                     {values.join(', ')}
                   </span>&nbsp;
-                  {calculateDiffClass(diff, 'headers', key) == 'soft-modified' &&
+                  {diffIsSoft &&
                     <Popup
                       trigger={<Icon name='info' className='diff-label' />}
                       content='This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable'
                     />
                   }
                 </List.Item>
-            )}          
+              );
+            })}          
           </List>
         </List.Item>
         <List.Item>
           <div><b>Content:</b></div>
           <List>
-            {Object.entries(response.content).map(([key, value]) => (
-                key === 'text' && textModified ? null :
-                <List.Item key={key}>
+            {Object.entries(response.content).map(([key, value]) => {
+              if (key === 'text' && textModified) {
+                return null;
+              } else {
+              const diffClass = calculateDiffClass(diff, 'content', key);
+              const diffIsNew = diffClass === 'insert' || diffClass === 'delete';
+              const diffIsSoft = diffClass === 'soft-modified';
+              return (
+                <List.Item key={key} className={diffIsNew && diffClass}>
                   <b>{key}</b>:
-                  <span className={`har-data-value ${calculateDiffClass(diff, 'content', key)}`}>
+                  <span className={`har-data-value ${diffClass}`}>
                     {key === 'text' && value === null ? 'Raw data too big' : value}
-                  </span>
+                  </span>&nbsp;
+                  {diffIsSoft &&
+                    <Popup
+                      trigger={<Icon name='info' className='diff-label' />}
+                      content='This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable'
+                    />
+                  }                  
                 </List.Item>
-            ))}
+              );
+            }})}
             {textModified &&
               <List.Item key='text'>
                 {renderTextDiff()}
