@@ -25,6 +25,8 @@ def render_diff_to_json(hars, diff, format='compact'):
 if __name__ == '__main__':
     h1 = HAR('hars/e-maxx.ru/1.har')
     h2 = HAR('hars/e-maxx.ru/2.har')
+    # h1 = HAR('hars/big/1.har')
+    # h2 = HAR('hars/big/2.har')
     diff = har_compare(h1, h2)
 
     with open(os.path.dirname(__file__) + '/../harnic-spa/public/data.json', 'w+') as file:

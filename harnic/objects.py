@@ -5,8 +5,8 @@ import json
 from json import JSONDecodeError
 from urllib.parse import urlparse, parse_qs, urlencode
 
-from harnic.constants import JSON_INDENT, JSON_CTYPES
-from harnic.utils import headers_list_to_map, is_ctype_media, is_ctype_ignored
+from harnic.constants import JSON_INDENT, MAX_BODY_SIZE
+from harnic.utils import headers_list_to_map, is_ctype_media, is_ctype_ignored, is_ctype_json
 
 
 class Url:
@@ -62,29 +62,43 @@ class Entry:
 
     def _clean_request(self):
         request = self.request
-        if is_ctype_media(request.get('postData', {}).get('mimeType')):
-            request['raw_body'] = request['postData'].get('text')
-            request['postData']['text'] = None
-            return
-
-        self._handle_request_encoding()
-
-    def _clean_response(self):
-        response = self.response
-        if is_ctype_media(response.get('content', {}).get('mimeType')):
-            response['raw_body'] = response['content'].get('text')
-            response['content']['text'] = None
-            return
-
-        self._handle_response_encoding()
-
-    def _handle_request_encoding(self):
-        request = self.request
         post_data = request.get('postData')
         if not post_data:
             return
+        request['raw_body'] = request['postData'].get('text')
+        if is_ctype_media(post_data.get('mimeType')) or post_data.get('size', 0) > MAX_BODY_SIZE:
+            request['postData']['text'] = None
+            return
 
-        if post_data.get('mimeType') in JSON_CTYPES and post_data.get('text'):
+        self._handle_request_types()
+
+    def _clean_response(self):
+        response = self.response
+        content = response.get('content')
+        if not content:
+            return
+        response['raw_body'] = response['content'].get('text')
+        if is_ctype_media(content.get('mimeType')) or content.get('size', 0) > MAX_BODY_SIZE:
+            response['content']['text'] = None
+            return
+
+        self._handle_response_types()
+
+    def _handle_request_types(self):
+        request = self.request
+        post_data = request['postData']
+        if post_data.get('encoding') == 'base64' or \
+                post_data.get('comment') == 'base64':  # our tappers' custom encoding
+            try:
+                decoded = base64.b64decode(post_data['text'].encode('utf8'))
+            except UnicodeDecodeError:
+                pass
+            else:
+                request['postData']['text'] = str(decoded, 'utf8')
+
+        if post_data.get('text') and \
+                (is_ctype_json(post_data.get('mimeType')) or \
+                 any(is_ctype_json(ctype) for ctype in request['headers'].get('content-type', []))):
             try:
                 json_object = json.loads(post_data['text'])
             except JSONDecodeError:
@@ -92,26 +106,26 @@ class Entry:
             else:
                 json_formatted_str = json.dumps(json_object, indent=2)
                 request['postData']['text'] = json_formatted_str
-        elif post_data.get('encoding') == 'base64' or \
-                post_data.get('comment') == 'base64':  # our tappers' custom encoding
+
+    def _handle_response_types(self):
+        response = self.response
+        content = response['content']
+        if content.get('compressed') == "base64+gzip":  # our custom compression
+            decoded = base64.b64decode(content['text'])
+            response['content']['text'] = codecs.decode(decoded, 'zlib').decode('utf-8')
+        elif content.get('encoding') == "base64" \
+                and content.get('text') is not None \
+                and not is_ctype_ignored(content['mimeType']):
             try:
-                decoded = base64.b64decode(post_data['text'].encode('utf8'))
+                decoded = base64.b64decode(content['text'])
             except UnicodeDecodeError:
                 pass
             else:
-                request['raw_body'] = request['postData']['text']
-                request['postData']['text'] = str(decoded, 'utf8')
+                content['text'] = str(decoded, 'utf8')
 
-    def _handle_response_encoding(self):
-        response = self.response
-        if response['content'].get('compressed') == "base64+gzip":  # our custom compression
-            decoded = base64.b64decode(response['content']['text'])
-            response['raw_body'] = response['content']['text']
-            response['content']['text'] = codecs.decode(decoded, 'zlib').decode('utf-8')
-        elif 'text' in response['content']:
-            response['raw_body'] = response['content']['text']
-
-        if response['content'].get('mimeType') in JSON_CTYPES and response['content'].get('text'):
+        if content.get('text') and \
+                (is_ctype_json(content.get('mimeType')) or \
+                 any(is_ctype_json(ctype) for ctype in response['headers'].get('content-type', []))):
             try:
                 json_object = json.loads(response['content']['text'])
             except JSONDecodeError:
@@ -119,13 +133,3 @@ class Entry:
             else:
                 json_formatted_str = json.dumps(json_object, indent=JSON_INDENT)
                 response['content']['text'] = json_formatted_str
-
-        elif response['content'].get('encoding') == "base64" \
-                and response.get('raw_body') is not None and not is_ctype_ignored(response['content']['mimeType']):
-            try:
-                decoded = base64.b64decode(response['raw_body'])
-            except UnicodeDecodeError:
-                pass
-            else:
-                response['raw_body'] = response['content']['text']
-                response['content']['text'] = str(decoded, 'utf8')

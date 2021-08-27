@@ -1,10 +1,19 @@
-from collections import namedtuple
 from difflib import _mdiff
 
-from harnic.constants import CONTENT_LONG_SKIP_TYPES
 
-Comparison = namedtuple('Comparison', ['equal', 'strict_equal', 'diff'])
-DictDiff = namedtuple('DictDiff', ['added', 'removed', 'modified', 'same'], defaults=[set(), set(), dict(), set()])
+class Comparison:
+    def __init__(self, equal, strict_equal, diff):
+        self.equal = equal
+        self.strict_equal = strict_equal
+        self.diff = diff
+
+
+class DictDiff:
+    def __init__(self, added=None, removed=None, modified=None, same=None):
+        self.added = added if added is not None else set()
+        self.removed = removed if removed is not None else set()
+        self.modified = modified if modified is not None else set()
+        self.same = same if same is not None else set()
 
 
 def split_diff(fromlines, tolines, **kwargs):
@@ -45,22 +54,26 @@ def scalars_compare(s1, s2):
     return Comparison(equal, strict_equal, None)
 
 
-def content_compare(c1, c2):
+def content_compare(r1, r2):
+    c1, raw1 = r1['content'], r1.get('raw_body')
+    c2, raw2 = r2['content'], r2.get('raw_body')
     # All content keys except 'text' are soft
     keys = set(c1.keys()).union(set(c2.keys()))
     keys.discard('text')
     cmp = dict_compare(c1, c2, exceptions=keys)
 
-    # TODO: bad
-    for c in (c1, c2):
-        if c['size'] > 2500 and any(skip_type in c['mimeType'] for skip_type in CONTENT_LONG_SKIP_TYPES):
-            return cmp._replace(diff=cmp.diff._replace(modified={**cmp.diff.modified, 'text': None}))
-
-    if 'text' in cmp.diff.modified.keys():
+    text_modified = cmp.diff.modified.get('text', ())
+    if text_modified and None not in text_modified:
         try:
             diff = split_diff(c1['text'].splitlines(), c2['text'].splitlines())
         except KeyError:
             pass
         else:
-            return cmp._replace(diff=cmp.diff._replace(modified={**cmp.diff.modified, 'text': diff}))
+            cmp.diff.modified['text'] = diff
+    else:
+        # We should check for raw equality in case cleaned failed
+        if raw1 != raw2:
+            # Values are skipped anyway so we just mark a diff without inner explanation
+            cmp.diff.modified['text'] = None
+
     return cmp

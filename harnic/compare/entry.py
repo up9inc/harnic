@@ -30,8 +30,8 @@ class EntryDiff:
                                                             self.b.response['status'])
         comparisons['response']['headers'] = headers_compare(self.a.response['headers'],
                                                              self.b.response['headers'])
-        comparisons['response']['content'] = content_compare(self.a.response['content'],
-                                                             self.b.response['content'])
+        comparisons['response']['content'] = content_compare(self.a.response,
+                                                             self.b.response)
 
         self.equal = all(all(cmp.equal for cmp in criteria.values()) for criteria in comparisons.values())
         return comparisons

@@ -4,7 +4,7 @@ from collections import defaultdict
 from tabulate import tabulate
 
 from harnic.compare.har import PermTag
-from harnic.constants import CONTENT_MEDIA_TYPES_SPECIAL
+from harnic.constants import CONTENT_MEDIA_TYPES_SPECIAL, JSON_CTYPES
 
 SPA_BASE = os.getenv('SPA_LOCATION', 'harnic-spa')
 
@@ -41,6 +41,15 @@ def is_ctype_media(ctype):
             ctype.startswith('font/') or \
             ctype.startswith('video/') or \
             ctype in CONTENT_MEDIA_TYPES_SPECIAL:
+        return True
+    return False
+
+
+def is_ctype_json(ctype):
+    ctype = ctype and ctype.split(';')[0].strip()
+    if not ctype:
+        return False
+    if ctype in JSON_CTYPES:
         return True
     return False
 
