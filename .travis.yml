@@ -15,6 +15,6 @@ before_script:
 script:
   - stty cols 120
   - travis_fold start "docker_build" && ../env-config/devops/ci/build_docker.sh ${PROJECT_NAME} && travis_fold end "docker_build"
-#  - travis_fold start "tests" && docker run -v `pwd`:/tmp/src:ro -it --env CODECOV_TOKEN=${CODECOV_TOKEN} --env TRAVIS_BRANCH=${TRAVIS_BRANCH} --env TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST} --env TRAVIS_EVENT_TYPE=${TRAVIS_EVENT_TYPE} --env TRAVIS_COMMIT=${TRAVIS_COMMIT} --env TRAVIS_JOB_ID=${TRAVIS_JOB_ID} --env CI=true --env TRAVIS=true --entrypoint /tmp/src/tests/dockerized_tests.sh gcr.io/${GCP_PROJECT_NAME}/${PROJECT_NAME}/${TRAVIS_BRANCH}:${TRAVIS_BUILD_NUMBER} && travis_fold end "tests"
+  - travis_fold start "run_as_job" && docker run gcr.io/${GCP_PROJECT_NAME}/${PROJECT_NAME}/${TRAVIS_BRANCH}:${TRAVIS_BUILD_NUMBER} --help && docker run -v `pwd`:/tmp/src:ro gcr.io/${GCP_PROJECT_NAME}/${PROJECT_NAME}/${TRAVIS_BRANCH}:${TRAVIS_BUILD_NUMBER} test1_a.har test1_b.har
 after_success:
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then travis_fold start "docker_push" && ../env-config/devops/ci/push_docker.sh ${PROJECT_NAME} && travis_fold end "docker_push"; fi
