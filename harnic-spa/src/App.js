@@ -1,4 +1,8 @@
-import React, { Component, Fragment, useState } from 'react';
+import React, {
+  Component,
+  Fragment,
+  useState
+} from 'react';
 import 'semantic-ui-css/semantic.min.css';
 import {
   Container,
@@ -12,8 +16,13 @@ import {
   Icon,
   Statistic,
   Popup,
+  Checkbox,
+  Segment,
+  Grid
 } from 'semantic-ui-react';
-import { DateTime } from "luxon";
+import {
+  DateTime
+} from "luxon";
 import regexifyString from "regexify-string";
 import _ from 'lodash';
 
@@ -61,31 +70,49 @@ const RequestData = ({ request, diff }) => {
         <List.Item>
           <div><b>Query params:</b></div>
           <List>
-            {Object.entries(request.url.query_params).map(([key, values]) =>
-                <List.Item key={key}>
+            {Object.entries(request.url.query_params).map(([key, values]) => {
+              const diffClass = calculateDiffClass(diff, 'query_params', key);
+              const diffIsNew = diffClass === 'insert' || diffClass === 'delete';
+              const diffIsSoft = diffClass === 'soft-modified';
+              return (
+                <List.Item key={key} className={diffIsNew && diffClass}>
                   <b>{key}</b>:
-                  <span className={`har-data-value ${calculateDiffClass(diff, 'query_params', key)}`}>{values.join(', ')}</span>
-                </List.Item>
-            )}
-          </List>
-        </List.Item>
-        <List.Item>
-          <div><b>Headers:</b></div>
-          <List>
-            {Object.entries(request.headers).map(([key, values]) => 
-                <List.Item key={key}>
-                  <b>{key}</b>:
-                  <span className={`har-data-value ${calculateDiffClass(diff, 'headers', key)}`}>
+                  <span className={`har-data-value ${diffClass}`}>
                     {values.join(', ')}
                   </span>&nbsp;
-                  {calculateDiffClass(diff, 'headers', key) == 'soft-modified' &&
+                  {diffIsSoft &&
                     <Popup
                       trigger={<Icon name='info' className='diff-label' />}
                       content='This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable'
                     />
                   }                  
                 </List.Item>
-            )}
+              );
+            })}
+          </List>
+        </List.Item>
+        <List.Item>
+          <div><b>Headers:</b></div>
+          <List>
+            {Object.entries(request.headers).map(([key, values]) => {
+              const diffClass = calculateDiffClass(diff, 'headers', key);
+              const diffIsNew = diffClass === 'insert' || diffClass === 'delete';
+              const diffIsSoft = diffClass === 'soft-modified';
+              return (
+                <List.Item key={key} className={diffIsNew && diffClass}>
+                  <b>{key}</b>:
+                  <span className={`har-data-value ${diffClass}`}>
+                    {values.join(', ')}
+                  </span>&nbsp;
+                  {diffIsSoft &&
+                    <Popup
+                      trigger={<Icon name='info' className='diff-label' />}
+                      content='This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable'
+                    />
+                  }                  
+                </List.Item>
+              );
+            })}
           </List>
         </List.Item>
       </List>
@@ -162,34 +189,52 @@ const ResponseData = ({ response, diff, initialEntry }) => {
         <List.Item>
           <div><b>Headers:</b></div>
           <List>
-            {Object.entries(response.headers).map(([key, values]) => 
-                <List.Item key={key}>
+            {Object.entries(response.headers).map(([key, values]) => {
+              const diffClass = calculateDiffClass(diff, 'headers', key);
+              const diffIsNew = diffClass === 'insert' || diffClass === 'delete';
+              const diffIsSoft = diffClass === 'soft-modified';
+              return (
+                <List.Item key={key} className={diffIsNew && diffClass}>
                   <b>{key}</b>:
-                  <span className={`har-data-value ${calculateDiffClass(diff, 'headers', key)}`}>
+                  <span className={`har-data-value ${diffClass}`}>
                     {values.join(', ')}
                   </span>&nbsp;
-                  {calculateDiffClass(diff, 'headers', key) == 'soft-modified' &&
+                  {diffIsSoft &&
                     <Popup
                       trigger={<Icon name='info' className='diff-label' />}
                       content='This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable'
                     />
                   }
                 </List.Item>
-            )}          
+              );
+            })}          
           </List>
         </List.Item>
         <List.Item>
           <div><b>Content:</b></div>
           <List>
-            {Object.entries(response.content).map(([key, value]) => (
-                key === 'text' && textModified ? null :
-                <List.Item key={key}>
+            {Object.entries(response.content).map(([key, value]) => {
+              if (key === 'text' && textModified) {
+                return null;
+              } else {
+              const diffClass = calculateDiffClass(diff, 'content', key);
+              const diffIsNew = diffClass === 'insert' || diffClass === 'delete';
+              const diffIsSoft = diffClass === 'soft-modified';
+              return (
+                <List.Item key={key} className={diffIsNew && diffClass}>
                   <b>{key}</b>:
-                  <span className={`har-data-value ${calculateDiffClass(diff, 'content', key)}`}>
-                    {key === 'text' && value === null ? 'Raw data too big' : value}
-                  </span>
+                  <span className={`har-data-value ${diffClass}`}>
+                    {key === 'text' && value === null ? 'Content skipped' : value}
+                  </span>&nbsp;
+                  {diffIsSoft &&
+                    <Popup
+                      trigger={<Icon name='info' className='diff-label' />}
+                      content='This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable'
+                    />
+                  }                  
                 </List.Item>
-            ))}
+              );
+            }})}
             {textModified &&
               <List.Item key='text'>
                 {renderTextDiff()}
@@ -205,7 +250,7 @@ const ResponseData = ({ response, diff, initialEntry }) => {
 
 const DiffRecordRow = ({ record }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(1);
+  const [activeIndex, setActiveIndex] = useState(0);
   const handleToggle = () => setIsOpen(!isOpen);
   const handleTabChange = (e, { activeIndex }) => setActiveIndex(activeIndex);
 
@@ -276,6 +321,7 @@ const DiffRecordRow = ({ record }) => {
               {truncate(record.pair.a.request.url.url, 150)}
             </>
           }
+          {record.is_reordering && <Icon name='exchange' className='reordering-icon' />}
         </Table.Cell>
         <Table.Cell>
           {record.pair.b && 
@@ -295,10 +341,10 @@ const DiffRecordRow = ({ record }) => {
 
       <Table.Row style={toggleStyle}>
         <Table.Cell colSpan={1} className="entry-data">
-          {record.pair.a && <ADiffTab />}
+          {record.pair.a && isOpen && <ADiffTab />}
         </Table.Cell>
         <Table.Cell colSpan={1} className="entry-data">
-          {record.pair.b && <BDiffTab />}
+          {record.pair.b && isOpen && <BDiffTab />}
         </Table.Cell>        
       </Table.Row>
     </>
@@ -369,7 +415,7 @@ const FilterDropdown = ({setFilterType}) => {
       ),
     },  
   ];
-  return <Dropdown selection fluid options={options} placeholder='Filter' />;
+  return <Dropdown selection fluid floating options={options} placeholder='Filter' />;
 }
 
 
@@ -386,7 +432,7 @@ const Statistics = ({stats}) => (
       </Statistic>
       <Statistic>
         <Statistic.Value>{stats.diff}</Statistic.Value>
-        <Statistic.Label>Diffs</Statistic.Label>
+        <Statistic.Label>Modified</Statistic.Label>
       </Statistic>
       <Statistic>
         <Statistic.Value>{stats.insert}</Statistic.Value>
@@ -404,11 +450,30 @@ const Statistics = ({stats}) => (
 class App extends Component {
   constructor(props) {
     super(props);
+
+    const index = window.globalData.diff.index;
+    const original_uuids = window.globalData.diff.original_records;
+    const reordered_uuids = window.globalData.diff.reordered_records;
+
+    let original_records = original_uuids.map(rUuid => index[rUuid]);
+    let reordered_records = reordered_uuids.map(rUuid => index[rUuid]);
+
+    let original_stats = window.globalData.stats.original;
+    let reordered_stats = window.globalData.stats.with_reorders;
+
     this.state = {
       filterName: null,
       hars: window.globalData.hars,
-      records: window.globalData.records,
-      stats: window.globalData.stats,
+
+      original_records: original_records,
+      reordered_records: reordered_records,
+      records: original_records,
+
+      original_stats: original_stats,
+      reordered_stats: reordered_stats,
+      stats: original_stats,
+
+      showReordered: false,
     };
   };
 
@@ -431,15 +496,25 @@ class App extends Component {
     return records;
   }
 
+  toogleReordered = () => {
+    this.setState(prevState => ({
+      showReordered: !prevState.showReordered,
+      records: prevState.showReordered ? this.state.original_records : this.state.reordered_records,
+      stats: prevState.showReordered ? this.state.original_stats : this.state.reordered_stats,
+    }));
+  }
+
   render() {
     let {
       hars,
       records,
-      stats
+      stats,
+      filterName,
+      showReordered,
     } = this.state;
-    if (this.state.filterName) {
+    if (filterName) {
       records = this.filterRecords();
-    }
+    };
 
     return (
       <Container>
@@ -452,7 +527,21 @@ class App extends Component {
           </div>
         </Container>
         {Object.keys(stats).length !== 0 && <Statistics stats={stats} />}
-        <FilterDropdown setFilterType={this.setFilterType}/>
+        <Grid>
+          <Grid.Row>
+            <Grid.Column width={2} className='reorders-toogle'>
+              <Checkbox toggle label='Allow reorders' onChange={this.toogleReordered}/>
+              <Popup
+                trigger={<Icon name='info' className='reordering-desc-icon' />}
+                content='Fixes ordering of the same entries if they were mismatched due to different response time deltas.
+                This is mostly caused by the nature of async requests. Those fixed entries have a special icon.'
+              />
+            </Grid.Column>
+            <Grid.Column width={14}>
+              <FilterDropdown setFilterType={this.setFilterType}/>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
         <Table fixed celled selectable>
           <Table.Header>
             <Table.Row>
@@ -462,9 +551,12 @@ class App extends Component {
           </Table.Header>
 
           <Table.Body>
-              {records.map(record => 
-                record && <DiffRecordRow record={record}/>           
-              )}
+            {records.map(record => (
+              <DiffRecordRow
+                key={record.id}
+                record={record}
+              />
+            ))}
           </Table.Body>      
         </Table>
       </Container>

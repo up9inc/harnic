@@ -4,6 +4,7 @@ from collections import defaultdict
 from tabulate import tabulate
 
 from harnic.compare.har import PermTag
+from harnic.constants import CONTENT_MEDIA_TYPES_SPECIAL, JSON_CTYPES
 
 SPA_BASE = os.getenv('SPA_LOCATION', 'harnic-spa')
 
@@ -18,18 +19,58 @@ def headers_list_to_map(headers):
     return result
 
 
+def is_ctype_ignored(ctype):
+    ctype = ctype and ctype.split(';')[0].strip()
+    if ctype in (
+            "application/javascript", "application/x-javascript", 'text/css', 'application/font-woff2',
+            'application/font-woff', 'application/x-font-woff', 'application/pdf') \
+            or (ctype and ctype.startswith("image/")) \
+            or (ctype and ctype.startswith("font/")) \
+            or (ctype and ctype.startswith("video/")) \
+            or (ctype and ctype.startswith("text/javascript")):
+        return True
+
+    return False
+
+
+def is_ctype_media(ctype):
+    ctype = ctype and ctype.split(';')[0].strip()
+    if not ctype:
+        return False
+    if ctype.startswith('image/') or \
+            ctype.startswith('font/') or \
+            ctype.startswith('video/') or \
+            ctype in CONTENT_MEDIA_TYPES_SPECIAL:
+        return True
+    return False
+
+
+def is_ctype_json(ctype):
+    ctype = ctype and ctype.split(';')[0].strip()
+    if not ctype:
+        return False
+    if ctype in JSON_CTYPES:
+        return True
+    return False
+
+
 def format_diff_stats(stats):
+    def get_match_ratio(ratio):
+        return "{:.2f}%".format(ratio * 100)
+
     rename_key_table = {
-        'from_count': '#1 har entries',
-        'to_count': '#2 har entries',
         PermTag.EQUAL: 'Matched',
-        PermTag.DIFF: 'Diffs',
+        PermTag.DIFF: 'Modified',
         PermTag.INSERT: 'Added',
         PermTag.DELETE: 'Removed',
     }
     table = [
-        ('Match ratio', "{:.2f}%".format((1 - stats['ratio']) * 100)),
+        ('Match ratio', get_match_ratio(stats['original']['ratio']), get_match_ratio(stats['with_reorders']['ratio'])),
     ]
-    table.extend((rename_key_table[k], v) for k, v in stats.items() if k in rename_key_table.keys())
-    headers = ["Label", "Value"]
+    table.extend(  # _ == k1
+        (rename_key_table[k], v1, v2)
+        for (k, v1), (_, v2) in zip(stats['original'].items(), stats['with_reorders'].items())
+        if k in rename_key_table.keys()
+    )
+    headers = ["", "Original", "With Reorders"]
     return tabulate(table, headers=headers, tablefmt='github')

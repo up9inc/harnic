@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields, pre_dump
 
 from harnic.compare.har import PermTag
-from harnic.constants import CONTENT_LONG_SKIP_TYPES, CONTENT_SKIP_TYPES
+from harnic.constants import CONTENT_LONG_SKIP_TYPES
 
 
 class UrlSchema(Schema):
@@ -44,8 +44,6 @@ class ResponseSchema(MessageSchema):
     def clear_content(self, in_data, **kwargs):
         content = in_data['content']
         if content['size'] > 2500 and any(skip_type in content['mimeType'] for skip_type in CONTENT_LONG_SKIP_TYPES):
-            in_data['content']['text'] = None
-        elif any(skip_type in content['mimeType'] for skip_type in CONTENT_SKIP_TYPES):
             in_data['content']['text'] = None
         return in_data
 

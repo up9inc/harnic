@@ -41,7 +41,8 @@ docker rm harnic
 ---
 
 **Backend**:
-- Allow Reorder
+- Handle ldjson files
+- Write top level KPIs to a separate json artifact
 - Count partial matches in match ratio
 - Ignore dynamic values/IDs in HTML/XML/JSON
 - Maybe some rules to ignore dynamic patterns inside body?
@@ -56,13 +57,6 @@ docker rm harnic
 
 
 **Issues**:
-- equal -> matched
-  diffs -> modified
-  in namings
 - Decode base64
-- Add response status code to entry _hash()
-- If k: v fully added or removed paint key also
-- Open request tab by default
-- Strict diff only text in content, other key values are soft
-- Add content.text word wrap
 - Diff FORMATED json
+- Change seq matcher match score from 0.7 to 0.5

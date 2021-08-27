@@ -69,7 +69,16 @@ h3 {
     margin-top: 10em;
 }
 
-.entry-info .key{
+code {
+  overflow-x: auto;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+
+.entry-info .key {
     width: 20% !important;
     font-weight: bold !important;
 }
@@ -160,4 +169,21 @@ h3 {
 
 .raw-content .inner-line-diff.removed {
     background: rgba(201, 60, 55, 0.4) !important;
+}
+
+.reorders-toogle {
+  padding-top: .625em;
+}
+
+.reordering-desc-icon {
+  margin-left: 0.5em !important;
+}
+
+.reordering-icon {
+  float: right;
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  transform: rotate(90deg);
 }
