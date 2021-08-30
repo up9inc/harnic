@@ -47,6 +47,7 @@ docker rm harnic
 - Ignore dynamic values/IDs in HTML/XML/JSON
 - Maybe some rules to ignore dynamic patterns inside body?
 - Maybe ignore inner differences of error responses
+- Handle url params
 
 
 **Frontend**:
@@ -59,3 +60,9 @@ docker rm harnic
 **Issues**:
 - Deal with long text stings
 - Change seq matcher match score from 0.7 to 0.5
+- Reorders by default
+- Query params compare only keys
+- modal with size too big
+- Show first bytes of too big content
+- Eeturn files info to stats (bytes, num lines)
+- Rename original to strict order
