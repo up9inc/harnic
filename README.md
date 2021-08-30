@@ -57,6 +57,5 @@ docker rm harnic
 
 
 **Issues**:
-- Decode base64
-- Diff FORMATED json
+- Deal with long text stings
 - Change seq matcher match score from 0.7 to 0.5
