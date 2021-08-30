@@ -46,4 +46,12 @@ with open(out_dir + '/data.js', 'w+') as file_js:
     file_js.write(diffjson)
     file_js.write(';')
 logger.info('Comparison artifacts generated: %r', out_dir)
-logger.info(f'\n\nComparison stats:\n{h1.pretty_repr()}\n{h2.pretty_repr()}\n{format_diff_stats(diff.stats)}')
+stats_report = f"""
+
+Comparison stats:
+{h1.pretty_repr()}
+{h2.pretty_repr()}
+
+{format_diff_stats(diff.stats)}
+"""
+logger.info(stats_report)
