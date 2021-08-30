@@ -60,7 +60,6 @@ docker rm harnic
 **Issues**:
 - Deal with long text stings
 - Change seq matcher match score from 0.7 to 0.5
-- Reorders by default
 - Query params compare only keys
 - modal with size too big
 - Show first bytes of too big content
