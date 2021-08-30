@@ -64,4 +64,3 @@ docker rm harnic
 - Query params compare only keys
 - modal with size too big
 - Show first bytes of too big content
-- Eeturn files info to stats (bytes, num lines)

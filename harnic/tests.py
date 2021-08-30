@@ -1,5 +1,7 @@
 import unittest
 
+from termcolor import colored
+
 from harnic.compare import har_compare
 from harnic.compare.har import create_compact_records_index
 from harnic.har import HAR

@@ -5,3 +5,4 @@ python-dateutil==2.8.2
 six==1.16.0
 tabulate==0.8.9
 tqdm==4.62.1
+termcolor==1.1.0
