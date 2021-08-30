@@ -72,5 +72,5 @@ def format_diff_stats(stats):
         for (k, v1), (_, v2) in zip(stats['original'].items(), stats['with_reorders'].items())
         if k in rename_key_table.keys()
     )
-    headers = ["", "Original", "With Reorders"]
+    headers = ["", "Strict order", "With Reorders"]
     return tabulate(table, headers=headers, tablefmt='github')
