@@ -467,13 +467,19 @@ class App extends Component {
 
       original_records: original_records,
       reordered_records: reordered_records,
-      records: original_records,
 
       original_stats: original_stats,
       reordered_stats: reordered_stats,
-      stats: original_stats,
 
-      showReordered: false,
+      showReordered: true,
+    };
+
+    if (this.state.showReordered) {
+      this.state.records = reordered_records;
+      this.state.stats = reordered_stats;
+    } else {
+      this.state.records = original_records;
+      this.state.stats = original_stats;
     };
   };
 
@@ -516,6 +522,9 @@ class App extends Component {
       records = this.filterRecords();
     };
 
+    const toogleProps = {};
+    toogleProps['defaultChecked'] = showReordered;
+
     return (
       <Container>
         <Container className="header-container">
@@ -530,7 +539,7 @@ class App extends Component {
         <Grid>
           <Grid.Row>
             <Grid.Column width={2} className='reorders-toogle'>
-              <Checkbox toggle label='Allow reorders' onChange={this.toogleReordered}/>
+              <Checkbox toggle {...toogleProps} label='Allow reorders' onChange={this.toogleReordered}/>
               <Popup
                 trigger={<Icon name='info' className='reordering-desc-icon' />}
                 content='Fixes ordering of the same entries if they were mismatched due to different response time deltas.

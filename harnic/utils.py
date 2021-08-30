@@ -65,14 +65,14 @@ def format_diff_stats(stats):
         PermTag.DELETE: 'Removed',
     }
     table = [
-        ('Match ratio', get_match_ratio(stats['original']['ratio']), get_match_ratio(stats['with_reorders']['ratio'])),
+        ('Match ratio', get_match_ratio(stats['with_reorders']['ratio']), get_match_ratio(stats['original']['ratio'])),
     ]
     table.extend(  # _ == k1
         (rename_key_table[k], v1, v2)
-        for (k, v1), (_, v2) in zip(stats['original'].items(), stats['with_reorders'].items())
+        for (k, v1), (_, v2) in zip(stats['with_reorders'].items(), stats['original'].items())
         if k in rename_key_table.keys()
     )
-    headers = ["", "Strict Order", "With Reorders"]
+    headers = ["", "With Reorders", "Strict Order"]
     return tabulate(table, headers=headers, tablefmt='github')
 
 
