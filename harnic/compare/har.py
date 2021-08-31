@@ -48,6 +48,7 @@ def har_compare(har1, har2):
     i_entries, j_entries = har1.entries, har2.entries
     sm = difflib.SequenceMatcher(None, i_entries, j_entries)
     sm.records, sm.reorders, sm.stats = _build_har_diff(sm.get_opcodes(), har1, har2)
+    sm.har1, sm.har2 = har1, har2
 
     return sm
 
@@ -97,8 +98,8 @@ def _build_har_diff(opcodes, har1, har2):
     reorders = _calculate_reorders(records)
     reorders_stats = _calculate_reorders_stats(reorders, stats)
     stats = {
-        'original': stats,
-        'with_reorders': reorders_stats
+        'with_reorders': reorders_stats,
+        'strict_order': stats,
     }
 
     return records, reorders, stats

@@ -5,6 +5,7 @@ from termcolor import colored
 from harnic.compare import har_compare
 from harnic.compare.har import create_compact_records_index
 from harnic.har import HAR
+from harnic.schemas import HarSchema
 
 
 class TestHarnic(unittest.TestCase):

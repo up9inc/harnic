@@ -4,12 +4,12 @@ import os
 import sys
 from distutils.dir_util import copy_tree
 
-from termcolor import colored
-
 from harnic.compare import har_compare
+from harnic.compare.schemas import DiffKpisSchema
 from harnic.har import HAR
+from harnic.helpers import stats_report
 from harnic.render import render_diff_to_json
-from harnic.utils import SPA_BASE, format_diff_stats
+from harnic.utils import SPA_BASE
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -30,6 +30,7 @@ my_parser.add_argument('to_file', action='store', type=str,
 
 args = my_parser.parse_args()
 
+
 logger.info(f'Running version {os.environ.get("IMG_LABEL")}')
 logger.info('Generating diffs...')
 h1 = HAR(args.from_file)
@@ -45,13 +46,9 @@ with open(out_dir + '/data.js', 'w+') as file_js:
     file_js.write('window.globalData = ')
     file_js.write(diffjson)
     file_js.write(';')
+
+with open(out_dir + '/kpis.json', 'w+') as kpis_file:
+    kpis_file.write(DiffKpisSchema().dumps(diff, indent=2))
+
 logger.info('Comparison artifacts generated: %r', out_dir)
-stats_report = f"""
-
-Comparison stats:
-{h1.pretty_repr()}
-{h2.pretty_repr()}
-
-{format_diff_stats(diff.stats)}
-"""
-logger.info(stats_report)
+logger.info(stats_report(diff))

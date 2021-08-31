@@ -4,6 +4,15 @@ from harnic.compare.har import PermTag
 from harnic.constants import CONTENT_LONG_SKIP_TYPES
 
 
+class HarSchema(Schema):
+    path = fields.Str()
+    num_entries = fields.Method("get_num_entries")
+    size = fields.Integer()
+
+    def get_num_entries(self, object):
+        return len(object.entries)
+
+
 class UrlSchema(Schema):
     url = fields.Url()
     clean_url = fields.Url()

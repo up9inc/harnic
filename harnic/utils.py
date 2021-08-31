@@ -1,9 +1,6 @@
 import os
 from collections import defaultdict
 
-from tabulate import tabulate
-
-from harnic.compare.har import PermTag
 from harnic.constants import CONTENT_MEDIA_TYPES_SPECIAL, JSON_CTYPES
 
 SPA_BASE = os.getenv('SPA_LOCATION', 'harnic-spa')
@@ -52,28 +49,6 @@ def is_ctype_json(ctype):
     if ctype in JSON_CTYPES:
         return True
     return False
-
-
-def format_diff_stats(stats):
-    def get_match_ratio(ratio):
-        return "{:.2f}%".format(ratio * 100)
-
-    rename_key_table = {
-        PermTag.EQUAL: 'Matched',
-        PermTag.DIFF: 'Modified',
-        PermTag.INSERT: 'Added',
-        PermTag.DELETE: 'Removed',
-    }
-    table = [
-        ('Match ratio', get_match_ratio(stats['with_reorders']['ratio']), get_match_ratio(stats['original']['ratio'])),
-    ]
-    table.extend(  # _ == k1
-        (rename_key_table[k], v1, v2)
-        for (k, v1), (_, v2) in zip(stats['with_reorders'].items(), stats['original'].items())
-        if k in rename_key_table.keys()
-    )
-    headers = ["", "With Reorders", "Strict Order"]
-    return tabulate(table, headers=headers, tablefmt='github')
 
 
 def sizeof_fmt(num, suffix='b'):

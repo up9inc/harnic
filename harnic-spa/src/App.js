@@ -458,7 +458,7 @@ class App extends Component {
     let original_records = original_uuids.map(rUuid => index[rUuid]);
     let reordered_records = reordered_uuids.map(rUuid => index[rUuid]);
 
-    let original_stats = window.globalData.stats.original;
+    let original_stats = window.globalData.stats.strict_order;
     let reordered_stats = window.globalData.stats.with_reorders;
 
     this.state = {
