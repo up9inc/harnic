@@ -5,10 +5,8 @@ import sys
 from distutils.dir_util import copy_tree
 
 from harnic.compare import har_compare
-from harnic.compare.schemas import DiffKpisSchema
 from harnic.har import HAR
-from harnic.helpers import stats_report
-from harnic.render import render_diff_to_json
+from harnic.helpers import stats_report, generate_artifacts
 from harnic.utils import SPA_BASE
 
 logger = logging.getLogger(__name__)
@@ -40,15 +38,7 @@ diff = har_compare(h1, h2)
 out_dir = 'diff_' + os.path.basename(args.from_file) + '_' + os.path.basename(args.to_file)
 copy_tree(SPA_BASE + "/build", out_dir)
 
-diffjson = render_diff_to_json(diff)
-
-with open(out_dir + '/data.js', 'w+') as file_js:
-    file_js.write('window.globalData = ')
-    file_js.write(diffjson)
-    file_js.write(';')
-
-with open(out_dir + '/kpis.json', 'w+') as kpis_file:
-    kpis_file.write(DiffKpisSchema().dumps(diff, indent=2))
+generate_artifacts(diff, out_dir)
 
 logger.info('Comparison artifacts generated: %r', out_dir)
 logger.info(stats_report(diff))

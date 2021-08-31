@@ -1,9 +1,22 @@
-import inspect
 import textwrap
 
 from tabulate import tabulate
 
 from harnic.compare.har import PermTag
+from harnic.compare.schemas import DiffKpisSchema
+from harnic.render import render_diff_to_json
+
+
+def generate_artifacts(diff, out_dir):
+    diffjson = render_diff_to_json(diff)
+
+    with open(out_dir + '/data.js', 'w+') as file_js:
+        file_js.write('window.globalData = ')
+        file_js.write(diffjson)
+        file_js.write(';')
+
+    with open(out_dir + '/kpis.json', 'w+') as kpis_file:
+        kpis_file.write(DiffKpisSchema().dumps(diff, indent=2))
 
 
 def format_diff_stats(stats):
