@@ -42,7 +42,6 @@ docker rm harnic
 
 **Backend**:
 - Handle ldjson files
-- Write top level KPIs to a separate json artifact
 - Count partial matches in match ratio
 - Ignore dynamic values/IDs in HTML/XML/JSON
 - Maybe some rules to ignore dynamic patterns inside body?
@@ -54,7 +53,6 @@ docker rm harnic
 
 - Apply prismjs to content bodies: https://betterstack.dev/blog/code-highlighting-in-react-using-prismjs/
 - Add D3.js graphics
-- if whole header is missing/added - color its name, too
 
 
 **Issues**:
