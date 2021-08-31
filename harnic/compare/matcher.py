@@ -5,6 +5,9 @@ from enum import Enum
 from tqdm import tqdm
 
 from harnic.compare import EntryDiff
+from harnic.difflib_patcher import patch as difflib_patcher
+
+difflib_patcher()
 
 
 class DiffRecord:

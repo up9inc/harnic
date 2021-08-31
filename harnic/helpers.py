@@ -4,6 +4,7 @@ from tabulate import tabulate
 
 from harnic.compare.matcher import PermTag
 from harnic.compare.schemas import DiffKpisSchema
+from harnic.constants import JSON_INDENT
 from harnic.render import render_diff_to_json
 
 
@@ -16,7 +17,7 @@ def generate_artifacts(diff, out_dir):
         file_js.write(';')
 
     with open(out_dir + '/kpis.json', 'w+') as kpis_file:
-        kpis_file.write(DiffKpisSchema().dumps(diff, indent=2))
+        kpis_file.write(DiffKpisSchema().dumps(diff, indent=JSON_INDENT))
 
 
 def format_diff_stats(stats):
