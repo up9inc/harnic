@@ -6,7 +6,7 @@ from harnic.reader import load
 from harnic.utils import sizeof_fmt
 
 
-class HAR:
+class TrafficFile:
 
     def __init__(self, path):
         self.path = path

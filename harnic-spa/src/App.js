@@ -509,12 +509,11 @@ class App extends Component {
 
   render() {
     let {
-      hars,
-      records,
       kpis,
+      records,
       stats,
-      filterName,
       showReordered,
+      filterName,
     } = this.state;
     if (filterName) {
       records = this.filterRecords();
@@ -552,8 +551,8 @@ class App extends Component {
         <Table fixed celled selectable>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>{kpis.har1.path}:&nbsp;&nbsp;{kpis.har1.num_entries} entries</Table.HeaderCell>
-              <Table.HeaderCell>{kpis.har2.path}:&nbsp;&nbsp;{kpis.har2.num_entries} entries</Table.HeaderCell>
+              <Table.HeaderCell>{kpis.file1.path}:&nbsp;&nbsp;{kpis.file1.num_entries} entries</Table.HeaderCell>
+              <Table.HeaderCell>{kpis.file2.path}:&nbsp;&nbsp;{kpis.file2.num_entries} entries</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
 

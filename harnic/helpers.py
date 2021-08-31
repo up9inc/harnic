@@ -2,7 +2,7 @@ import textwrap
 
 from tabulate import tabulate
 
-from harnic.compare.har import PermTag
+from harnic.compare.matcher import PermTag
 from harnic.compare.schemas import DiffKpisSchema
 from harnic.render import render_diff_to_json
 
@@ -47,7 +47,7 @@ def stats_report(diff):
     return textwrap.dedent(f"""
 
         Comparison stats:
-        {diff.har1.pretty_repr()}
-        {diff.har2.pretty_repr()}
+        {diff.file1.pretty_repr()}
+        {diff.file2.pretty_repr()}
 
     """) + format_diff_stats(diff.stats)

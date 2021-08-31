@@ -1,10 +1,10 @@
 import json
 import os
 
-from harnic.compare import har_compare
-from harnic.compare.har import create_compact_records_index
+from harnic.compare import files_compare
+from harnic.compare.matcher import create_compact_records_index
 from harnic.compare.schemas import DiffCompactSchema, DiffKpisSchema
-from harnic.har import HAR
+from harnic.traffic_file import TrafficFile
 
 
 def render_diff_to_json(diff, format='compact'):
@@ -20,11 +20,11 @@ def render_diff_to_json(diff, format='compact'):
 
 
 if __name__ == '__main__':
-    h1 = HAR('hars/e-maxx.ru/1.har')
-    h2 = HAR('hars/e-maxx.ru/2.har')
+    h1 = TrafficFile('hars/e-maxx.ru/1.har')
+    h2 = TrafficFile('hars/e-maxx.ru/2.har')
     # h1 = HAR('hars/big/1.har')
     # h2 = HAR('hars/big/2.har')
-    diff = har_compare(h1, h2)
+    diff = files_compare(h1, h2)
 
     with open(os.path.dirname(__file__) + '/../harnic-spa/public/data.json', 'w+') as file:
         result = render_diff_to_json(diff)

@@ -43,18 +43,18 @@ class PermTag(Enum):
     DIFF = 'diff'
 
 
-def har_compare(har1, har2):
+def files_compare(file1, file2):
     # TODO: static can be junk
-    i_entries, j_entries = har1.entries, har2.entries
+    i_entries, j_entries = file1.entries, file2.entries
     sm = difflib.SequenceMatcher(None, i_entries, j_entries)
-    sm.records, sm.reorders, sm.stats = _build_har_diff(sm.get_opcodes(), har1, har2)
-    sm.har1, sm.har2 = har1, har2
+    sm.records, sm.reorders, sm.stats = _build_files_diff(sm.get_opcodes(), file1, file2)
+    sm.file1, sm.file2 = file1, file2
 
     return sm
 
 
-def _build_har_diff(opcodes, har1, har2):
-    i_entries, j_entries = har1.entries, har2.entries
+def _build_files_diff(opcodes, file1, file2):
+    i_entries, j_entries = file1.entries, file2.entries
     records = []
     stats = {
         PermTag.EQUAL: 0,
@@ -91,10 +91,10 @@ def _build_har_diff(opcodes, har1, har2):
                 dr = DiffRecord(Pair(None, j_entries[j]), None, PermTag(tag))
                 records.append(dr)
                 stats[PermTag.INSERT] += 1
-        stats['ratio'] = 2.0 * stats[PermTag.EQUAL] / (len(har1) + len(har2))
+        stats['ratio'] = 2.0 * stats[PermTag.EQUAL] / (len(file1) + len(file2))
 
     reorders = _calculate_reorders(records)
-    reorders_stats = _calculate_reorders_stats(reorders, stats, (har1, har2))
+    reorders_stats = _calculate_reorders_stats(reorders, stats, (file1, file2))
     stats = {
         'with_reorders': reorders_stats,
         'strict_order': stats,
@@ -128,8 +128,8 @@ def _calculate_reorders(records):
     return record_reorders
 
 
-def _calculate_reorders_stats(reorders, stats, hars):
-    har1, har2 = hars
+def _calculate_reorders_stats(reorders, stats, files):
+    file1, file2 = files
     stats = stats.copy()
     num_reorders = len(reorders)
     stats[PermTag.INSERT] -= num_reorders
@@ -137,7 +137,7 @@ def _calculate_reorders_stats(reorders, stats, hars):
     for reorder in reorders:
         tag_selector = PermTag.EQUAL if reorder['entry_diff'].equal else PermTag.DIFF
         stats[tag_selector] += 1
-    stats['ratio'] = 2.0 * stats[PermTag.EQUAL] / (len(har1) + len(har2))
+    stats['ratio'] = 2.0 * stats[PermTag.EQUAL] / (len(file1) + len(file2))
 
     return stats
 

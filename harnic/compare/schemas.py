@@ -53,6 +53,6 @@ class DiffStatsSchema(Schema):
 
 
 class DiffKpisSchema(Schema):
-    har1 = fields.Nested(HarSchema)
-    har2 = fields.Nested(HarSchema)
+    file1 = fields.Nested(HarSchema)
+    file2 = fields.Nested(HarSchema)
     stats = fields.Nested(DiffStatsSchema)

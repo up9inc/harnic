@@ -4,8 +4,8 @@ import os
 import sys
 from distutils.dir_util import copy_tree
 
-from harnic.compare import har_compare
-from harnic.har import HAR
+from harnic.compare import files_compare
+from harnic.traffic_file import TrafficFile
 from harnic.helpers import stats_report, generate_artifacts
 from harnic.utils import SPA_BASE
 
@@ -31,9 +31,9 @@ args = my_parser.parse_args()
 
 logger.info(f'Running version {os.environ.get("IMG_LABEL")}')
 logger.info('Generating diffs...')
-h1 = HAR(args.from_file)
-h2 = HAR(args.to_file)
-diff = har_compare(h1, h2)
+h1 = TrafficFile(args.from_file)
+h2 = TrafficFile(args.to_file)
+diff = files_compare(h1, h2)
 
 out_dir = 'diff_' + os.path.basename(args.from_file) + '_' + os.path.basename(args.to_file)
 copy_tree(SPA_BASE + "/build", out_dir)

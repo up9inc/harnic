@@ -1,6 +1,6 @@
 from marshmallow import Schema, fields, pre_dump
 
-from harnic.compare.har import PermTag
+from harnic.compare.matcher import PermTag
 from harnic.constants import CONTENT_LONG_SKIP_TYPES
 
 
