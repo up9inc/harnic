@@ -58,20 +58,20 @@ class ResponseSchema(MessageSchema):
 
 
 class StatsSchema(Schema):
-    equal = fields.Method("get_equal")
-    diff = fields.Method("get_diff")
-    insert = fields.Method("get_insert")
-    delete = fields.Method("get_delete")
+    matched = fields.Method("get_matched")
+    modified = fields.Method("get_modified")
+    added = fields.Method("get_added")
+    removed = fields.Method("get_removed")
     ratio = fields.Float()
 
-    def get_equal(self, object):
+    def get_matched(self, object):
         return object[PermTag.EQUAL]
 
-    def get_diff(self, object):
+    def get_modified(self, object):
         return object[PermTag.DIFF]
 
-    def get_insert(self, object):
+    def get_added(self, object):
         return object[PermTag.INSERT]
 
-    def get_delete(self, object):
+    def get_removed(self, object):
         return object[PermTag.DELETE]

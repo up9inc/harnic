@@ -427,19 +427,19 @@ const Statistics = ({stats}) => (
         <Statistic.Label>Match ratio</Statistic.Label>
       </Statistic>
       <Statistic>
-        <Statistic.Value>{stats.equal}</Statistic.Value>
+        <Statistic.Value>{stats.matched}</Statistic.Value>
         <Statistic.Label>Matched</Statistic.Label>
       </Statistic>
       <Statistic>
-        <Statistic.Value>{stats.diff}</Statistic.Value>
+        <Statistic.Value>{stats.modified}</Statistic.Value>
         <Statistic.Label>Modified</Statistic.Label>
       </Statistic>
       <Statistic>
-        <Statistic.Value>{stats.insert}</Statistic.Value>
+        <Statistic.Value>{stats.added}</Statistic.Value>
         <Statistic.Label>Added</Statistic.Label>
       </Statistic>
       <Statistic>
-        <Statistic.Value>{stats.delete}</Statistic.Value>
+        <Statistic.Value>{stats.removed}</Statistic.Value>
         <Statistic.Label>Removed</Statistic.Label>
       </Statistic>
     </Statistic.Group>
@@ -452,20 +452,18 @@ class App extends Component {
     super(props);
 
     const index = window.globalData.diff.index;
-    const original_uuids = window.globalData.diff.original_records;
+    const original_uuids = window.globalData.diff.strict_order_records;
     const reordered_uuids = window.globalData.diff.reordered_records;
 
-    let original_records = original_uuids.map(rUuid => index[rUuid]);
-    let reordered_records = reordered_uuids.map(rUuid => index[rUuid]);
+    const strict_order_records = original_uuids.map(rUuid => index[rUuid]);
+    const reordered_records = reordered_uuids.map(rUuid => index[rUuid]);
 
-    let kpis = window.globalData.kpis;
-    let original_stats = window.globalData.kpis.stats.strict_order;
-    let reordered_stats = window.globalData.kpis.stats.with_reorders;
+    const kpis = window.globalData.kpis;
 
     this.state = {
       filterName: null,
 
-      original_records: original_records,
+      strict_order_records: strict_order_records,
       reordered_records: reordered_records,
 
       kpis: kpis,
@@ -477,7 +475,7 @@ class App extends Component {
       this.state.records = reordered_records;
       this.state.stats = kpis.stats.with_reorders;
     } else {
-      this.state.records = original_records;
+      this.state.records = strict_order_records;
       this.state.stats = kpis.stats.strict_order;
     };
   };
@@ -504,7 +502,7 @@ class App extends Component {
   toogleReordered = () => {
     this.setState(prevState => ({
       showReordered: !prevState.showReordered,
-      records: prevState.showReordered ? this.state.original_records : this.state.reordered_records,
+      records: prevState.showReordered ? this.state.strict_order_records : this.state.reordered_records,
       stats: prevState.showReordered ? this.state.kpis.stats.strict_order : this.state.kpis.stats.with_reorders,
     }));
   }

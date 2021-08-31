@@ -158,7 +158,7 @@ def create_compact_records_index(diff):
     original_index = {r.id: r for r in diff.records}
     index = {**original_index, **reorders_index}
 
-    original_records = [record.id for record in diff.records]
+    strict_order_records = [record.id for record in diff.records]
     reordered_records = []
 
     # helps to clean reordered_records from destinations
@@ -176,6 +176,6 @@ def create_compact_records_index(diff):
 
     return {
         'index': index,
-        'original_records': original_records,
+        'strict_order_records': strict_order_records,
         'reordered_records': reordered_records,
     }

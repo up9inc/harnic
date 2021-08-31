@@ -43,7 +43,7 @@ class DiffRecordSchema(Schema):
 
 class DiffCompactSchema(Schema):
     index = fields.Dict(keys=fields.UUID(), values=fields.Nested('DiffRecordSchema'))
-    original_records = fields.List(fields.UUID())
+    strict_order_records = fields.List(fields.UUID())
     reordered_records = fields.List(fields.UUID())
 
 
