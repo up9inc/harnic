@@ -57,8 +57,6 @@ def _build_har_diff(opcodes, har1, har2):
     i_entries, j_entries = har1.entries, har2.entries
     records = []
     stats = {
-        'from_count': len(har1.entries),
-        'to_count': len(har2.entries),
         PermTag.EQUAL: 0,
         PermTag.DIFF: 0,
         PermTag.INSERT: 0,
@@ -93,10 +91,10 @@ def _build_har_diff(opcodes, har1, har2):
                 dr = DiffRecord(Pair(None, j_entries[j]), None, PermTag(tag))
                 records.append(dr)
                 stats[PermTag.INSERT] += 1
-        stats['ratio'] = 2.0 * stats[PermTag.EQUAL] / (len(i_entries) + len(j_entries))
+        stats['ratio'] = 2.0 * stats[PermTag.EQUAL] / (len(har1) + len(har2))
 
     reorders = _calculate_reorders(records)
-    reorders_stats = _calculate_reorders_stats(reorders, stats)
+    reorders_stats = _calculate_reorders_stats(reorders, stats, (har1, har2))
     stats = {
         'with_reorders': reorders_stats,
         'strict_order': stats,
@@ -130,7 +128,8 @@ def _calculate_reorders(records):
     return record_reorders
 
 
-def _calculate_reorders_stats(reorders, stats):
+def _calculate_reorders_stats(reorders, stats, hars):
+    har1, har2 = hars
     stats = stats.copy()
     num_reorders = len(reorders)
     stats[PermTag.INSERT] -= num_reorders
@@ -138,7 +137,7 @@ def _calculate_reorders_stats(reorders, stats):
     for reorder in reorders:
         tag_selector = PermTag.EQUAL if reorder['entry_diff'].equal else PermTag.DIFF
         stats[tag_selector] += 1
-    stats['ratio'] = 2.0 * stats[PermTag.EQUAL] / (stats['from_count'] + stats['to_count'])
+    stats['ratio'] = 2.0 * stats[PermTag.EQUAL] / (len(har1) + len(har2))
 
     return stats
 

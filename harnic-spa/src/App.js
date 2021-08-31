@@ -458,28 +458,27 @@ class App extends Component {
     let original_records = original_uuids.map(rUuid => index[rUuid]);
     let reordered_records = reordered_uuids.map(rUuid => index[rUuid]);
 
-    let original_stats = window.globalData.stats.strict_order;
-    let reordered_stats = window.globalData.stats.with_reorders;
+    let kpis = window.globalData.kpis;
+    let original_stats = window.globalData.kpis.stats.strict_order;
+    let reordered_stats = window.globalData.kpis.stats.with_reorders;
 
     this.state = {
       filterName: null,
-      hars: window.globalData.hars,
 
       original_records: original_records,
       reordered_records: reordered_records,
 
-      original_stats: original_stats,
-      reordered_stats: reordered_stats,
+      kpis: kpis,
 
       showReordered: true,
     };
 
     if (this.state.showReordered) {
       this.state.records = reordered_records;
-      this.state.stats = reordered_stats;
+      this.state.stats = kpis.stats.with_reorders;
     } else {
       this.state.records = original_records;
-      this.state.stats = original_stats;
+      this.state.stats = kpis.stats.strict_order;
     };
   };
 
@@ -506,7 +505,7 @@ class App extends Component {
     this.setState(prevState => ({
       showReordered: !prevState.showReordered,
       records: prevState.showReordered ? this.state.original_records : this.state.reordered_records,
-      stats: prevState.showReordered ? this.state.original_stats : this.state.reordered_stats,
+      stats: prevState.showReordered ? this.state.kpis.stats.strict_order : this.state.kpis.stats.with_reorders,
     }));
   }
 
@@ -514,6 +513,7 @@ class App extends Component {
     let {
       hars,
       records,
+      kpis,
       stats,
       filterName,
       showReordered,
@@ -535,7 +535,7 @@ class App extends Component {
             <Header size='huge'>Traffic comparison tool</Header>
           </div>
         </Container>
-        {Object.keys(stats).length !== 0 && <Statistics stats={stats} />}
+        <Statistics stats={stats} />
         <Grid>
           <Grid.Row>
             <Grid.Column width={2} className='reorders-toogle'>
@@ -554,8 +554,8 @@ class App extends Component {
         <Table fixed celled selectable>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>{hars[0]}:&nbsp;&nbsp;{stats.from_count} entries</Table.HeaderCell>
-              <Table.HeaderCell>{hars[1]}:&nbsp;&nbsp;{stats.to_count} entries</Table.HeaderCell>
+              <Table.HeaderCell>{kpis.har1.path}:&nbsp;&nbsp;{kpis.har1.num_entries} entries</Table.HeaderCell>
+              <Table.HeaderCell>{kpis.har2.path}:&nbsp;&nbsp;{kpis.har2.num_entries} entries</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
 

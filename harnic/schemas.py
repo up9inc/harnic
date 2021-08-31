@@ -63,8 +63,6 @@ class StatsSchema(Schema):
     insert = fields.Method("get_insert")
     delete = fields.Method("get_delete")
     ratio = fields.Float()
-    from_count = fields.Integer()
-    to_count = fields.Integer()
 
     def get_equal(self, object):
         return object[PermTag.EQUAL]

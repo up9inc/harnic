@@ -16,6 +16,9 @@ class HAR:
     def __repr__(self):
         return self.path
 
+    def __len__(self):
+        return len(self.entries)
+
     def _sort(self, by='ts'):
         if by == 'ts':
             self.entries.sort(key=lambda e: e.request.get('_ts'))
@@ -28,5 +31,4 @@ class HAR:
 
     def pretty_repr(self):
         name = colored(self.path, "yellow")
-        num_entries = len(self.entries)
-        return f'{name}: {num_entries} entries, {sizeof_fmt(self.size)}'
+        return f'{name}: {len(self)} entries, {sizeof_fmt(self.size)}'
