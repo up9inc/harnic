@@ -170,19 +170,15 @@ const ContentText = ({ value, request }) => {
 const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => {
   const cmpIdx = initialEntry ? 0 : 1;
 
-  const getDiffStringClass = (string, key) => {
+  const getDiffStringClass = (string, key, diffCmpIdx=cmpIdx) => {
     let cls = '';
     if (diff['content'].diff.modified['text'][2][key]){
-      if (cmpIdx === 0) {
-        cls = 'content-diff-removed'; 
-      } else {
-        cls = 'content-diff-added'; 
-      }
+      cls = diffCmpIdx ? 'content-diff-added' : 'content-diff-removed';
     }
     return cls;
   };
 
-  const getDiffString = string => {
+  const getDiffString = (string, diffCmpIdx=cmpIdx) => {
     const wholeLineRegex = /^\u0000[\+\^-](.+?)\u0001$/g;
     const regex = /\u0000[\+\^-](.+?)\u0001/g;
     if (string.match(wholeLineRegex)) {
@@ -191,7 +187,7 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
     string = regexifyString({
         pattern: regex,
         decorator: (match, index) => {
-          const cls = initialEntry ? "inner-line-diff removed" : "inner-line-diff added";
+          const cls = diffCmpIdx ? "inner-line-diff added" : "inner-line-diff removed";
           return (
             <span className={cls}>
               {/*excludes wrappers ^\0(+|-|^){} to {}\1 */}
@@ -254,7 +250,9 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
                     <div className="raw-content">
                       <code>
                         {textDiff[0].map((i,key) => (
-                          <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
+                          <div key={key} className={getDiffStringClass(i, key, 0)}>
+                            {getDiffString(i, 0)}
+                          </div>
                         ))}
                       </code>
                     </div>
@@ -265,7 +263,9 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
                     <div className="raw-content">
                       <code>
                         {textDiff[1].map((i,key) => (
-                          <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
+                          <div key={key} className={getDiffStringClass(i, key, 1)}>
+                            {getDiffString(i, 1)}
+                          </div>
                         ))}
                       </code>
                     </div>
