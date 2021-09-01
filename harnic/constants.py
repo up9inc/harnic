@@ -32,10 +32,12 @@ CONTENT_MEDIA_TYPES_SPECIAL = (
 
 )
 CONTENT_LONG_SKIP_TYPES = ('text/css', 'text/javascript', 'application/javascript', 'text/html')
-MAX_BODY_SIZE = 50000
+# MAX_BODY_SIZE = 50000
+MAX_BODY_SIZE = 1000000
 
 JSON_CTYPES = ('application/json', 'application/x-amz-json-1.1', 'application/reports+json')
 
 JSON_INDENT = 2
 
 PARTIAL_MATCH_CUTOFF = 0.5
+FANCY_REPLACE_THRESHOLD_LEN = 256

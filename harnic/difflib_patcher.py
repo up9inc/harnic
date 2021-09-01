@@ -1,6 +1,6 @@
 from difflib import Differ
 
-from harnic.constants import PARTIAL_MATCH_CUTOFF
+from harnic.constants import PARTIAL_MATCH_CUTOFF, FANCY_REPLACE_THRESHOLD_LEN
 
 
 def _fancy_replace_PATCHED(self, a, alo, ahi, b, blo, bhi):
@@ -42,6 +42,9 @@ def _fancy_replace_PATCHED(self, a, alo, ahi, b, blo, bhi):
                     eqi, eqj = i, j
                 continue
             cruncher.set_seq1(ai)
+            if max(len(ai), len(bj)) > FANCY_REPLACE_THRESHOLD_LEN:
+                yield from self._plain_replace(a, alo, ahi, b, blo, bhi)
+                return
             # computing similarity is expensive, so use the quick
             # upper bounds first -- have seen this speed up messy
             # compares by a factor of 3.

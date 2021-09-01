@@ -4,6 +4,7 @@ import traceback
 from urllib.parse import urlencode
 
 import dateutil.parser
+from tqdm import tqdm
 
 from harnic.objects import Url, Entry
 
@@ -26,11 +27,11 @@ def load(fname):
 
     logging.debug("Entries in HAR: %s", len(entries))
     metainfo = {'_source': source}
-    return _har_entry_reader(entries, metainfo)
+    return _har_entry_reader(entries, metainfo, fname)
 
 
-def _har_entry_reader(entries, metadata):
-    for entry in entries:
+def _har_entry_reader(entries, metadata, fname):
+    for entry in tqdm(entries, desc=f'Loading {fname}'):
         try:
             if metadata.get('messageType') == 'kafka':
                 req, resp = _from_kafka_msg(entry)

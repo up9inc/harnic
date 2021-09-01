@@ -65,36 +65,43 @@ def _build_files_diff(opcodes, file1, file2):
         PermTag.INSERT: 0,
         PermTag.DELETE: 0,
     }
-    for permutation in tqdm(opcodes):
-        tag, i1, i2, j1, j2 = permutation
-        if tag == 'equal':
-            for i, j in zip(range(i1, i2), range(j1, j2)):
-                pair = Pair(i_entries[i], j_entries[j])
-                entry_diff = EntryDiff(*pair)
-                tag_selector = PermTag.EQUAL if entry_diff.equal else PermTag.DIFF
-                dr = DiffRecord(pair, entry_diff, tag_selector)
-                records.append(dr)
-                stats[tag_selector] += 1
-        elif tag == 'replace':
-            for i in range(i1, i2):
-                dr = DiffRecord(Pair(i_entries[i], None), None, PermTag.DELETE)
-                records.append(dr)
-                stats[PermTag.DELETE] += 1
-            for j in range(j1, j2):
-                dr = DiffRecord(Pair(None, j_entries[j]), None, PermTag.INSERT)
-                records.append(dr)
-                stats[PermTag.INSERT] += 1
-        elif tag == 'delete':
-            for i in range(i1, i2):
-                dr = DiffRecord(Pair(i_entries[i], None), None, PermTag(tag))
-                records.append(dr)
-                stats[PermTag.DELETE] += 1
-        elif tag == 'insert':
-            for j in range(j1, j2):
-                dr = DiffRecord(Pair(None, j_entries[j]), None, PermTag(tag))
-                records.append(dr)
-                stats[PermTag.INSERT] += 1
-        stats['ratio'] = 2.0 * stats[PermTag.EQUAL] / (len(file1) + len(file2))
+    perms_total = _calculate_permutations_total_number(opcodes)
+    with tqdm(total=perms_total, desc='Constructing diff records') as pbar:
+        for permutation in opcodes:
+            tag, i1, i2, j1, j2 = permutation
+            if tag == 'equal':
+                for i, j in zip(range(i1, i2), range(j1, j2)):
+                    pair = Pair(i_entries[i], j_entries[j])
+                    entry_diff = EntryDiff(*pair)
+                    tag_selector = PermTag.EQUAL if entry_diff.equal else PermTag.DIFF
+                    dr = DiffRecord(pair, entry_diff, tag_selector)
+                    records.append(dr)
+                    stats[tag_selector] += 1
+                    pbar.update()
+            elif tag == 'replace':
+                for i in range(i1, i2):
+                    dr = DiffRecord(Pair(i_entries[i], None), None, PermTag.DELETE)
+                    records.append(dr)
+                    stats[PermTag.DELETE] += 1
+                    pbar.update()
+                for j in range(j1, j2):
+                    dr = DiffRecord(Pair(None, j_entries[j]), None, PermTag.INSERT)
+                    records.append(dr)
+                    stats[PermTag.INSERT] += 1
+                    pbar.update()
+            elif tag == 'delete':
+                for i in range(i1, i2):
+                    dr = DiffRecord(Pair(i_entries[i], None), None, PermTag(tag))
+                    records.append(dr)
+                    stats[PermTag.DELETE] += 1
+                    pbar.update()
+            elif tag == 'insert':
+                for j in range(j1, j2):
+                    dr = DiffRecord(Pair(None, j_entries[j]), None, PermTag(tag))
+                    records.append(dr)
+                    stats[PermTag.INSERT] += 1
+                    pbar.update()
+            stats['ratio'] = 2.0 * stats[PermTag.EQUAL] / (len(file1) + len(file2))
 
     reorders = _calculate_reorders(records)
     reorders_stats = _calculate_reorders_stats(reorders, stats, (file1, file2))
@@ -106,10 +113,25 @@ def _build_files_diff(opcodes, file1, file2):
     return records, reorders, stats
 
 
+def _calculate_permutations_total_number(opcodes):
+    total = 0
+    for permutation in opcodes:
+        tag, i1, i2, j1, j2 = permutation
+        if tag == 'equal':
+            total += i2 - i1
+        elif tag == 'replace':
+            total += (i2 - i1 + j2 - j1)
+        elif tag == 'delete':
+            total += i2 - i1
+        elif tag == 'insert':
+            total += j2 - i1
+    return total
+
+
 def _calculate_reorders(records):
     entry_reorders = {}
     record_reorders = []
-    for record in records:
+    for record in tqdm(records, desc='Calculating reorders'):
         if record.tag not in (PermTag.INSERT, PermTag.DELETE):
             continue
         entry = record.pair.partial_entry
