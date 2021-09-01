@@ -162,13 +162,13 @@ const ResponseData = ({ response, diff, initialEntry }) => {
   };
 
   const renderTextDiff = () => {
-    const textDiff = diff['content'].diff.modified['text'][cmpIdx];
-    if (textDiff.length < 50) {
+    const textDiff = diff['content'].diff.modified['text'];
+    if (textDiff[cmpIdx].length < 50) {
       return(
         <List.Item key='text'>
           <div className="raw-content">
             <code>
-              {textDiff.map((i,key) => (
+              {textDiff[cmpIdx].map((i,key) => (
                 <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
               ))}
             </code>
@@ -181,12 +181,12 @@ const ResponseData = ({ response, diff, initialEntry }) => {
           <List.Item key='text'>
             <div className="raw-content">
               <code>
-                {textDiff.slice(0, 25).map((i,key) => (
+                {textDiff[cmpIdx].slice(0, 20).map((i,key) => (
                   <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
                 ))}
                 <div>&nbsp;</div>
                 <div>&nbsp;</div>
-                <div key='truncated'>TRUNCATED...</div>
+                <div key='truncated' className='truncated'>...TRUNCATED...</div>
               </code>
             </div>
           </List.Item>
@@ -194,10 +194,26 @@ const ResponseData = ({ response, diff, initialEntry }) => {
             <Grid celled='internally'>
               <Grid.Row>
                 <Grid.Column width={8}>
-                  <Image src='https://react.semantic-ui.com/images/wireframe/image.png' />
+                  <List.Item key='text'>
+                    <div className="raw-content">
+                      <code>
+                        {textDiff[0].map((i,key) => (
+                          <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
+                        ))}
+                      </code>
+                    </div>
+                  </List.Item>
                 </Grid.Column>
                 <Grid.Column width={8}>
-                  <Image src='https://react.semantic-ui.com/images/wireframe/centered-paragraph.png' />
+                  <List.Item key='text'>
+                    <div className="raw-content">
+                      <code>
+                        {textDiff[1].map((i,key) => (
+                          <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
+                        ))}
+                      </code>
+                    </div>
+                  </List.Item>
                 </Grid.Column>
               </Grid.Row>
             </Grid>            
@@ -299,7 +315,7 @@ const ModalScrollingContent = ({ children }) => {
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
-        <Button onClick={() => setOpen(false)} primary>
+        <Button onClick={() => setOpen(false)} basic color='blue'>
           Proceed <Icon name='chevron right' />
         </Button>
       </Modal.Actions>
