@@ -293,7 +293,7 @@ const ResponseData = ({ recordPair, response, diff, initialEntry }) => {
                   <b>{key}</b>:
                   <span className={`har-data-value ${diffClass}`}>
                     {
-                      key === 'text' && <ContentText value={value}/>
+                      key === 'text' ? <ContentText value={value}/> : value
                     }
                   </span>&nbsp;
                   {diffIsSoft &&
