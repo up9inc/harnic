@@ -51,10 +51,11 @@ class ResponseSchema(MessageSchema):
 
     @pre_dump
     def clear_content(self, in_data, **kwargs):
-        content = in_data['content']
-        if content['size'] > 2500 and any(skip_type in content['mimeType'] for skip_type in CONTENT_LONG_SKIP_TYPES):
-            in_data['content']['text'] = None
         return in_data
+        # content = in_data['content']
+        # if content['size'] > 2500 and any(skip_type in content['mimeType'] for skip_type in CONTENT_LONG_SKIP_TYPES):
+        #     in_data['content']['text'] = None
+        # return in_data
 
 
 class StatsSchema(Schema):

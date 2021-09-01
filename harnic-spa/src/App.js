@@ -123,6 +123,20 @@ const RequestData = ({ request, diff }) => {
 };
 
 
+const ContentText = ({ value }) => {
+  if (value === null) {
+    return 'Content skipped';
+  }
+  return (
+    <div className="raw-content">
+      <code>
+        {value}
+      </code>
+    </div>    
+  );
+}
+
+
 const ResponseData = ({ recordPair, response, diff, initialEntry }) => {
   const cmpIdx = initialEntry ? 0 : 1;
 
@@ -181,7 +195,7 @@ const ResponseData = ({ recordPair, response, diff, initialEntry }) => {
           <List.Item key='text'>
             <div className="raw-content">
               <code>
-                {textDiff[cmpIdx].slice(0, 20).map((i,key) => (
+                {textDiff[cmpIdx].slice(0, 15).map((i,key) => (
                   <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
                 ))}
                 <div>&nbsp;</div>
@@ -278,7 +292,9 @@ const ResponseData = ({ recordPair, response, diff, initialEntry }) => {
                 <List.Item key={key} className={diffIsNew && diffClass}>
                   <b>{key}</b>:
                   <span className={`har-data-value ${diffClass}`}>
-                    {key === 'text' && value === null ? 'Content skipped' : value}
+                    {
+                      key === 'text' && <ContentText value={value}/>
+                    }
                   </span>&nbsp;
                   {diffIsSoft &&
                     <Popup
