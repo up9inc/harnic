@@ -190,7 +190,18 @@ const ResponseData = ({ response, diff, initialEntry }) => {
               </code>
             </div>
           </List.Item>
-          <ModalScrollingContent />
+          <ModalScrollingContent>
+            <Grid celled='internally'>
+              <Grid.Row>
+                <Grid.Column width={8}>
+                  <Image src='https://react.semantic-ui.com/images/wireframe/image.png' />
+                </Grid.Column>
+                <Grid.Column width={8}>
+                  <Image src='https://react.semantic-ui.com/images/wireframe/centered-paragraph.png' />
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>            
+          </ModalScrollingContent>
         </>
       );      
     }
@@ -270,7 +281,7 @@ const ResponseData = ({ response, diff, initialEntry }) => {
   );
 };
 
-const ModalScrollingContent = () => {
+const ModalScrollingContent = ({ children }) => {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -279,15 +290,12 @@ const ModalScrollingContent = () => {
       open={open}
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
-      trigger={<Button fluid basic>Full diff</Button>}
+      trigger={<Button fluid basic color='blue'>Full diff</Button>}
     >
-      <Modal.Header>Profile Picture</Modal.Header>
+      <Modal.Header>/Add url1 -> urlr2 here/</Modal.Header>
       <Modal.Content scrolling>
         <Modal.Description>
-          <p>
-            This is an example of expanded content that will cause the modal's
-            dimmer to scroll.
-          </p>
+          { children }
         </Modal.Description>
       </Modal.Content>
       <Modal.Actions>
