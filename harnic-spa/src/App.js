@@ -18,7 +18,9 @@ import {
   Popup,
   Checkbox,
   Segment,
-  Grid
+  Grid,
+  Modal,
+  Button,
 } from 'semantic-ui-react';
 import {
   DateTime
@@ -121,22 +123,62 @@ const RequestData = ({ request, diff }) => {
 };
 
 
-const ResponseData = ({ response, diff, initialEntry }) => {
+const ContentText = ({ value, request }) => {
+  let lines = value.split(/\n/);
+  if (value === null) {
+    return 'Content skipped';
+  }
+  if (lines.length < 50) {
+    return (
+      <div className="raw-content">
+        <code>
+          {lines.map((i,key) => (
+            <div key={key}>{i}</div>
+          ))}
+        </code>
+      </div>
+    );   
+  } else {
+    const header = request.url.url;
+    return (
+      <>
+        <div className="raw-content">
+          <code>
+            {lines.slice(0, 15).map((i,key) => (
+              <div key={key}>{i}</div>
+            ))}
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div key='truncated' className='truncated'>...TRUNCATED...</div>
+          </code>
+        </div>
+        <ModalScrollingContent header={header}>
+          <div className="raw-content">
+            <code>
+              {lines.map((i,key) => (
+                <div key={key}>{i}</div>
+              ))}
+            </code>
+          </div>        
+        </ModalScrollingContent>
+      </>
+    );
+  }
+}
+
+
+const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => {
   const cmpIdx = initialEntry ? 0 : 1;
 
-  const getDiffStringClass = (string, key) => {
+  const getDiffStringClass = (string, key, diffCmpIdx=cmpIdx) => {
     let cls = '';
     if (diff['content'].diff.modified['text'][2][key]){
-      if (cmpIdx === 0) {
-        cls = 'content-diff-removed'; 
-      } else {
-        cls = 'content-diff-added'; 
-      }
+      cls = diffCmpIdx ? 'content-diff-added' : 'content-diff-removed';
     }
     return cls;
   };
 
-  const getDiffString = string => {
+  const getDiffString = (string, diffCmpIdx=cmpIdx) => {
     const wholeLineRegex = /^\u0000[\+\^-](.+?)\u0001$/g;
     const regex = /\u0000[\+\^-](.+?)\u0001/g;
     if (string.match(wholeLineRegex)) {
@@ -145,7 +187,7 @@ const ResponseData = ({ response, diff, initialEntry }) => {
     string = regexifyString({
         pattern: regex,
         decorator: (match, index) => {
-          const cls = initialEntry ? "inner-line-diff removed" : "inner-line-diff added";
+          const cls = diffCmpIdx ? "inner-line-diff added" : "inner-line-diff removed";
           return (
             <span className={cls}>
               {/*excludes wrappers ^\0(+|-|^){} to {}\1 */}
@@ -159,15 +201,83 @@ const ResponseData = ({ response, diff, initialEntry }) => {
     return string;
   };
 
-  const renderTextDiff = () => (
-    <div className="raw-content">
-      <code>
-        {diff['content'].diff.modified['text'][cmpIdx].map((i,key) => (
-          <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
-        ))}
-      </code>
-    </div>
-  )
+  const renderTextDiff = () => {
+    const textDiff = diff['content'].diff.modified['text'];
+    if (textDiff[cmpIdx].length < 50) {
+      return(
+        <List.Item key='text'>
+          <div className="raw-content">
+            <code>
+              {textDiff[cmpIdx].map((i,key) => (
+                <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
+              ))}
+            </code>
+          </div>
+        </List.Item>
+      );
+    } else {
+      const header = (
+        <Grid celled='internally'>
+          <Grid.Row>
+            <Grid.Column width={8}>
+              {truncate(recordPair.a.request.url.url, 90)}
+            </Grid.Column>
+            <Grid.Column width={8}>
+              {truncate(recordPair.b.request.url.url, 90)}
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+        );
+      return(
+        <>
+          <List.Item key='text'>
+            <div className="raw-content">
+              <code>
+                {textDiff[cmpIdx].slice(0, 15).map((i,key) => (
+                  <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
+                ))}
+                <div>&nbsp;</div>
+                <div>&nbsp;</div>
+                <div key='truncated' className='truncated'>...TRUNCATED...</div>
+              </code>
+            </div>
+          </List.Item>
+          <ModalScrollingContent header={header}>
+            <Grid celled='internally'>
+              <Grid.Row>
+                <Grid.Column width={8}>
+                  <List.Item key='text'>
+                    <div className="raw-content">
+                      <code>
+                        {textDiff[0].map((i,key) => (
+                          <div key={key} className={getDiffStringClass(i, key, 0)}>
+                            {getDiffString(i, 0)}
+                          </div>
+                        ))}
+                      </code>
+                    </div>
+                  </List.Item>
+                </Grid.Column>
+                <Grid.Column width={8}>
+                  <List.Item key='text'>
+                    <div className="raw-content">
+                      <code>
+                        {textDiff[1].map((i,key) => (
+                          <div key={key} className={getDiffStringClass(i, key, 1)}>
+                            {getDiffString(i, 1)}
+                          </div>
+                        ))}
+                      </code>
+                    </div>
+                  </List.Item>
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>            
+          </ModalScrollingContent>
+        </>
+      );      
+    }
+  }
 
   let textModified = false;
   if ('text' in response.content &&
@@ -224,7 +334,9 @@ const ResponseData = ({ response, diff, initialEntry }) => {
                 <List.Item key={key} className={diffIsNew && diffClass}>
                   <b>{key}</b>:
                   <span className={`har-data-value ${diffClass}`}>
-                    {key === 'text' && value === null ? 'Content skipped' : value}
+                    {
+                      key === 'text' ? <ContentText value={value} request={request}/> : value
+                    }
                   </span>&nbsp;
                   {diffIsSoft &&
                     <Popup
@@ -235,17 +347,41 @@ const ResponseData = ({ response, diff, initialEntry }) => {
                 </List.Item>
               );
             }})}
-            {textModified &&
-              <List.Item key='text'>
-                {renderTextDiff()}
-              </List.Item>
-            }
+            {textModified && renderTextDiff()}
           </List>
         </List.Item>
       </List>
     </pre>
   );
 };
+
+const ModalScrollingContent = ({ header, children }) => {
+  const [open, setOpen] = React.useState(false)
+
+  return (
+    <Modal
+      size='fullscreen'
+      open={open}
+      onClose={() => setOpen(false)}
+      onOpen={() => setOpen(true)}
+      trigger={<Button fluid basic color='blue'>Full diff</Button>}
+    >
+      <Modal.Header>
+        {header}
+      </Modal.Header>
+      <Modal.Content scrolling>
+        <Modal.Description>
+          { children }
+        </Modal.Description>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button onClick={() => setOpen(false)} basic color='blue'>
+          Proceed <Icon name='chevron right' />
+        </Button>
+      </Modal.Actions>
+    </Modal>
+  )
+}
 
 
 const DiffRecordRow = ({ record }) => {
@@ -273,6 +409,8 @@ const DiffRecordRow = ({ record }) => {
     { menuItem: 'Response', render: () => (
       <Tab.Pane>
         <ResponseData
+          recordPair={record.pair}
+          request={record.pair.a.request}
           response={record.pair.a.response}
           diff={record.diff && record.diff.comparisons.response}
           initialEntry={true}
@@ -295,6 +433,8 @@ const DiffRecordRow = ({ record }) => {
     { menuItem: 'Response', render: () => (
       <Tab.Pane>
         <ResponseData
+          recordPair={record.pair}
+          request={record.pair.b.request}
           response={record.pair.b.response}
           diff={record.diff && record.diff.comparisons.response}
           initialEntry={false}

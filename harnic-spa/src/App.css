@@ -187,3 +187,11 @@ code {
   -o-transform: rotate(90deg);
   transform: rotate(90deg);
 }
+
+.truncated {
+  text-align: center;
+}
+
+.ui.fullscreen.modal {
+  left: auto !important;
+}
