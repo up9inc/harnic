@@ -123,7 +123,7 @@ const RequestData = ({ request, diff }) => {
 };
 
 
-const ResponseData = ({ response, diff, initialEntry }) => {
+const ResponseData = ({ recordPair, response, diff, initialEntry }) => {
   const cmpIdx = initialEntry ? 0 : 1;
 
   const getDiffStringClass = (string, key) => {
@@ -190,7 +190,7 @@ const ResponseData = ({ response, diff, initialEntry }) => {
               </code>
             </div>
           </List.Item>
-          <ModalScrollingContent>
+          <ModalScrollingContent recordPair={recordPair}>
             <Grid celled='internally'>
               <Grid.Row>
                 <Grid.Column width={8}>
@@ -297,7 +297,7 @@ const ResponseData = ({ response, diff, initialEntry }) => {
   );
 };
 
-const ModalScrollingContent = ({ children }) => {
+const ModalScrollingContent = ({ recordPair, children }) => {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -308,7 +308,18 @@ const ModalScrollingContent = ({ children }) => {
       onOpen={() => setOpen(true)}
       trigger={<Button fluid basic color='blue'>Full diff</Button>}
     >
-      <Modal.Header>/Add url1 -> urlr2 here/</Modal.Header>
+      <Modal.Header>
+        <Grid celled='internally'>
+          <Grid.Row>
+            <Grid.Column width={8}>
+              {truncate(recordPair.a.request.url.url, 90)}
+            </Grid.Column>
+            <Grid.Column width={8}>
+              {truncate(recordPair.b.request.url.url, 90)}
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </Modal.Header>
       <Modal.Content scrolling>
         <Modal.Description>
           { children }
@@ -349,6 +360,7 @@ const DiffRecordRow = ({ record }) => {
     { menuItem: 'Response', render: () => (
       <Tab.Pane>
         <ResponseData
+          recordPair={record.pair}
           response={record.pair.a.response}
           diff={record.diff && record.diff.comparisons.response}
           initialEntry={true}
@@ -371,6 +383,7 @@ const DiffRecordRow = ({ record }) => {
     { menuItem: 'Response', render: () => (
       <Tab.Pane>
         <ResponseData
+          recordPair={record.pair}
           response={record.pair.b.response}
           diff={record.diff && record.diff.comparisons.response}
           initialEntry={false}
