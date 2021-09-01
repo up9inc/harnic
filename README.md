@@ -56,7 +56,4 @@ docker rm harnic
 
 
 **Issues**:
-- Deal with long text stings
 - Query params compare only keys
-- modal with size too big
-- Show first bytes of too big content
