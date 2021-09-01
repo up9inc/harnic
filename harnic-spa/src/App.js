@@ -18,7 +18,9 @@ import {
   Popup,
   Checkbox,
   Segment,
-  Grid
+  Grid,
+  Modal,
+  Button,
 } from 'semantic-ui-react';
 import {
   DateTime
@@ -159,15 +161,37 @@ const ResponseData = ({ response, diff, initialEntry }) => {
     return string;
   };
 
-  const renderTextDiff = () => (
-    <div className="raw-content">
-      <code>
-        {diff['content'].diff.modified['text'][cmpIdx].map((i,key) => (
-          <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
-        ))}
-      </code>
-    </div>
-  )
+  const renderTextDiff = () => {
+    const textDiff = diff['content'].diff.modified['text'][cmpIdx];
+    if (textDiff.length < 50) {
+      return(
+        <List.Item key='text'>
+          <div className="raw-content">
+            <code>
+              {textDiff.map((i,key) => (
+                <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
+              ))}
+            </code>
+          </div>
+        </List.Item>
+      );
+    } else {
+      return(
+        <List.Item key='text'>
+          <div className="raw-content">
+            <code>
+              {textDiff.slice(0, 25).map((i,key) => (
+                <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
+              ))}
+              <div>&nbsp;</div>
+              <div>&nbsp;</div>
+              <div key='truncated'>TRUNCATED...</div>
+            </code>
+          </div>
+        </List.Item>
+      );      
+    }
+  }
 
   let textModified = false;
   if ('text' in response.content &&
@@ -235,17 +259,41 @@ const ResponseData = ({ response, diff, initialEntry }) => {
                 </List.Item>
               );
             }})}
-            {textModified &&
-              <List.Item key='text'>
-                {renderTextDiff()}
-              </List.Item>
-            }
+            {textModified && renderTextDiff()}
           </List>
         </List.Item>
       </List>
     </pre>
   );
 };
+
+const ModalScrollingContent = () => {
+  const [open, setOpen] = React.useState(false)
+
+  return (
+    <Modal
+      open={open}
+      onClose={() => setOpen(false)}
+      onOpen={() => setOpen(true)}
+      trigger={<Button>Full diff</Button>}
+    >
+      <Modal.Header>Profile Picture</Modal.Header>
+      <Modal.Content scrolling>
+        <Modal.Description>
+          <p>
+            This is an example of expanded content that will cause the modal's
+            dimmer to scroll.
+          </p>
+        </Modal.Description>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button onClick={() => setOpen(false)} primary>
+          Proceed <Icon name='chevron right' />
+        </Button>
+      </Modal.Actions>
+    </Modal>
+  )
+}
 
 
 const DiffRecordRow = ({ record }) => {
