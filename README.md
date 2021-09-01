@@ -66,3 +66,5 @@ docker rm harnic
 - Add contextual context-wrap
 - Rename proceed button
 - Profile stats for big files
+- Add request postData
+- fix encoding to utf-8
