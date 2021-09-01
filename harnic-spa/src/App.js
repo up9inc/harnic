@@ -123,21 +123,51 @@ const RequestData = ({ request, diff }) => {
 };
 
 
-const ContentText = ({ value }) => {
+const ContentText = ({ value, request }) => {
+  let lines = value.split(/\n/);
   if (value === null) {
     return 'Content skipped';
   }
-  return (
-    <div className="raw-content">
-      <code>
-        {value}
-      </code>
-    </div>    
-  );
+  if (lines.length < 50) {
+    return (
+      <div className="raw-content">
+        <code>
+          {lines.map((i,key) => (
+            <div key={key}>{i}</div>
+          ))}
+        </code>
+      </div>
+    );   
+  } else {
+    const header = request.url.url;
+    return (
+      <>
+        <div className="raw-content">
+          <code>
+            {lines.slice(0, 15).map((i,key) => (
+              <div key={key}>{i}</div>
+            ))}
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div key='truncated' className='truncated'>...TRUNCATED...</div>
+          </code>
+        </div>
+        <ModalScrollingContent header={header}>
+          <div className="raw-content">
+            <code>
+              {lines.map((i,key) => (
+                <div key={key}>{i}</div>
+              ))}
+            </code>
+          </div>        
+        </ModalScrollingContent>
+      </>
+    );
+  }
 }
 
 
-const ResponseData = ({ recordPair, response, diff, initialEntry }) => {
+const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => {
   const cmpIdx = initialEntry ? 0 : 1;
 
   const getDiffStringClass = (string, key) => {
@@ -190,6 +220,18 @@ const ResponseData = ({ recordPair, response, diff, initialEntry }) => {
         </List.Item>
       );
     } else {
+      const header = (
+        <Grid celled='internally'>
+          <Grid.Row>
+            <Grid.Column width={8}>
+              {truncate(recordPair.a.request.url.url, 90)}
+            </Grid.Column>
+            <Grid.Column width={8}>
+              {truncate(recordPair.b.request.url.url, 90)}
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+        );
       return(
         <>
           <List.Item key='text'>
@@ -204,7 +246,7 @@ const ResponseData = ({ recordPair, response, diff, initialEntry }) => {
               </code>
             </div>
           </List.Item>
-          <ModalScrollingContent recordPair={recordPair}>
+          <ModalScrollingContent header={header}>
             <Grid celled='internally'>
               <Grid.Row>
                 <Grid.Column width={8}>
@@ -293,7 +335,7 @@ const ResponseData = ({ recordPair, response, diff, initialEntry }) => {
                   <b>{key}</b>:
                   <span className={`har-data-value ${diffClass}`}>
                     {
-                      key === 'text' ? <ContentText value={value}/> : value
+                      key === 'text' ? <ContentText value={value} request={request}/> : value
                     }
                   </span>&nbsp;
                   {diffIsSoft &&
@@ -313,7 +355,7 @@ const ResponseData = ({ recordPair, response, diff, initialEntry }) => {
   );
 };
 
-const ModalScrollingContent = ({ recordPair, children }) => {
+const ModalScrollingContent = ({ header, children }) => {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -325,16 +367,7 @@ const ModalScrollingContent = ({ recordPair, children }) => {
       trigger={<Button fluid basic color='blue'>Full diff</Button>}
     >
       <Modal.Header>
-        <Grid celled='internally'>
-          <Grid.Row>
-            <Grid.Column width={8}>
-              {truncate(recordPair.a.request.url.url, 90)}
-            </Grid.Column>
-            <Grid.Column width={8}>
-              {truncate(recordPair.b.request.url.url, 90)}
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
+        {header}
       </Modal.Header>
       <Modal.Content scrolling>
         <Modal.Description>
@@ -377,6 +410,7 @@ const DiffRecordRow = ({ record }) => {
       <Tab.Pane>
         <ResponseData
           recordPair={record.pair}
+          request={record.pair.a.request}
           response={record.pair.a.response}
           diff={record.diff && record.diff.comparisons.response}
           initialEntry={true}
@@ -400,6 +434,7 @@ const DiffRecordRow = ({ record }) => {
       <Tab.Pane>
         <ResponseData
           recordPair={record.pair}
+          request={record.pair.b.request}
           response={record.pair.b.response}
           diff={record.diff && record.diff.comparisons.response}
           initialEntry={false}
