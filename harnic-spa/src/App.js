@@ -124,10 +124,10 @@ const RequestData = ({ request, diff }) => {
 
 
 const ContentText = ({ value, request }) => {
-  let lines = value.split(/\n/);
   if (value === null) {
     return 'Content skipped';
   }
+  let lines = value.split(/\n/);
   if (lines.length < 50) {
     return (
       <div className="raw-content">
