@@ -53,7 +53,16 @@ docker rm harnic
 
 - Apply prismjs to content bodies: https://betterstack.dev/blog/code-highlighting-in-react-using-prismjs/
 - Add D3.js graphics
+- Add collapsing of 'same' content
+- Add loaders
 
 
 **Issues**:
 - Query params compare only keys
+- Add req/resp body to modal header title
+- Change `...TRUNCATED..`. and `Full diff` top be more human friendly
+- Add bytes limit to truncated part
+- Add horizontal scroll to diff
+- Add contextual context-wrap
+- Rename proceed button
+- Profile stats for big files
