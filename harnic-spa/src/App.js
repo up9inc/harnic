@@ -177,18 +177,21 @@ const ResponseData = ({ response, diff, initialEntry }) => {
       );
     } else {
       return(
-        <List.Item key='text'>
-          <div className="raw-content">
-            <code>
-              {textDiff.slice(0, 25).map((i,key) => (
-                <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
-              ))}
-              <div>&nbsp;</div>
-              <div>&nbsp;</div>
-              <div key='truncated'>TRUNCATED...</div>
-            </code>
-          </div>
-        </List.Item>
+        <>
+          <List.Item key='text'>
+            <div className="raw-content">
+              <code>
+                {textDiff.slice(0, 25).map((i,key) => (
+                  <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
+                ))}
+                <div>&nbsp;</div>
+                <div>&nbsp;</div>
+                <div key='truncated'>TRUNCATED...</div>
+              </code>
+            </div>
+          </List.Item>
+          <ModalScrollingContent />
+        </>
       );      
     }
   }
@@ -272,10 +275,11 @@ const ModalScrollingContent = () => {
 
   return (
     <Modal
+      size='fullscreen'
       open={open}
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
-      trigger={<Button>Full diff</Button>}
+      trigger={<Button fluid basic>Full diff</Button>}
     >
       <Modal.Header>Profile Picture</Modal.Header>
       <Modal.Content scrolling>

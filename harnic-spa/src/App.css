@@ -187,3 +187,7 @@ code {
   -o-transform: rotate(90deg);
   transform: rotate(90deg);
 }
+
+.ui.fullscreen.modal {
+  left: auto !important;
+}
