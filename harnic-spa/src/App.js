@@ -361,6 +361,7 @@ const ModalScrollingContent = ({ header, children }) => {
   return (
     <Modal
       size='fullscreen'
+      closeIcon
       open={open}
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
@@ -374,11 +375,6 @@ const ModalScrollingContent = ({ header, children }) => {
           { children }
         </Modal.Description>
       </Modal.Content>
-      <Modal.Actions>
-        <Button onClick={() => setOpen(false)} basic color='blue'>
-          Proceed <Icon name='chevron right' />
-        </Button>
-      </Modal.Actions>
     </Modal>
   )
 }
