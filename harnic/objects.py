@@ -91,10 +91,9 @@ class Entry:
                 post_data.get('comment') == 'base64':  # our tappers' custom encoding
             try:
                 decoded = base64.b64decode(post_data['text'].encode('utf8'))
+                request['postData']['text'] = str(decoded, 'utf8')
             except UnicodeDecodeError:
                 pass
-            else:
-                request['postData']['text'] = str(decoded, 'utf8')
 
         if post_data.get('text') and \
                 (is_ctype_json(post_data.get('mimeType')) or \
@@ -118,10 +117,9 @@ class Entry:
                 and not is_ctype_ignored(content['mimeType']):
             try:
                 decoded = base64.b64decode(content['text'])
+                content['text'] = str(decoded, 'utf8')
             except UnicodeDecodeError:
                 pass
-            else:
-                content['text'] = str(decoded, 'utf8')
 
         if content.get('text') and \
                 (is_ctype_json(content.get('mimeType')) or \
