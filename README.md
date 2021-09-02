@@ -67,4 +67,4 @@ docker rm harnic
 - Rename proceed button
 - Profile stats for big files
 - Add request postData
-- fix encoding to utf-8
+- Handle soft diffs missing or added as soft
