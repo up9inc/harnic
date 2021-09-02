@@ -1,9 +1,5 @@
-import React, {
-  Component,
-  Fragment,
-  useState
-} from 'react';
-import 'semantic-ui-css/semantic.min.css';
+import React, { Component, Fragment, useState } from "react";
+import "semantic-ui-css/semantic.min.css";
 import {
   Container,
   Header,
@@ -21,97 +17,108 @@ import {
   Grid,
   Modal,
   Button,
-} from 'semantic-ui-react';
-import {
-  DateTime
-} from "luxon";
+} from "semantic-ui-react";
+import { DateTime } from "luxon";
 import regexifyString from "regexify-string";
-import _ from 'lodash';
+import _ from "lodash";
 
-
-import logo from './logo.svg';
-import './App.css';
-import {
-  truncate,
-  fetchLocal,
-} from './utils.js';
-
+import logo from "./logo.svg";
+import "./App.css";
+import { truncate, fetchLocal } from "./utils.js";
 
 const calculateDiffClass = (diff, criteria, key) => {
-  let keyClass = '';
+  let keyClass = "";
   if (diff) {
     let keyDiff = diff[criteria].diff;
     if (keyDiff.removed.includes(key)) {
-      keyClass = 'delete';
+      keyClass = "delete";
     } else if (keyDiff.added.includes(key)) {
-      keyClass = 'insert';
+      keyClass = "insert";
     } else if (Object.keys(keyDiff.modified).includes(key)) {
-      keyClass = 'modified';
-      if (keyDiff.modified[key] && (keyDiff.modified[key][2] === true)) {
-        keyClass = 'soft-modified';
-      };
-    };
-  };
+      keyClass = "modified";
+      if (keyDiff.modified[key] && keyDiff.modified[key][2] === true) {
+        keyClass = "soft-modified";
+      }
+    }
+  }
   return keyClass;
 };
-
 
 const RequestData = ({ request, diff }) => {
   return (
     <pre className="har-data">
       <List>
         <List.Item>
-          <div><b>Started:</b><span className="har-data-value">{DateTime.fromSeconds(request._ts).toISO()}</span></div>
+          <div>
+            <b>Started:</b>
+            <span className="har-data-value">
+              {DateTime.fromSeconds(request._ts).toISO()}
+            </span>
+          </div>
         </List.Item>
         <List.Item>
-          <div><b>Method:</b><span className="har-data-value">{request.method}</span></div>
+          <div>
+            <b>Method:</b>
+            <span className="har-data-value">{request.method}</span>
+          </div>
         </List.Item>
         <List.Item>
-          <div><b>Body size:</b><span className="har-data-value">{request.bodySize}</span></div>
+          <div>
+            <b>Body size:</b>
+            <span className="har-data-value">{request.bodySize}</span>
+          </div>
         </List.Item>
         <List.Item>
-          <div><b>Query params:</b></div>
+          <div>
+            <b>Query params:</b>
+          </div>
           <List>
             {Object.entries(request.url.query_params).map(([key, values]) => {
-              const diffClass = calculateDiffClass(diff, 'query_params', key);
-              const diffIsNew = diffClass === 'insert' || diffClass === 'delete';
-              const diffIsSoft = diffClass === 'soft-modified';
+              const diffClass = calculateDiffClass(diff, "query_params", key);
+              const diffIsNew =
+                diffClass === "insert" || diffClass === "delete";
+              const diffIsSoft = diffClass === "soft-modified";
               return (
                 <List.Item key={key} className={diffIsNew && diffClass}>
                   <b>{key}</b>:
                   <span className={`har-data-value ${diffClass}`}>
-                    {values.join(', ')}
-                  </span>&nbsp;
-                  {diffIsSoft &&
+                    {values.join(", ")}
+                  </span>
+                  &nbsp;
+                  {diffIsSoft && (
                     <Popup
-                      trigger={<Icon name='info' className='diff-label' />}
-                      content='This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable'
+                      trigger={<Icon name="info" className="diff-label" />}
+                      content="This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable"
                     />
-                  }                  
+                  )}
                 </List.Item>
               );
             })}
           </List>
         </List.Item>
         <List.Item>
-          <div><b>Headers:</b></div>
+          <div>
+            <b>Headers:</b>
+          </div>
           <List>
             {Object.entries(request.headers).map(([key, values]) => {
-              const diffClass = calculateDiffClass(diff, 'headers', key);
-              const diffIsNew = diffClass === 'insert' || diffClass === 'delete';
-              const diffIsSoft = diffClass === 'soft-modified';
+              const diffClass = calculateDiffClass(diff, "headers", key);
+              const diffIsNew =
+                diffClass === "insert" || diffClass === "delete";
+              const diffIsSoft = diffClass === "soft-modified";
               return (
                 <List.Item key={key} className={diffIsNew && diffClass}>
                   <b>{key}</b>:
                   <span className={`har-data-value ${diffClass}`}>
-                    {values.join(', ')}
-                  </span>&nbsp;
-                  {diffIsSoft &&
+                    {values.join(", ")}
+                  </span>
+                  &nbsp;
+                  {diffIsSoft && (
                     <Popup
-                      trigger={<Icon name='info' className='diff-label' />}
-                      content='This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable'
+                      trigger={<Icon name="info" className="diff-label" />}
+                      content="This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable"
                     />
-                  }                  
+                  )}
                 </List.Item>
               );
             })}
@@ -122,103 +129,117 @@ const RequestData = ({ request, diff }) => {
   );
 };
 
-
 const ContentText = ({ value, request }) => {
   if (value === null) {
-    return 'Content skipped';
+    return "Content skipped";
   }
   let lines = value.split(/\n/);
   if (lines.length < 50) {
     return (
       <div className="raw-content">
         <code>
-          {lines.map((i,key) => (
+          {lines.map((i, key) => (
             <div key={key}>{i}</div>
           ))}
         </code>
       </div>
-    );   
+    );
   } else {
     const header = request.url.url;
-    const trigger = <Button fluid basic color='grey'>Open full body</Button>;
+    const trigger = (
+      <Button fluid basic color="grey">
+        Open full body
+      </Button>
+    );
     return (
       <>
         <div className="raw-content">
           <code>
-            {lines.slice(0, 15).map((i,key) => (
+            {lines.slice(0, 15).map((i, key) => (
               <div key={key}>{i}</div>
             ))}
             <div>&nbsp;</div>
             <div>&nbsp;</div>
-            <div key='truncated' className='truncated grey'>Full body is too long to be displayed here...</div>
+            <div key="truncated" className="truncated grey">
+              Full body is too long to be displayed here...
+            </div>
           </code>
         </div>
         <ModalScrollingContent header={header} trigger={trigger}>
           <div className="raw-content">
             <code>
-              {lines.map((i,key) => (
+              {lines.map((i, key) => (
                 <div key={key}>{i}</div>
               ))}
             </code>
-          </div>        
+          </div>
         </ModalScrollingContent>
       </>
     );
   }
-}
+};
 
-
-const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => {
+const ResponseData = ({
+  recordPair,
+  request,
+  response,
+  diff,
+  initialEntry,
+}) => {
   const cmpIdx = initialEntry ? 0 : 1;
 
-  const getDiffStringClass = (string, key, diffCmpIdx=cmpIdx) => {
-    let cls = '';
-    if (diff['content'].diff.modified['text'][2][key]){
-      cls = diffCmpIdx ? 'content-diff-added' : 'content-diff-removed';
+  const getDiffStringClass = (string, key, diffCmpIdx = cmpIdx) => {
+    let cls = "";
+    if (diff["content"].diff.modified["text"][2][key]) {
+      cls = diffCmpIdx ? "content-diff-added" : "content-diff-removed";
     }
     return cls;
   };
 
-  const getDiffString = (string, diffCmpIdx=cmpIdx) => {
+  const getDiffString = (string, diffCmpIdx = cmpIdx) => {
     const wholeLineRegex = /^\u0000[\+\^-](.+?)\u0001$/g;
     const regex = /\u0000[\+\^-](.+?)\u0001/g;
     if (string.match(wholeLineRegex)) {
-      return <>{' ' + string.slice(2)}</>;
+      return <>{" " + string.slice(2)}</>;
     }
     string = regexifyString({
-        pattern: regex,
-        decorator: (match, index) => {
-          const cls = diffCmpIdx ? "inner-line-diff added" : "inner-line-diff removed";
-          return (
-            <span className={cls}>
-              {/*excludes wrappers ^\0(+|-|^){} to {}\1 */}
-              {match.slice(2, -1)}
-            </span>
-          );
-        },
-        input: string,
+      pattern: regex,
+      decorator: (match, index) => {
+        const cls = diffCmpIdx
+          ? "inner-line-diff added"
+          : "inner-line-diff removed";
+        return (
+          <span className={cls}>
+            {/*excludes wrappers ^\0(+|-|^){} to {}\1 */}
+            {match.slice(2, -1)}
+          </span>
+        );
+      },
+      input: string,
     });
 
     return string;
   };
 
   const renderText = () => {
-    const contentText = response.content['text'];
+    const contentText = response.content["text"];
     if (!textModified) {
       if (contentText) {
-        return <ContentText value={contentText} request={request}/>;
+        return <ContentText value={contentText} request={request} />;
       } else {
         return null;
       }
     }
-    const textDiff = diff['content'].diff.modified['text'];
+    const textDiff = diff["content"].diff.modified["text"];
     if (textDiff[cmpIdx].length < 50) {
-      return(
-        <List.Item key='text'>
+      return (
+        <List.Item key="text">
           <div className="raw-content">
             <code>
-              {textDiff[cmpIdx].map((i,key) => (
-                <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
+              {textDiff[cmpIdx].map((i, key) => (
+                <div key={key} className={getDiffStringClass(i, key)}>
+                  {getDiffString(i)}
+                </div>
               ))}
             </code>
           </div>
@@ -226,7 +247,7 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
       );
     } else {
       const header = (
-        <Grid celled='internally'>
+        <Grid celled="internally">
           <Grid.Row>
             <Grid.Column width={8}>
               {truncate(recordPair.a.request.url.url, 90)}
@@ -236,31 +257,42 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
             </Grid.Column>
           </Grid.Row>
         </Grid>
-        );
-      const trigger = <Button fluid basic color='orange'>Open full difference</Button>;
-      return(
+      );
+      const trigger = (
+        <Button fluid basic color="orange">
+          Open full difference
+        </Button>
+      );
+      return (
         <>
-          <List.Item key='text'>
+          <List.Item key="text">
             <div className="raw-content">
               <code>
-                {textDiff[cmpIdx].slice(0, 15).map((i,key) => (
-                  <div key={key} className={getDiffStringClass(i, key)}>{getDiffString(i)}</div>
+                {textDiff[cmpIdx].slice(0, 15).map((i, key) => (
+                  <div key={key} className={getDiffStringClass(i, key)}>
+                    {getDiffString(i)}
+                  </div>
                 ))}
                 <div>&nbsp;</div>
                 <div>&nbsp;</div>
-                <div key='truncated' className='truncated orange'>Full body is too long to be displayed here...</div>
+                <div key="truncated" className="truncated orange">
+                  Full body is too long to be displayed here...
+                </div>
               </code>
             </div>
           </List.Item>
           <ModalScrollingContent header={header} trigger={trigger}>
-            <Grid celled='internally'>
+            <Grid celled="internally">
               <Grid.Row>
                 <Grid.Column width={8}>
-                  <List.Item key='text'>
+                  <List.Item key="text">
                     <div className="raw-content">
                       <code>
-                        {textDiff[0].map((i,key) => (
-                          <div key={key} className={getDiffStringClass(i, key, 0)}>
+                        {textDiff[0].map((i, key) => (
+                          <div
+                            key={key}
+                            className={getDiffStringClass(i, key, 0)}
+                          >
                             {getDiffString(i, 0)}
                           </div>
                         ))}
@@ -269,11 +301,14 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
                   </List.Item>
                 </Grid.Column>
                 <Grid.Column width={8}>
-                  <List.Item key='text'>
+                  <List.Item key="text">
                     <div className="raw-content">
                       <code>
-                        {textDiff[1].map((i,key) => (
-                          <div key={key} className={getDiffStringClass(i, key, 1)}>
+                        {textDiff[1].map((i, key) => (
+                          <div
+                            key={key}
+                            className={getDiffStringClass(i, key, 1)}
+                          >
                             {getDiffString(i, 1)}
                           </div>
                         ))}
@@ -282,18 +317,20 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
                   </List.Item>
                 </Grid.Column>
               </Grid.Row>
-            </Grid>            
+            </Grid>
           </ModalScrollingContent>
         </>
-      );      
+      );
     }
-  }
+  };
 
   let textModified = false;
-  if ('text' in response.content &&
-      diff &&
-      'text' in diff['content'].diff.modified &&
-      diff['content'].diff.modified['text'] !== null) {
+  if (
+    "text" in response.content &&
+    diff &&
+    "text" in diff["content"].diff.modified &&
+    diff["content"].diff.modified["text"] !== null
+  ) {
     textModified = true;
   }
 
@@ -301,60 +338,77 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
     <pre className="har-data">
       <List>
         <List.Item>
-          <div><b>Recieved:</b><span className="har-data-value">{DateTime.fromSeconds(response._ts).toISO()}</span></div>
+          <div>
+            <b>Recieved:</b>
+            <span className="har-data-value">
+              {DateTime.fromSeconds(response._ts).toISO()}
+            </span>
+          </div>
         </List.Item>
         <List.Item>
-          <div><b>Status:</b><span className="har-data-value">{response.status}</span></div>
+          <div>
+            <b>Status:</b>
+            <span className="har-data-value">{response.status}</span>
+          </div>
         </List.Item>
         <List.Item>
-          <div><b>Headers:</b></div>
+          <div>
+            <b>Headers:</b>
+          </div>
           <List>
             {Object.entries(response.headers).map(([key, values]) => {
-              const diffClass = calculateDiffClass(diff, 'headers', key);
-              const diffIsNew = diffClass === 'insert' || diffClass === 'delete';
-              const diffIsSoft = diffClass === 'soft-modified';
+              const diffClass = calculateDiffClass(diff, "headers", key);
+              const diffIsNew =
+                diffClass === "insert" || diffClass === "delete";
+              const diffIsSoft = diffClass === "soft-modified";
               return (
                 <List.Item key={key} className={diffIsNew && diffClass}>
                   <b>{key}</b>:
                   <span className={`har-data-value ${diffClass}`}>
-                    {values.join(', ')}
-                  </span>&nbsp;
-                  {diffIsSoft &&
+                    {values.join(", ")}
+                  </span>
+                  &nbsp;
+                  {diffIsSoft && (
                     <Popup
-                      trigger={<Icon name='info' className='diff-label' />}
-                      content='This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable'
+                      trigger={<Icon name="info" className="diff-label" />}
+                      content="This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable"
                     />
-                  }
+                  )}
                 </List.Item>
               );
-            })}          
+            })}
           </List>
         </List.Item>
         <List.Item>
-          <div><b>Content:</b></div>
+          <div>
+            <b>Content:</b>
+          </div>
           <List>
             {Object.entries(response.content).map(([key, value]) => {
-              if (key === 'text') {
+              if (key === "text") {
                 return null;
               } else {
-              const diffClass = calculateDiffClass(diff, 'content', key);
-              const diffIsNew = diffClass === 'insert' || diffClass === 'delete';
-              const diffIsSoft = diffClass === 'soft-modified';
-              return (
-                <List.Item key={key} className={diffIsNew && diffClass}>
-                  <b>{key}</b>:
-                  <span className={`har-data-value ${diffClass}`}>
-                    {value}
-                  </span>&nbsp;
-                  {diffIsSoft &&
-                    <Popup
-                      trigger={<Icon name='info' className='diff-label' />}
-                      content='This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable'
-                    />
-                  }                  
-                </List.Item>
-              );
-            }})}
+                const diffClass = calculateDiffClass(diff, "content", key);
+                const diffIsNew =
+                  diffClass === "insert" || diffClass === "delete";
+                const diffIsSoft = diffClass === "soft-modified";
+                return (
+                  <List.Item key={key} className={diffIsNew && diffClass}>
+                    <b>{key}</b>:
+                    <span className={`har-data-value ${diffClass}`}>
+                      {value}
+                    </span>
+                    &nbsp;
+                    {diffIsSoft && (
+                      <Popup
+                        trigger={<Icon name="info" className="diff-label" />}
+                        content="This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable"
+                      />
+                    )}
+                  </List.Item>
+                );
+              }
+            })}
             {renderText()}
           </List>
         </List.Item>
@@ -364,29 +418,24 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
 };
 
 const ModalScrollingContent = ({ header, trigger, children }) => {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false);
 
   return (
     <Modal
-      size='fullscreen'
+      size="fullscreen"
       closeIcon
       open={open}
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
       trigger={trigger}
     >
-      <Modal.Header>
-        {header}
-      </Modal.Header>
+      <Modal.Header>{header}</Modal.Header>
       <Modal.Content scrolling>
-        <Modal.Description>
-          { children }
-        </Modal.Description>
+        <Modal.Description>{children}</Modal.Description>
       </Modal.Content>
     </Modal>
-  )
-}
-
+  );
+};
 
 const DiffRecordRow = ({ record }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -395,91 +444,137 @@ const DiffRecordRow = ({ record }) => {
   const handleTabChange = (e, { activeIndex }) => setActiveIndex(activeIndex);
 
   const toggleStyle = {
-    display: isOpen ? "table-row" : "none"
+    display: isOpen ? "table-row" : "none",
   };
 
-  const rowClassMap = {'delete': 'negative', 'insert': 'positive', 'diff': 'warning', 'equal': 'normal'};
-  const reqMethodClassMap = {'get': 'blue', 'post': 'green', 'delete': 'red', 'patch': 'orange'};
+  const rowClassMap = {
+    delete: "negative",
+    insert: "positive",
+    diff: "warning",
+    equal: "normal",
+  };
+  const reqMethodClassMap = {
+    get: "blue",
+    post: "green",
+    delete: "red",
+    patch: "orange",
+  };
 
-  const aPanes = record.pair.a ? [
-    { menuItem: 'Request', render: () => (
-      <Tab.Pane>
-        <RequestData
-          request={record.pair.a.request}
-          diff={record.diff && record.diff.comparisons.request}
-        />
-      </Tab.Pane>
-    )},
-    { menuItem: 'Response', render: () => (
-      <Tab.Pane>
-        <ResponseData
-          recordPair={record.pair}
-          request={record.pair.a.request}
-          response={record.pair.a.response}
-          diff={record.diff && record.diff.comparisons.response}
-          initialEntry={true}
-        />      
-      </Tab.Pane>
-    )},
-  ] : [];
+  const aPanes = record.pair.a
+    ? [
+        {
+          menuItem: "Request",
+          render: () => (
+            <Tab.Pane>
+              <RequestData
+                request={record.pair.a.request}
+                diff={record.diff && record.diff.comparisons.request}
+              />
+            </Tab.Pane>
+          ),
+        },
+        {
+          menuItem: "Response",
+          render: () => (
+            <Tab.Pane>
+              <ResponseData
+                recordPair={record.pair}
+                request={record.pair.a.request}
+                response={record.pair.a.response}
+                diff={record.diff && record.diff.comparisons.response}
+                initialEntry={true}
+              />
+            </Tab.Pane>
+          ),
+        },
+      ]
+    : [];
 
-  const ADiffTab = () => <Tab panes={aPanes} activeIndex={activeIndex} onTabChange={handleTabChange} />;
+  const ADiffTab = () => (
+    <Tab
+      panes={aPanes}
+      activeIndex={activeIndex}
+      onTabChange={handleTabChange}
+    />
+  );
 
-  const bPanes = record.pair.b ? [
-    { menuItem: 'Request', render: () => (
-      <Tab.Pane>
-        <RequestData
-          request={record.pair.b.request}
-          diff={record.diff && record.diff.comparisons.request}
-        />
-      </Tab.Pane>
-    )},
-    { menuItem: 'Response', render: () => (
-      <Tab.Pane>
-        <ResponseData
-          recordPair={record.pair}
-          request={record.pair.b.request}
-          response={record.pair.b.response}
-          diff={record.diff && record.diff.comparisons.response}
-          initialEntry={false}
-        />      
-      </Tab.Pane>
-    )},
-  ] : [];
+  const bPanes = record.pair.b
+    ? [
+        {
+          menuItem: "Request",
+          render: () => (
+            <Tab.Pane>
+              <RequestData
+                request={record.pair.b.request}
+                diff={record.diff && record.diff.comparisons.request}
+              />
+            </Tab.Pane>
+          ),
+        },
+        {
+          menuItem: "Response",
+          render: () => (
+            <Tab.Pane>
+              <ResponseData
+                recordPair={record.pair}
+                request={record.pair.b.request}
+                response={record.pair.b.response}
+                diff={record.diff && record.diff.comparisons.response}
+                initialEntry={false}
+              />
+            </Tab.Pane>
+          ),
+        },
+      ]
+    : [];
 
-  const BDiffTab = () => <Tab panes={bPanes} activeIndex={activeIndex} onTabChange={handleTabChange} />;
+  const BDiffTab = () => (
+    <Tab
+      panes={bPanes}
+      activeIndex={activeIndex}
+      onTabChange={handleTabChange}
+    />
+  );
 
   return (
     <>
       <Table.Row className={rowClassMap[record.tag]} onClick={handleToggle}>
         <Table.Cell>
-          {record.pair.a && 
+          {record.pair.a && (
             <>
               <Label
-                size='mini'
-                color={reqMethodClassMap[record.pair.a.request.method.toLowerCase()]}
+                size="mini"
+                color={
+                  reqMethodClassMap[record.pair.a.request.method.toLowerCase()]
+                }
                 basic
               >
                 {record.pair.a.request.method}
-              </Label>&nbsp;&nbsp;
+              </Label>
+              &nbsp;&nbsp;
               {truncate(record.pair.a.request.url.url, 150)}
             </>
-          }
-          {record.is_reordering && <Icon name='exchange' className='reordering-icon' />}
+          )}
+          {record.is_reordering && (
+            <Icon name="exchange" className="reordering-icon" />
+          )}
         </Table.Cell>
         <Table.Cell>
-          {record.pair.b && 
+          {record.pair.b && (
             <>
               <Label
-                size='mini'
-                color={reqMethodClassMap[record.pair.b.request.method.toLowerCase()]}
+                size="mini"
+                color={
+                  reqMethodClassMap[record.pair.b.request.method.toLowerCase()]
+                }
                 basic
               >
                 {record.pair.b.request.method}
-              </Label>&nbsp;&nbsp;
+              </Label>
+              &nbsp;&nbsp;
               {truncate(record.pair.b.request.url.url, 150)}
             </>
-          }
+          )}
         </Table.Cell>
       </Table.Row>
 
@@ -489,85 +584,90 @@ const DiffRecordRow = ({ record }) => {
         </Table.Cell>
         <Table.Cell colSpan={1} className="entry-data">
           {record.pair.b && isOpen && <BDiffTab />}
-        </Table.Cell>        
+        </Table.Cell>
       </Table.Row>
     </>
   );
 };
 
-
-const FilterDropdown = ({setFilterType}) => {
+const FilterDropdown = ({ setFilterType }) => {
   const options = [
     {
       key: 1,
-      text: 'All',
+      text: "All",
       value: 1,
       content: (
-        <Header icon='table' content='All' subheader='Shows all compared hars records' onClick={() => setFilterType('')}/>
+        <Header
+          icon="table"
+          content="All"
+          subheader="Shows all compared hars records"
+          onClick={() => setFilterType("")}
+        />
       ),
     },
     {
       key: 2,
-      text: 'Changes',
+      text: "Changes",
       value: 2,
       content: (
         <Header
-          icon='list'
-          content='Changes'
-          subheader='Shows all records except those that are equal'
-          onClick={() => setFilterType('diff')}          
+          icon="list"
+          content="Changes"
+          subheader="Shows all records except those that are equal"
+          onClick={() => setFilterType("diff")}
         />
       ),
-    },  
+    },
     {
       key: 3,
-      text: 'Modified entries',
+      text: "Modified entries",
       value: 3,
       content: (
         <Header
-          icon='exchange'
-          content='Modifed'
-          subheader='Shows only modified records'
-          onClick={() => setFilterType('modified')}
+          icon="exchange"
+          content="Modifed"
+          subheader="Shows only modified records"
+          onClick={() => setFilterType("modified")}
         />
       ),
-    },  
+    },
     {
       key: 4,
-      text: 'Added',
+      text: "Added",
       value: 4,
       content: (
         <Header
-          icon='plus'
-          content='Added'
-          subheader='Shows all added records from second har'
-          onClick={() => setFilterType('added')}
+          icon="plus"
+          content="Added"
+          subheader="Shows all added records from second har"
+          onClick={() => setFilterType("added")}
         />
       ),
     },
     {
       key: 5,
-      text: 'Removed',
+      text: "Removed",
       value: 5,
       content: (
         <Header
-          icon='minus'
-          content='Removed'
-          subheader='Shows all removed records from second har'
-          onClick={() => setFilterType('removed')}          
+          icon="minus"
+          content="Removed"
+          subheader="Shows all removed records from second har"
+          onClick={() => setFilterType("removed")}
         />
       ),
-    },  
+    },
   ];
-  return <Dropdown selection fluid floating options={options} placeholder='Filter' />;
-}
+  return (
+    <Dropdown selection fluid floating options={options} placeholder="Filter" />
+  );
+};
 
-
-const Statistics = ({stats}) => (
+const Statistics = ({ stats }) => (
   <div className="statistics">
-    <Statistic.Group widths='5'>
+    <Statistic.Group widths="5">
       <Statistic>
-        <Statistic.Value>{(stats.ratio*100).toFixed(1)}%</Statistic.Value>
+        <Statistic.Value>{(stats.ratio * 100).toFixed(1)}%</Statistic.Value>
         <Statistic.Label>Match ratio</Statistic.Label>
       </Statistic>
       <Statistic>
@@ -588,8 +688,7 @@ const Statistics = ({stats}) => (
       </Statistic>
     </Statistic.Group>
   </div>
-)
-
+);
 
 class App extends Component {
   constructor(props) {
@@ -599,8 +698,8 @@ class App extends Component {
     const original_uuids = window.globalData.diff.strict_order_records;
     const reordered_uuids = window.globalData.diff.reordered_records;
 
-    const strict_order_records = original_uuids.map(rUuid => index[rUuid]);
-    const reordered_records = reordered_uuids.map(rUuid => index[rUuid]);
+    const strict_order_records = original_uuids.map((rUuid) => index[rUuid]);
+    const reordered_records = reordered_uuids.map((rUuid) => index[rUuid]);
 
     const kpis = window.globalData.kpis;
 
@@ -621,93 +720,99 @@ class App extends Component {
     } else {
       this.state.records = strict_order_records;
       this.state.stats = kpis.stats.strict_order;
-    };
-  };
+    }
+  }
 
   setFilterType = (filterName) => {
-    this.setState({filterName: filterName});
+    this.setState({ filterName: filterName });
   };
 
   filterRecords = () => {
     const filter = this.state.filterName;
     let records = this.state.records.slice();
-    if (filter === 'added') {
-      records = records.filter(record => record.pair.a == null)
-    } else if (filter === 'removed') {
-      records = records.filter(record => record.pair.b == null)
-    } else if (filter === 'modified') {
-      records = records.filter(record => record.diff && !record.diff.equal)
-    } else if (filter === 'diff') {
-      records = records.filter(record => !record.diff || (record.diff && !record.diff.equal))
-    };
+    if (filter === "added") {
+      records = records.filter((record) => record.pair.a == null);
+    } else if (filter === "removed") {
+      records = records.filter((record) => record.pair.b == null);
+    } else if (filter === "modified") {
+      records = records.filter((record) => record.diff && !record.diff.equal);
+    } else if (filter === "diff") {
+      records = records.filter(
+        (record) => !record.diff || (record.diff && !record.diff.equal)
+      );
+    }
     return records;
-  }
+  };
 
   toogleReordered = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showReordered: !prevState.showReordered,
-      records: prevState.showReordered ? this.state.strict_order_records : this.state.reordered_records,
-      stats: prevState.showReordered ? this.state.kpis.stats.strict_order : this.state.kpis.stats.with_reorders,
+      records: prevState.showReordered
+        ? this.state.strict_order_records
+        : this.state.reordered_records,
+      stats: prevState.showReordered
+        ? this.state.kpis.stats.strict_order
+        : this.state.kpis.stats.with_reorders,
     }));
-  }
+  };
 
   render() {
-    let {
-      kpis,
-      records,
-      stats,
-      showReordered,
-      filterName,
-    } = this.state;
+    let { kpis, records, stats, showReordered, filterName } = this.state;
     if (filterName) {
       records = this.filterRecords();
-    };
+    }
 
     const toogleProps = {};
-    toogleProps['defaultChecked'] = showReordered;
+    toogleProps["defaultChecked"] = showReordered;
 
     return (
       <Container>
         <Container className="header-container">
           <div className="item">
-            <Image src={logo} size='small' wrapped />
+            <Image src={logo} size="small" wrapped />
           </div>
           <div className="item header page-header">
-            <Header size='huge'>Traffic comparison tool</Header>
+            <Header size="huge">Traffic comparison tool</Header>
           </div>
         </Container>
         <Statistics stats={stats} />
         <Grid>
           <Grid.Row>
-            <Grid.Column width={2} className='reorders-toogle'>
-              <Checkbox toggle {...toogleProps} label='Allow reorders' onChange={this.toogleReordered}/>
+            <Grid.Column width={2} className="reorders-toogle">
+              <Checkbox
+                toggle
+                {...toogleProps}
+                label="Allow reorders"
+                onChange={this.toogleReordered}
+              />
               <Popup
-                trigger={<Icon name='info' className='reordering-desc-icon' />}
-                content='Fixes ordering of the same entries if they were mismatched due to different response time deltas.
-                This is mostly caused by the nature of async requests. Those fixed entries have a special icon.'
+                trigger={<Icon name="info" className="reordering-desc-icon" />}
+                content="Fixes ordering of the same entries if they were mismatched due to different response time deltas.
+                This is mostly caused by the nature of async requests. Those fixed entries have a special icon."
               />
             </Grid.Column>
             <Grid.Column width={14}>
-              <FilterDropdown setFilterType={this.setFilterType}/>
+              <FilterDropdown setFilterType={this.setFilterType} />
             </Grid.Column>
           </Grid.Row>
         </Grid>
         <Table fixed celled selectable>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>{kpis.file1.path}:&nbsp;&nbsp;{kpis.file1.num_entries} entries</Table.HeaderCell>
-              <Table.HeaderCell>{kpis.file2.path}:&nbsp;&nbsp;{kpis.file2.num_entries} entries</Table.HeaderCell>
+              <Table.HeaderCell>
+                {kpis.file1.path}:&nbsp;&nbsp;{kpis.file1.num_entries} entries
+              </Table.HeaderCell>
+              <Table.HeaderCell>
+                {kpis.file2.path}:&nbsp;&nbsp;{kpis.file2.num_entries} entries
+              </Table.HeaderCell>
             </Table.Row>
           </Table.Header>
 
           <Table.Body>
-            {records.map(record => (
-              <DiffRecordRow
-                key={record.id}
-                record={record}
-              />
+            {records.map((record) => (
+              <DiffRecordRow key={record.id} record={record} />
             ))}
-          </Table.Body>      
+          </Table.Body>
         </Table>
       </Container>
     );
