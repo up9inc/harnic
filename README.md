@@ -68,3 +68,5 @@ docker rm harnic
 - Profile stats for big files
 - Add request postData
 - Handle soft diffs missing or added as soft
+- Render content text always at the botton
+- Add request postdata
