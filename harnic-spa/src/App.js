@@ -202,7 +202,15 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
     return string;
   };
 
-  const renderTextDiff = () => {
+  const renderText = () => {
+    const contentText = response.content['text'];
+    if (!textModified) {
+      if (contentText) {
+        return <ContentText value={contentText} request={request}/>;
+      } else {
+        return null;
+      }
+    }
     const textDiff = diff['content'].diff.modified['text'];
     if (textDiff[cmpIdx].length < 50) {
       return(
@@ -326,7 +334,7 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
           <div><b>Content:</b></div>
           <List>
             {Object.entries(response.content).map(([key, value]) => {
-              if (key === 'text' && textModified) {
+              if (key === 'text') {
                 return null;
               } else {
               const diffClass = calculateDiffClass(diff, 'content', key);
@@ -336,9 +344,7 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
                 <List.Item key={key} className={diffIsNew && diffClass}>
                   <b>{key}</b>:
                   <span className={`har-data-value ${diffClass}`}>
-                    {
-                      key === 'text' ? <ContentText value={value} request={request}/> : value
-                    }
+                    {value}
                   </span>&nbsp;
                   {diffIsSoft &&
                     <Popup
@@ -349,7 +355,7 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
                 </List.Item>
               );
             }})}
-            {textModified && renderTextDiff()}
+            {renderText()}
           </List>
         </List.Item>
       </List>
