@@ -140,6 +140,7 @@ const ContentText = ({ value, request }) => {
     );   
   } else {
     const header = request.url.url;
+    const trigger = <Button fluid basic color='grey'>Open full body</Button>;
     return (
       <>
         <div className="raw-content">
@@ -149,10 +150,10 @@ const ContentText = ({ value, request }) => {
             ))}
             <div>&nbsp;</div>
             <div>&nbsp;</div>
-            <div key='truncated' className='truncated'>...TRUNCATED...</div>
+            <div key='truncated' className='truncated grey'>Full body is too long to be displayed here...</div>
           </code>
         </div>
-        <ModalScrollingContent header={header}>
+        <ModalScrollingContent header={header} trigger={trigger}>
           <div className="raw-content">
             <code>
               {lines.map((i,key) => (
@@ -228,6 +229,7 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
           </Grid.Row>
         </Grid>
         );
+      const trigger = <Button fluid basic color='orange'>Open full difference</Button>;
       return(
         <>
           <List.Item key='text'>
@@ -238,11 +240,11 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
                 ))}
                 <div>&nbsp;</div>
                 <div>&nbsp;</div>
-                <div key='truncated' className='truncated'>...TRUNCATED...</div>
+                <div key='truncated' className='truncated orange'>Full body is too long to be displayed here...</div>
               </code>
             </div>
           </List.Item>
-          <ModalScrollingContent header={header}>
+          <ModalScrollingContent header={header} trigger={trigger}>
             <Grid celled='internally'>
               <Grid.Row>
                 <Grid.Column width={8}>
@@ -355,7 +357,7 @@ const ResponseData = ({ recordPair, request, response, diff, initialEntry }) => 
   );
 };
 
-const ModalScrollingContent = ({ header, children }) => {
+const ModalScrollingContent = ({ header, trigger, children }) => {
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -365,7 +367,7 @@ const ModalScrollingContent = ({ header, children }) => {
       open={open}
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
-      trigger={<Button fluid basic color='blue'>Full diff</Button>}
+      trigger={trigger}
     >
       <Modal.Header>
         {header}

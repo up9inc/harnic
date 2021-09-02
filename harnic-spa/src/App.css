@@ -190,8 +190,33 @@ code {
 
 .truncated {
   text-align: center;
+  font-family: 'Lato', auto;
+}
+
+.truncated.orange {
+  color: rgb(246, 157, 80) !important;
+}
+
+.truncated.grey {
+  color: rgba(0, 0, 0, 0.61) !important;
 }
 
 .ui.fullscreen.modal {
   left: auto !important;
+}
+
+.ui.basic.orange.button, .ui.basic.orange.buttons .button {
+  box-shadow: 0 0 0 1px rgb(246, 157, 80) inset!important;
+  color: rgb(246, 157, 80) !important;
+}
+
+.ui.basic.grey.button, .ui.basic.grey.buttons .button {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.61) inset!important;
+  color: rgba(0, 0, 0, 0.61) !important;
+}
+
+.ui.basic.grey.button:hover, .ui.basic.grey.buttons .button:hover {
+    background: 0 0 !important;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.79) inset!important;
+    color: rgba(0, 0, 0, 0.79) !important;
 }

@@ -60,11 +60,9 @@ docker rm harnic
 **Issues**:
 - Query params compare only keys
 - Add req/resp body to modal header title
-- Change `...TRUNCATED..`. and `Full diff` top be more human friendly
 - Add bytes limit to truncated part
 - Add horizontal scroll to diff
 - Add contextual context-wrap
-- Rename proceed button
 - Profile stats for big files
 - Add request postData
 - Handle soft diffs missing or added as soft
