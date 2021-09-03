@@ -220,3 +220,7 @@ code {
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.79) inset!important;
     color: rgba(0, 0, 0, 0.79) !important;
 }
+
+.diff-modal-header-lablel {
+  padding: 0 .4em;
+}

@@ -1,5 +1,12 @@
 import React from "react";
-import { Button, List, Grid, Popup, Icon } from "semantic-ui-react";
+import {
+  Button,
+  List,
+  Grid,
+  Popup,
+  Icon,
+  Label,
+} from "semantic-ui-react";
 import { DateTime } from "luxon";
 import regexifyString from "regexify-string";
 
@@ -127,10 +134,18 @@ const ResponseData = ({
         <Grid celled="internally">
           <Grid.Row>
             <Grid.Column width={8}>
-              {truncate(recordPair.a.request.url.url, 90)}
+              <Label basic horizontal size='large'>
+                Response
+              </Label>
+              <span className='diff-modal-header-lablel'>
+                {truncate(recordPair.a.request.url.url, 75)}
+              </span>
             </Grid.Column>
             <Grid.Column width={8}>
-              {truncate(recordPair.b.request.url.url, 90)}
+              <Label basic horizontal size='large'>
+                Response
+              </Label>
+              {truncate(recordPair.b.request.url.url, 75)}
             </Grid.Column>
           </Grid.Row>
         </Grid>
