@@ -47,6 +47,7 @@ docker rm harnic
 - Maybe some rules to ignore dynamic patterns inside body?
 - Maybe ignore inner differences of error responses
 - Handle url params
+- Profile stats for big files
 
 
 **Frontend**:
@@ -59,11 +60,8 @@ docker rm harnic
 
 **Issues**:
 - Query params compare only keys
-- Add req/resp body to modal header title
 - Add bytes limit to truncated part
 - Add horizontal scroll to diff
 - Add contextual context-wrap
-- Profile stats for big files
 - Add request postData
 - Handle soft diffs missing or added as soft
-- Add request postdata
