@@ -1,6 +1,6 @@
 from functools import partial
 
-from harnic.compare.utils import dict_compare, scalars_compare, content_compare
+from harnic.compare.utils import dict_compare, qp_compare, scalars_compare, content_compare
 from harnic.constants import SOFT_HEADER_KEYS
 
 headers_compare = partial(dict_compare, exceptions=SOFT_HEADER_KEYS, exculde_values=True)
@@ -21,7 +21,7 @@ class EntryDiff:
 
         comparisons['request']['bodySize'] = scalars_compare(self.a.request['bodySize'],
                                                              self.b.request['bodySize'])
-        comparisons['request']['query_params'] = dict_compare(self.a.request['url'].query_params,
+        comparisons['request']['query_params'] = qp_compare(self.a.request['url'].query_params,
                                                               self.b.request['url'].query_params)
         comparisons['request']['headers'] = headers_compare(self.a.request['headers'],
                                                             self.b.request['headers'])

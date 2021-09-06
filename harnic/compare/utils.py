@@ -54,6 +54,13 @@ def scalars_compare(s1, s2):
     return Comparison(equal, strict_equal, None)
 
 
+def qp_compare(qp1, qp2):
+    # All query params are soft
+    keys = set(qp1.keys()).union(set(qp2.keys()))
+    cmp = dict_compare(qp1, qp2, exceptions=keys)
+    return cmp
+
+
 def content_compare(r1, r2):
     c1, raw1 = r1['content'], r1.get('raw_body')
     c2, raw2 = r2['content'], r2.get('raw_body')
