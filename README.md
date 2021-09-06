@@ -59,9 +59,8 @@ docker rm harnic
 
 
 **Issues**:
-- Query params compare only keys
 - Add bytes limit to truncated part
-- Add horizontal scroll to diff
-- Add contextual context-wrap
+- Add horizontal scroll to diff (*Hard*)
+- Add contextual context-wrap (*Hard*)
 - Add request postData
-- Handle soft diffs missing or added as soft
+- Handle soft diffs missing or added as soft (*Under question*)
