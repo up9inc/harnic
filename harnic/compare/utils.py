@@ -1,5 +1,9 @@
 from difflib import _mdiff
 
+import spacy
+
+nlp = spacy.load('en_core_web_sm')
+
 
 class Comparison:
     def __init__(self, equal, strict_equal, diff):
@@ -29,6 +33,10 @@ def split_diff(fromlines, tolines, **kwargs):
     return fromlist, tolist, flaglist
 
 
+def dict_product(d1, d2):
+    return {key: d1.get(key, 0) * d2[key] for key in d2.keys()}
+
+
 def dict_compare(d1, d2, exceptions=(), exculde_values=False):
     d1_keys = set(d1.keys())
     d2_keys = set(d2.keys())
@@ -46,19 +54,31 @@ def dict_compare(d1, d2, exceptions=(), exculde_values=False):
     else:
         equal = {k: v for k, v in d1.items() if k not in exceptions} == \
                 {k: v for k, v in d2.items() if k not in exceptions}
-    return Comparison(equal, d1 == d2, DictDiff(added, removed, modified, same))
+
+    try:
+        score = 2.0 * len(same) / (len(d1_keys) + len(d2_keys))
+    except ZeroDivisionError:
+        score = 1
+    return Comparison(equal, d1 == d2, DictDiff(added, removed, modified, same)), score
 
 
 def scalars_compare(s1, s2):
     equal = strict_equal = s1 == s2
-    return Comparison(equal, strict_equal, None)
+    return Comparison(equal, strict_equal, None), int(equal)
 
 
 def qp_compare(qp1, qp2):
     # All query params are soft
     keys = set(qp1.keys()).union(set(qp2.keys()))
-    cmp = dict_compare(qp1, qp2, exceptions=keys)
-    return cmp
+    cmp, score = dict_compare(qp1, qp2, exceptions=keys)
+    return cmp, score
+
+
+def text_compare(t1, t2):
+    doc1 = nlp(t1)
+    doc2 = nlp(t2)
+    score = doc2.similarity(doc1)
+    return score
 
 
 def content_compare(r1, r2):
@@ -67,20 +87,23 @@ def content_compare(r1, r2):
     # All content keys except 'text' are soft
     keys = set(c1.keys()).union(set(c2.keys()))
     keys.discard('text')
-    cmp = dict_compare(c1, c2, exceptions=keys)
+    cmp, score = dict_compare(c1, c2, exceptions=keys)
 
     text_modified = cmp.diff.modified.get('text', ())
+    score = 1
     if text_modified and None not in text_modified:
         try:
             diff = split_diff(c1['text'].splitlines(), c2['text'].splitlines())
         except KeyError:
             pass
         else:
+            score = text_compare(c1['text'], c2['text'])
             cmp.diff.modified['text'] = diff
     else:
         # We should check for raw equality in case cleaned failed
         if raw1 != raw2:
+            score = text_compare(c1['text'], c2['text'])
             # Values are skipped anyway so we just mark a diff without inner explanation
             cmp.diff.modified['text'] = None
 
-    return cmp
+    return cmp, score

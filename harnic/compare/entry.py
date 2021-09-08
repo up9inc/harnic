@@ -1,7 +1,7 @@
 from functools import partial
 
-from harnic.compare.utils import dict_compare, qp_compare, scalars_compare, content_compare
-from harnic.constants import SOFT_HEADER_KEYS
+from harnic.compare.utils import content_compare, dict_compare, dict_product, qp_compare, scalars_compare
+from harnic.constants import SCORE_COEFS, SCORE_HTTP_TX_TYPE_COEFS, SOFT_HEADER_KEYS
 
 headers_compare = partial(dict_compare, exceptions=SOFT_HEADER_KEYS, exculde_values=True)
 
@@ -14,24 +14,49 @@ class EntryDiff:
         self.b = b
         self.equal = None
         self.comparisons = self._get_diff()
+        self.score = 1
 
     def _get_diff(self):
         # method and url are not handled here as long as they are part of the entry hash
         comparisons = {'request': {}, 'response': {}}
 
-        comparisons['request']['bodySize'] = scalars_compare(self.a.request['bodySize'],
-                                                             self.b.request['bodySize'])
-        comparisons['request']['query_params'] = qp_compare(self.a.request['url'].query_params,
-                                                              self.b.request['url'].query_params)
-        comparisons['request']['headers'] = headers_compare(self.a.request['headers'],
-                                                            self.b.request['headers'])
+        diff_score = {
+            'request': {},
+            'response': {},
+        }
 
-        comparisons['response']['status'] = scalars_compare(self.a.response['status'],
-                                                            self.b.response['status'])
-        comparisons['response']['headers'] = headers_compare(self.a.response['headers'],
-                                                             self.b.response['headers'])
-        comparisons['response']['content'] = content_compare(self.a.response,
-                                                             self.b.response)
+        cmp, score = scalars_compare(self.a.request['bodySize'], self.b.request['bodySize'])
+        comparisons['request']['bodySize'], diff_score['request']['bodySize'] = cmp, score
+
+        cmp, score = qp_compare(self.a.request['url'].query_params, self.b.request['url'].query_params)
+        comparisons['request']['query_params'], diff_score['request']['query_params'] = cmp, score
+
+        cmp, score = headers_compare(self.a.request['headers'], self.b.request['headers'])
+        comparisons['request']['headers'], diff_score['request']['headers'] = cmp, score
+
+        # TODO: implement postData cmp
+        diff_score['request']['postData'] = 1  # Treat same for now
+
+        cmp, score = scalars_compare(self.a.response['status'], self.b.response['status'])
+        comparisons['response']['status'], diff_score['response']['status'] = cmp, score
+
+        cmp, score = headers_compare(self.a.response['headers'], self.b.response['headers'])
+        comparisons['response']['headers'], diff_score['response']['headers'] = cmp, score
+
+        cmp, score = content_compare(self.a.response, self.b.response)
+        comparisons['response']['content'], diff_score['response']['content'] = cmp, score
 
         self.equal = all(all(cmp.equal for cmp in criteria.values()) for criteria in comparisons.values())
+
+        diff_score_with_coefs = {
+            'request': sum(dict_product(diff_score['request'], SCORE_COEFS['request']).values()),
+            'response': sum(dict_product(diff_score['response'], SCORE_COEFS['response']).values()),
+        }
+        diff_score_with_coefs = {
+            'request': dict_product(diff_score_with_coefs['request'], SCORE_HTTP_TX_TYPE_COEFS['request']),
+            'response': dict_product(diff_score_with_coefs['response'], SCORE_HTTP_TX_TYPE_COEFS['response']),
+        }
+        final_score = sum(diff_score_with_coefs.values())
+        self.score = final_score
+
         return comparisons
