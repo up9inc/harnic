@@ -47,15 +47,11 @@ class EntryDiff:
         comparisons['response']['content'], diff_score['response']['content'] = cmp, score
 
         self.equal = all(all(cmp.equal for cmp in criteria.values()) for criteria in comparisons.values())
-
         diff_score_with_coefs = {
             'request': sum(dict_product(diff_score['request'], SCORE_COEFS['request']).values()),
             'response': sum(dict_product(diff_score['response'], SCORE_COEFS['response']).values()),
         }
-        diff_score_with_coefs = {
-            'request': dict_product(diff_score_with_coefs['request'], SCORE_HTTP_TX_TYPE_COEFS['request']),
-            'response': dict_product(diff_score_with_coefs['response'], SCORE_HTTP_TX_TYPE_COEFS['response']),
-        }
+        diff_score_with_coefs = dict_product(diff_score_with_coefs, SCORE_HTTP_TX_TYPE_COEFS)
         final_score = sum(diff_score_with_coefs.values())
         self.score = final_score
 
