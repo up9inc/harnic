@@ -57,7 +57,8 @@ def dict_compare(d1, d2, exceptions=(), exculde_values=False):
                 {k: v for k, v in d2.items() if k not in exceptions}
 
     try:
-        score = 2.0 * len(same) / (len(d1_keys) + len(d2_keys))
+        total_soft_diffs = len([v for v in modified.values() if v[2]])
+        score = 2.0 * (len(same) + total_soft_diffs) / (len(d1_keys) + len(d2_keys))
     except ZeroDivisionError:
         score = 1
     return Comparison(equal, d1 == d2, DictDiff(added, removed, modified, same), score)
