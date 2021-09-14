@@ -84,6 +84,7 @@ BASELINE=$HOME/hars/origin/main
 if ls $BASELINE/latest.har; then
   ls -la $BASELINE
   python3 -m harnic $BASELINE/latest.har traffic/captured.har
+  echo YVALUE=`cat diff_latest.har_captured.har/kpis.json | jq .stats.with_reorders.ratio` &gt; kpis.properties
 fi
 
 mkdir -p $HOME/hars/$GIT_BRANCH/
@@ -94,6 +95,33 @@ cp ./traffic/captured.har $HOME/hars/$GIT_BRANCH/latest.har
     </hudson.tasks.Shell>
   </builders>
   <publishers>
+    <hudson.plugins.plot.PlotPublisher plugin="plot@2.1.9">
+      <plots>
+        <hudson.plugins.plot.Plot>
+          <title>Match Score</title>
+          <description></description>
+          <yaxis>%</yaxis>
+          <series>
+            <hudson.plugins.plot.PropertiesSeries>
+              <file>kpis.properties</file>
+              <label></label>
+              <fileType>properties</fileType>
+            </hudson.plugins.plot.PropertiesSeries>
+          </series>
+          <group>Traffic Diff Stats</group>
+          <numBuilds></numBuilds>
+          <csvFileName></csvFileName>
+          <csvLastModification>0</csvLastModification>
+          <style>line</style>
+          <useDescr>false</useDescr>
+          <keepRecords>false</keepRecords>
+          <exclZero>false</exclZero>
+          <logarithmic>false</logarithmic>
+          <yaxisMinimum></yaxisMinimum>
+          <yaxisMaximum></yaxisMaximum>
+        </hudson.plugins.plot.Plot>
+      </plots>
+    </hudson.plugins.plot.PlotPublisher>
     <htmlpublisher.HtmlPublisher plugin="htmlpublisher@1.25">
       <reportTargets>
         <htmlpublisher.HtmlPublisherTarget>

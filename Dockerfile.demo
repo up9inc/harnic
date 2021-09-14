@@ -13,7 +13,7 @@ FROM jenkins/jenkins
 
 USER root
 
-RUN apt update && apt install -y build-essential python3 sudo python3-pip mc psmisc procps
+RUN apt update && apt install -y build-essential python3 sudo python3-pip mc psmisc procps jq
 RUN usermod -aG sudo jenkins && sed -i s/[!]// /etc/shadow
 # RUN echo "#! /usr/bin/sudo /bin/sh\n/usr/bin/docker \"\$@\"" > /usr/local/bin/docker && chmod +x /usr/local/bin/docker
 # RUN echo "PATH=\$PATH:\$HOME/.local/bin" >> /etc/profile

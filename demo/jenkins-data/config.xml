@@ -3,6 +3,7 @@
   <disabledAdministrativeMonitors>
     <string>jenkins.diagnostics.ControllerExecutorsNoAgents</string>
     <string>jenkins.diagnostics.SecurityIsOffMonitor</string>
+    <string>jenkins.security.ResourceDomainRecommendation</string>
   </disabledAdministrativeMonitors>
   <version>2.311</version>
   <numExecutors>1</numExecutors>
