@@ -1,0 +1,121 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>10</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
+    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.32">
+      <autoRebuild>false</autoRebuild>
+      <rebuildDisabled>false</rebuildDisabled>
+    </com.sonyericsson.rebuild.RebuildSettings>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.8.2">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/up9inc/mockintosh.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>**</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="empty-list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <hudson.triggers.SCMTrigger>
+      <spec>* * * * *</spec>
+      <ignorePostCommitHooks>false</ignorePostCommitHooks>
+    </hudson.triggers.SCMTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command># PREPARE
+killall python3 || echo Not running
+pip3 install -r requirements.txt
+pip3 install mitmproxy
+(PYTHONPATH=.:./tests_integrated python3 -m mockintosh tests_integrated/integration_config.yaml --interceptor=custom_interceptors.intercept_for_logging --interceptor=custom_interceptors.intercept_for_modifying &gt; ./tests_integrated/server.log 2&gt;&amp;1) &amp;
+sleep 5
+curl -vf http://localhost:8001
+curl -vkf https://localhost:8000
+mkdir traffic
+(~/.local/bin/mitmdump -vvv --mode regular --ssl-insecure --set block-global=false --listen-port 8888 --set hardump=./traffic/captured.har -s $HOME/scripts/har_dump.py &gt; ./traffic/mitmdump.log 2&gt;&amp;1) &amp;
+sleep 5
+HTTP_PROXY=http://localhost:8888 curl -vf http://localhost:8001
+HTTPS_PROXY=http://localhost:8888 curl -vkf https://localhost:8000
+sed -i s/test_conn_status/_test_conn_status/ tests_integrated/tests_integration.py</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command># RUN
+export HTTP_PROXY=http://localhost:8888
+export HTTPS_PROXY=http://localhost:8888
+export NO_PROXY=raw.githubusercontent.com
+python3 -m unittest -v tests_integrated.tests_integration.RESTTests</command>
+      <configuredLocalRules/>
+      <unstableReturn>1</unstableReturn>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command># POST-PROCESS
+killall -SIGUSR1 mitmdump  # supposed to trigger HAR write
+sleep 5
+ls `pwd`/traffic/captured.har  # make sure it was written
+killall python3 || echo Not running # shut down mockintosh server
+
+
+BASELINE=$HOME/hars/origin/main
+
+if ls $BASELINE/latest.har; then
+  ls -la $BASELINE
+  python3 -m harnic $BASELINE/latest.har traffic/captured.har
+fi
+
+mkdir -p $HOME/hars/$GIT_BRANCH/
+
+cp ./traffic/captured.har $HOME/hars/$GIT_BRANCH/latest.har
+</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <htmlpublisher.HtmlPublisher plugin="htmlpublisher@1.25">
+      <reportTargets>
+        <htmlpublisher.HtmlPublisherTarget>
+          <reportName>Traffic Comparison Report</reportName>
+          <reportDir>diff_latest.har_captured.har</reportDir>
+          <reportFiles>index.html</reportFiles>
+          <alwaysLinkToLastBuild>true</alwaysLinkToLastBuild>
+          <reportTitles></reportTitles>
+          <keepAll>true</keepAll>
+          <allowMissing>true</allowMissing>
+          <includes>**/*</includes>
+          <escapeUnderscores>true</escapeUnderscores>
+        </htmlpublisher.HtmlPublisherTarget>
+      </reportTargets>
+    </htmlpublisher.HtmlPublisher>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.39">
+      <deleteDirs>false</deleteDirs>
+      <cleanupParameter></cleanupParameter>
+      <externalDelete></externalDelete>
+      <disableDeferredWipeout>false</disableDeferredWipeout>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  </buildWrappers>
+</project>
