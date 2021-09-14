@@ -128,7 +128,7 @@ def _calculate_permutations_total_number(opcodes):
         elif tag == 'delete':
             total += i2 - i1
         elif tag == 'insert':
-            total += j2 - i1
+            total += j2 - j1
     return total
 
 
