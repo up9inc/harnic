@@ -133,33 +133,24 @@ def _calculate_permutations_total_number(opcodes):
 
 
 def _calculate_reorders(records):
-    entry_reorders = {}
     record_reorders = []
-    inserts = [record for record in records if record.tag == PermTag.INSERT]
-    deletes = [record for record in records if record.tag == PermTag.DELETE]
 
     inserts_idx = defaultdict(deque)
-    for insert in inserts:
+    for insert in (record for record in records if record.tag == PermTag.INSERT):
         inserts_idx[insert.pair.partial_entry].append(insert)
 
     deletes_idx = defaultdict(deque)
-    for delete in deletes:
+    for delete in (record for record in records if record.tag == PermTag.DELETE):
         deletes_idx[delete.pair.partial_entry].append(delete)
 
-    reorders_keys = inserts_idx.keys() & deletes_idx.keys()
-
-    pairs = []
-    for key in reorders_keys:
+    for key in inserts_idx.keys() & deletes_idx.keys():
         try:
             insert = inserts_idx[key].pop()
             delete = deletes_idx[key].pop()
         except IndexError:
             continue
         insert_first = insert.pair.partial_entry.request['_ts'] >= delete.pair.partial_entry.request['_ts']
-        pairs.append((insert, delete) if insert_first else (delete, insert))
-
-    for pair in pairs:
-        from_record, to_record = pair
+        from_record, to_record = (insert, delete) if insert_first else (delete, insert)
         record_reorders.append({
             'from': from_record.id,
             'to': to_record.id,
