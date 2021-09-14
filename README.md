@@ -64,5 +64,3 @@ docker rm harnic
 - Add contextual context-wrap (*Hard*)
 - Add request postData
 - Handle soft diffs missing or added as soft (*Under question*)
-- Http tx scores to 0.5/0.5
-- Add score of entry and body to UI
