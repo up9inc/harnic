@@ -3,7 +3,7 @@ import { Tab, Table, Icon, Label, Menu } from "semantic-ui-react";
 
 import RequestData from "./RequestData.js";
 import ResponseData from "./ResponseData.js";
-import { truncate, getScoreLabelClass } from ".././utils.js";
+import { truncate, getScoreLabelClass, decimalAdjust } from ".././utils.js";
 
 const DiffRecordRow = ({ record }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,7 +36,7 @@ const DiffRecordRow = ({ record }) => {
               Request
               {record.tag === "diff" &&
                 <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.request)} floating>
-                  {(record.diff.score.by_http_tx_type.request * 100).toFixed(1)}%
+                  {decimalAdjust('floor', record.diff.score.by_http_tx_type.request * 100, -1)}%
                 </Label>
               }
             </Menu.Item>
@@ -56,7 +56,7 @@ const DiffRecordRow = ({ record }) => {
               Response
               {record.tag === "diff" &&
                 <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.response)} floating>
-                  {(record.diff.score.by_http_tx_type.response * 100).toFixed(1)}%
+                  {decimalAdjust('floor', record.diff.score.by_http_tx_type.response * 100, -1)}%
                 </Label>
               }
             </Menu.Item>
@@ -93,7 +93,7 @@ const DiffRecordRow = ({ record }) => {
               Request
               {record.tag === "diff" &&
                 <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.request)} floating>
-                  {(record.diff.score.by_http_tx_type.request * 100).toFixed(1)}%
+                  {decimalAdjust('floor', record.diff.score.by_http_tx_type.request * 100, -1)}%
                 </Label>
               }
             </Menu.Item>
@@ -113,7 +113,7 @@ const DiffRecordRow = ({ record }) => {
               Response
               {record.tag === "diff" &&
                 <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.response)} floating>
-                  {(record.diff.score.by_http_tx_type.response * 100).toFixed(1)}%
+                  {decimalAdjust('floor', record.diff.score.by_http_tx_type.response * 100, -1)}%
                 </Label>
               }
             </Menu.Item>
@@ -168,7 +168,7 @@ const DiffRecordRow = ({ record }) => {
           )}
           {record.tag === "diff" &&
             <Label className="entry-diff meta-label">
-              {(record.diff.score.final * 100).toFixed(1)}%
+              {decimalAdjust('floor', record.diff.score.final * 100, -1)}%
             </Label>
           }
         </Table.Cell>
