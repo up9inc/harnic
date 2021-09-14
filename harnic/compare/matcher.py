@@ -168,27 +168,6 @@ def _calculate_reorders(records):
 
     return record_reorders
 
-    for record in tqdm(records, desc='Calculating reorders'):
-        if record.tag not in (PermTag.INSERT, PermTag.DELETE):
-            continue
-        entry = record.pair.partial_entry
-        assert entry
-        if entry in entry_reorders:
-            if record.tag == PermTag.INSERT:
-                pair = (entry_reorders[entry][1], entry)
-            else:  # tag == PermTag.DELETE
-                pair = (entry, entry_reorders[entry][1])
-            record_reorders.append({
-                'from': entry_reorders[entry][0],
-                'to': record.id,
-                'entry_diff': EntryDiff(*pair)
-            })
-            entry_reorders.pop(entry)
-        else:
-            entry_reorders[entry] = (record.id, entry)
-
-    return record_reorders
-
 
 def _calculate_reorders_stats(reorders, stats, files):
     file1, file2 = files
