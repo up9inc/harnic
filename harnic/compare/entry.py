@@ -13,8 +13,12 @@ class EntryDiff:
         self.a = a
         self.b = b
         self.equal = None
+        self.score = {
+            'final': 1,
+            'by_http_tx_type': {},
+            'full': {}
+        }
         self.comparisons = self._get_diff()
-        self.score = 1
 
     def _get_diff(self):
         # method and url are not handled here as long as they are part of the entry hash
@@ -25,8 +29,11 @@ class EntryDiff:
             'response': {},
         }
 
-        cmp, score = scalars_compare(self.a.request['bodySize'], self.b.request['bodySize'])
-        comparisons['request']['bodySize'], diff_score['request']['bodySize'] = cmp, score
+        _, score = scalars_compare(self.a.request['url'].url, self.b.request['url'].url)
+        diff_score['request']['url'] = score
+
+        cmp, _ = scalars_compare(self.a.request['bodySize'], self.b.request['bodySize'])
+        comparisons['request']['bodySize'] = cmp
 
         cmp, score = qp_compare(self.a.request['url'].query_params, self.b.request['url'].query_params)
         comparisons['request']['query_params'], diff_score['request']['query_params'] = cmp, score
@@ -47,12 +54,15 @@ class EntryDiff:
         comparisons['response']['content'], diff_score['response']['content'] = cmp, score
 
         self.equal = all(all(cmp.equal for cmp in criteria.values()) for criteria in comparisons.values())
-        diff_score_with_coefs = {
-            'request': sum(dict_product(diff_score['request'], SCORE_COEFS['request']).values()),
-            'response': sum(dict_product(diff_score['response'], SCORE_COEFS['response']).values()),
-        }
-        diff_score_with_coefs = dict_product(diff_score_with_coefs, SCORE_HTTP_TX_TYPE_COEFS)
-        final_score = sum(diff_score_with_coefs.values())
-        self.score = final_score
+        if not self.equal:
+            self.score['full'] = diff_score
+            diff_score_with_coefs = {
+                'request': sum(dict_product(diff_score['request'], SCORE_COEFS['request']).values()),
+                'response': sum(dict_product(diff_score['response'], SCORE_COEFS['response']).values()),
+            }
+            self.score['by_http_tx_type'] = diff_score_with_coefs
+            diff_score_with_coefs = dict_product(diff_score_with_coefs, SCORE_HTTP_TX_TYPE_COEFS)
+            final_score = sum(diff_score_with_coefs.values())
+            self.score['final'] = final_score
 
         return comparisons

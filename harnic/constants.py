@@ -45,10 +45,10 @@ FANCY_REPLACE_THRESHOLD_LEN = 256
 # TODO: add assert that sum is 1
 SCORE_COEFS = {
     'request': {
-        'bodySize': 0.05,
-        'query_params': 0.25,
+        'url': 0.1,
+        'query_params': 0.3,
         'headers': 0.2,
-        'postData': 0.5,
+        'postData': 0.4,
     },
     'response': {
         'status': 0.25,
@@ -61,3 +61,7 @@ SCORE_HTTP_TX_TYPE_COEFS = {
     'request': 0.4,
     'response': 0.6,
 }
+
+assert sum(SCORE_COEFS['request'].values()) == 1
+assert sum(SCORE_COEFS['response'].values()) == 1
+assert sum(SCORE_HTTP_TX_TYPE_COEFS.values()) == 1

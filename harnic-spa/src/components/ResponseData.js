@@ -69,6 +69,7 @@ const ResponseData = ({
   response,
   diff,
   initialEntry,
+  score,
 }) => {
   const cmpIdx = initialEntry ? 0 : 1;
 
@@ -274,6 +275,11 @@ const ResponseData = ({
         <List.Item>
           <div>
             <b>Content:</b>
+            {score &&
+              <Label>
+                {(score.full.response.content * 100).toFixed(1)}%
+              </Label>
+            }            
           </div>
           <List>
             {Object.entries(response.content).map(([key, value]) => {
