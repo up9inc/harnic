@@ -6,10 +6,11 @@ nlp = spacy.load('en_core_web_sm')
 
 
 class Comparison:
-    def __init__(self, equal, strict_equal, diff):
+    def __init__(self, equal, strict_equal, diff, score):
         self.equal = equal
         self.strict_equal = strict_equal
         self.diff = diff
+        self.score = score
 
 
 class DictDiff:
@@ -59,19 +60,19 @@ def dict_compare(d1, d2, exceptions=(), exculde_values=False):
         score = 2.0 * len(same) / (len(d1_keys) + len(d2_keys))
     except ZeroDivisionError:
         score = 1
-    return Comparison(equal, d1 == d2, DictDiff(added, removed, modified, same)), score
+    return Comparison(equal, d1 == d2, DictDiff(added, removed, modified, same), score)
 
 
 def scalars_compare(s1, s2):
     equal = strict_equal = s1 == s2
-    return Comparison(equal, strict_equal, None), int(equal)
+    return Comparison(equal, strict_equal, None, int(equal))
 
 
 def qp_compare(qp1, qp2):
     # All query params are soft
     keys = set(qp1.keys()).union(set(qp2.keys()))
-    cmp, score = dict_compare(qp1, qp2, exceptions=keys)
-    return cmp, score
+    cmp = dict_compare(qp1, qp2, exceptions=keys)
+    return cmp
 
 
 def text_compare(t1, t2):
@@ -87,23 +88,23 @@ def content_compare(r1, r2):
     # All content keys except 'text' are soft
     keys = set(c1.keys()).union(set(c2.keys()))
     keys.discard('text')
-    cmp, score = dict_compare(c1, c2, exceptions=keys)
+    cmp = dict_compare(c1, c2, exceptions=keys)
 
     text_modified = cmp.diff.modified.get('text', ())
-    score = 1
+    cmp.score = 1
     if text_modified and None not in text_modified:
         try:
             diff = split_diff(c1['text'].splitlines(), c2['text'].splitlines())
         except KeyError:
             pass
         else:
-            score = text_compare(c1['text'], c2['text'])
+            cmp.score = text_compare(c1['text'], c2['text'])
             cmp.diff.modified['text'] = diff
     else:
         # We should check for raw equality in case cleaned failed
         if raw1 != raw2:
-            score = text_compare(c1['text'], c2['text'])
+            cmp.score = text_compare(c1['text'], c2['text'])
             # Values are skipped anyway so we just mark a diff without inner explanation
             cmp.diff.modified['text'] = None
 
-    return cmp, score
+    return cmp

@@ -25,29 +25,29 @@ class EntryDiff:
             'response': {},
         }
 
-        _, score = scalars_compare(self.a.request['url'].url, self.b.request['url'].url)
-        diff_score['request']['url'] = score
+        cmp = scalars_compare(self.a.request['url'].url, self.b.request['url'].url)
+        diff_score['request']['url'] = cmp.score
 
-        cmp, _ = scalars_compare(self.a.request['bodySize'], self.b.request['bodySize'])
+        cmp = scalars_compare(self.a.request['bodySize'], self.b.request['bodySize'])
         comparisons['request']['bodySize'] = cmp
 
-        cmp, score = qp_compare(self.a.request['url'].query_params, self.b.request['url'].query_params)
-        comparisons['request']['query_params'], diff_score['request']['query_params'] = cmp, score
+        cmp = qp_compare(self.a.request['url'].query_params, self.b.request['url'].query_params)
+        comparisons['request']['query_params'], diff_score['request']['query_params'] = cmp, cmp.score
 
-        cmp, score = headers_compare(self.a.request['headers'], self.b.request['headers'])
-        comparisons['request']['headers'], diff_score['request']['headers'] = cmp, score
+        cmp = headers_compare(self.a.request['headers'], self.b.request['headers'])
+        comparisons['request']['headers'], diff_score['request']['headers'] = cmp, cmp.score
 
         # TODO: implement postData cmp
         diff_score['request']['postData'] = 1  # Treat same for now
 
-        cmp, score = scalars_compare(self.a.response['status'], self.b.response['status'])
-        comparisons['response']['status'], diff_score['response']['status'] = cmp, score
+        cmp = scalars_compare(self.a.response['status'], self.b.response['status'])
+        comparisons['response']['status'], diff_score['response']['status'] = cmp, cmp.score
 
-        cmp, score = headers_compare(self.a.response['headers'], self.b.response['headers'])
-        comparisons['response']['headers'], diff_score['response']['headers'] = cmp, score
+        cmp = headers_compare(self.a.response['headers'], self.b.response['headers'])
+        comparisons['response']['headers'], diff_score['response']['headers'] = cmp, cmp.score
 
-        cmp, score = content_compare(self.a.response, self.b.response)
-        comparisons['response']['content'], diff_score['response']['content'] = cmp, score
+        cmp = content_compare(self.a.response, self.b.response)
+        comparisons['response']['content'], diff_score['response']['content'] = cmp, cmp.score
 
         self.equal = all(all(cmp.equal for cmp in criteria.values()) for criteria in comparisons.values())
 
