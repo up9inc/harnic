@@ -144,7 +144,7 @@ def _calculate_reorders(records):
             index = deletes_idx
         index[filtered_record.pair.partial_entry].append(filtered_record)
 
-    for key in inserts_idx.keys() & deletes_idx.keys():
+    for key in tqdm(inserts_idx.keys() & deletes_idx.keys(), desc='Calculating reorders'):
         try:
             insert = inserts_idx[key].pop()
             delete = deletes_idx[key].pop()
