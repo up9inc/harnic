@@ -1,5 +1,6 @@
 import difflib
 import uuid
+from collections import defaultdict, deque
 from enum import Enum
 
 from tqdm import tqdm
@@ -132,26 +133,30 @@ def _calculate_permutations_total_number(opcodes):
 
 
 def _calculate_reorders(records):
-    entry_reorders = {}
     record_reorders = []
-    for record in tqdm(records, desc='Calculating reorders'):
-        if record.tag not in (PermTag.INSERT, PermTag.DELETE):
-            continue
-        entry = record.pair.partial_entry
-        assert entry
-        if entry in entry_reorders:
-            if record.tag == PermTag.INSERT:
-                pair = (entry_reorders[entry][1], entry)
-            else:  # tag == PermTag.DELETE
-                pair = (entry, entry_reorders[entry][1])
-            record_reorders.append({
-                'from': entry_reorders[entry][0],
-                'to': record.id,
-                'entry_diff': EntryDiff(*pair)
-            })
-            entry_reorders.pop(entry)
+    inserts_idx = defaultdict(deque)
+    deletes_idx = defaultdict(deque)
+
+    for filtered_record in (record for record in records if record.tag in (PermTag.INSERT, PermTag.DELETE)):
+        if filtered_record.tag == PermTag.INSERT:
+            index = inserts_idx
         else:
-            entry_reorders[entry] = (record.id, entry)
+            index = deletes_idx
+        index[filtered_record.pair.partial_entry].append(filtered_record)
+
+    for key in tqdm(inserts_idx.keys() & deletes_idx.keys(), desc='Calculating reorders'):
+        try:
+            insert = inserts_idx[key].pop()
+            delete = deletes_idx[key].pop()
+        except IndexError:
+            continue
+        insert_first = insert.pair.partial_entry.request['_ts'] >= delete.pair.partial_entry.request['_ts']
+        from_record, to_record = (insert, delete) if insert_first else (delete, insert)
+        record_reorders.append({
+            'from': from_record.id,
+            'to': to_record.id,
+            'entry_diff': EntryDiff(from_record.pair.partial_entry, to_record.pair.partial_entry)
+        })
 
     return record_reorders
 
