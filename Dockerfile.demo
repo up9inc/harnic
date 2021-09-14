@@ -40,5 +40,5 @@ COPY setup.py .
 RUN pip3 install -e .
 
 WORKDIR /
-
+ENV JAVA_OPTS='-Dhudson.model.DirectoryBrowserSupport.CSP=""'
 USER jenkins
