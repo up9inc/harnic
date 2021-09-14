@@ -1,3 +1,4 @@
+import warnings
 from difflib import _mdiff
 
 import spacy
@@ -79,7 +80,9 @@ def qp_compare(qp1, qp2):
 def text_compare(t1, t2):
     doc1 = nlp(t1)
     doc2 = nlp(t2)
-    score = doc2.similarity(doc1)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        score = doc2.similarity(doc1)
     return score
 
 
