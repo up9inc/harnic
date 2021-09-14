@@ -24,16 +24,31 @@
   background-color: rgba(0, 0, 0, 0.25)
 }
 */
-.ui.table td.warning, .ui.table tr.warning {
-    background: rgba(246, 157, 80, 0.2) !important;
+.ui.table td.warning, .ui.table tr.warning, .label.warning {
+  background: rgba(246, 157, 80, 0.2) !important;
 }
 
-.ui.table td.positive, .ui.table tr.positive {
-    background: rgba(70, 149, 74, 0.2) !important;
+.ui.table td.positive, .ui.table tr.positive, .label.positive {
+  background: rgba(70, 149, 74, 0.2) !important;
 }
 
-.ui.table td.negative, .ui.table tr.negative {
-    background: rgba(201, 60, 55, 0.2) !important;
+.ui.table td.negative, .ui.table tr.negative, .label.negative {
+  background: rgba(201, 60, 55, 0.2) !important;
+}
+
+.label.warning {
+  background: rgba(246, 157, 80, 0.55) !important;
+  color: white !important;
+}
+
+.label.positive {
+  background: rgba(70, 149, 74, 0.55) !important;
+  color: white !important;
+}
+
+.label.negative {
+  background: rgba(201, 60, 55, 0.55) !important;
+  color: white !important;
 }
 
 /* Some basic formatting */

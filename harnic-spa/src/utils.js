@@ -20,5 +20,15 @@ const calculateDiffClass = (diff, criteria, key) => {
   return keyClass;
 };
 
- export { truncate, calculateDiffClass };
+const getScoreLabelClass = (score) => {
+  if (score < 0.25) {
+    return 'negative';
+  } else if (score == 1) {
+    return 'positive';
+  } else {
+    return 'warning';
+  }
+};
+
+export { truncate, calculateDiffClass, getScoreLabelClass };
  

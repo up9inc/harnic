@@ -3,7 +3,7 @@ import { Tab, Table, Icon, Label, Menu } from "semantic-ui-react";
 
 import RequestData from "./RequestData.js";
 import ResponseData from "./ResponseData.js";
-import { truncate } from ".././utils.js";
+import { truncate, getScoreLabelClass } from ".././utils.js";
 
 const DiffRecordRow = ({ record }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,7 +35,7 @@ const DiffRecordRow = ({ record }) => {
             <Menu.Item key='request'>
               Request
               {record.tag === "diff" &&
-                <Label floating>
+                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.request)} floating>
                   {(record.diff.score.by_http_tx_type.request * 100).toFixed(1)}%
                 </Label>
               }
@@ -55,7 +55,7 @@ const DiffRecordRow = ({ record }) => {
             <Menu.Item key='response'>
               Response
               {record.tag === "diff" &&
-                <Label floating>
+                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.response)} floating>
                   {(record.diff.score.by_http_tx_type.response * 100).toFixed(1)}%
                 </Label>
               }
@@ -92,7 +92,7 @@ const DiffRecordRow = ({ record }) => {
             <Menu.Item key='request'>
               Request
               {record.tag === "diff" &&
-                <Label floating>
+                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.request)} floating>
                   {(record.diff.score.by_http_tx_type.request * 100).toFixed(1)}%
                 </Label>
               }
@@ -112,7 +112,7 @@ const DiffRecordRow = ({ record }) => {
             <Menu.Item key='response'>
               Response
               {record.tag === "diff" &&
-                <Label floating>
+                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.response)} floating>
                   {(record.diff.score.by_http_tx_type.response * 100).toFixed(1)}%
                 </Label>
               }

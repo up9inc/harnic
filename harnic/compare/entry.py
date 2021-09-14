@@ -13,11 +13,7 @@ class EntryDiff:
         self.a = a
         self.b = b
         self.equal = None
-        self.score = {
-            'final': 1,
-            'by_http_tx_type': {},
-            'full': {}
-        }
+        self.score = {}
         self.comparisons = self._get_diff()
 
     def _get_diff(self):
@@ -54,15 +50,15 @@ class EntryDiff:
         comparisons['response']['content'], diff_score['response']['content'] = cmp, score
 
         self.equal = all(all(cmp.equal for cmp in criteria.values()) for criteria in comparisons.values())
-        if not self.equal:
-            self.score['full'] = diff_score
-            diff_score_with_coefs = {
-                'request': sum(dict_product(diff_score['request'], SCORE_COEFS['request']).values()),
-                'response': sum(dict_product(diff_score['response'], SCORE_COEFS['response']).values()),
-            }
-            self.score['by_http_tx_type'] = diff_score_with_coefs
-            diff_score_with_coefs = dict_product(diff_score_with_coefs, SCORE_HTTP_TX_TYPE_COEFS)
-            final_score = sum(diff_score_with_coefs.values())
-            self.score['final'] = final_score
+
+        self.score['full'] = diff_score
+        diff_score_with_coefs = {
+            'request': sum(dict_product(diff_score['request'], SCORE_COEFS['request']).values()),
+            'response': sum(dict_product(diff_score['response'], SCORE_COEFS['response']).values()),
+        }
+        self.score['by_http_tx_type'] = diff_score_with_coefs
+        diff_score_with_coefs = dict_product(diff_score_with_coefs, SCORE_HTTP_TX_TYPE_COEFS)
+        final_score = sum(diff_score_with_coefs.values())
+        self.score['final'] = final_score
 
         return comparisons
