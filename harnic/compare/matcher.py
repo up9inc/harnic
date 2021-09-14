@@ -134,14 +134,15 @@ def _calculate_permutations_total_number(opcodes):
 
 def _calculate_reorders(records):
     record_reorders = []
-
     inserts_idx = defaultdict(deque)
-    for insert in (record for record in records if record.tag == PermTag.INSERT):
-        inserts_idx[insert.pair.partial_entry].append(insert)
-
     deletes_idx = defaultdict(deque)
-    for delete in (record for record in records if record.tag == PermTag.DELETE):
-        deletes_idx[delete.pair.partial_entry].append(delete)
+
+    for filtered_record in (record for record in records if record.tag in (PermTag.INSERT, PermTag.DELETE)):
+        if filtered_record.tag == PermTag.INSERT:
+            index = inserts_idx
+        else:
+            index = deletes_idx
+        index[filtered_record.pair.partial_entry].append(filtered_record)
 
     for key in inserts_idx.keys() & deletes_idx.keys():
         try:
