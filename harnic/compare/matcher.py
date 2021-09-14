@@ -147,6 +147,17 @@ def _calculate_reorders(records):
         deletes_idx[delete].append(delete)
 
     reorders_keys = inserts_idx.keys() & deletes_idx.keys()
+
+    pairs = []
+    for key in reorders_keys:
+        try:
+            insert = inserts_idx[key].pop()
+            delete = deletes_idx[key].pop()
+        except IndexError:
+            continue
+        insert_first = insert.request['_ts'] >= delete.request['_ts']
+        pairs.append((insert, delete) if insert_first else (delete, insert))
+
     assert 1
 
     for record in tqdm(records, desc='Calculating reorders'):
