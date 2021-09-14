@@ -1,5 +1,6 @@
 import difflib
 import uuid
+from collections import defaultdict, deque
 from enum import Enum
 
 from tqdm import tqdm
@@ -134,6 +135,20 @@ def _calculate_permutations_total_number(opcodes):
 def _calculate_reorders(records):
     entry_reorders = {}
     record_reorders = []
+    inserts = [record.pair.partial_entry for record in records if record.tag == PermTag.INSERT]
+    deletes = [record.pair.partial_entry for record in records if record.tag == PermTag.DELETE]
+
+    inserts_idx = defaultdict(deque)
+    for insert in inserts:
+        inserts_idx[insert].append(insert)
+
+    deletes_idx = defaultdict(deque)
+    for delete in deletes:
+        deletes_idx[delete].append(delete)
+
+    reorders_keys = inserts_idx.keys() & deletes_idx.keys()
+    assert 1
+
     for record in tqdm(records, desc='Calculating reorders'):
         if record.tag not in (PermTag.INSERT, PermTag.DELETE):
             continue
