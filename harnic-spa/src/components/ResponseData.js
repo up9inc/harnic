@@ -11,7 +11,7 @@ import { DateTime } from "luxon";
 import regexifyString from "regexify-string";
 
 import ModalScrollingContent from "./ModalScrollingContent.js";
-import { truncate, calculateDiffClass } from ".././utils.js";
+import { truncate, calculateDiffClass, getScoreLabelClass, decimalAdjust } from ".././utils.js";
 
 const ContentText = ({ value, request }) => {
   if (value === null) {
@@ -69,6 +69,7 @@ const ResponseData = ({
   response,
   diff,
   initialEntry,
+  score,
 }) => {
   const cmpIdx = initialEntry ? 0 : 1;
 
@@ -274,6 +275,11 @@ const ResponseData = ({
         <List.Item>
           <div>
             <b>Content:</b>
+            {score && 
+                <Label className={getScoreLabelClass(score.full.response.content)}>
+                  {decimalAdjust('floor', score.full.response.content * 100, -1)}%
+                </Label>
+            }            
           </div>
           <List>
             {Object.entries(response.content).map(([key, value]) => {

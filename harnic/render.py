@@ -35,3 +35,6 @@ if __name__ == '__main__':
         file_js.write('window.globalData = ')
         file_js.writelines(l for l in file_json)
         file_js.write(';')
+
+    from harnic.helpers import stats_report
+    print(stats_report(diff))

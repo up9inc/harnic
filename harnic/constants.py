@@ -41,3 +41,26 @@ JSON_INDENT = 2
 
 PARTIAL_MATCH_CUTOFF = 0.5
 FANCY_REPLACE_THRESHOLD_LEN = 256
+
+SCORE_COEFS = {
+    'request': {
+        'url': 0.1,
+        'query_params': 0.3,
+        'headers': 0.2,
+        'postData': 0.4,
+    },
+    'response': {
+        'status': 0.25,
+        'headers': 0.3,
+        'content': 0.45,
+    }
+}
+
+SCORE_HTTP_TX_TYPE_COEFS = {
+    'request': 0.4,
+    'response': 0.6,
+}
+
+assert sum(SCORE_COEFS['request'].values()) == 1
+assert sum(SCORE_COEFS['response'].values()) == 1
+assert sum(SCORE_HTTP_TX_TYPE_COEFS.values()) == 1

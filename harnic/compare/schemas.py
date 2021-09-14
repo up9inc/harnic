@@ -19,6 +19,7 @@ class ComparisonSchema(Schema):
 class EntryDiffSchema(Schema):
     equal = fields.Bool()
     comparisons = fields.Dict(values=fields.Dict(values=fields.Nested('ComparisonSchema')))
+    score = fields.Dict()
 
 
 class PairSchema(Schema):

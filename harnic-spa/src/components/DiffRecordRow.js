@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Tab, Table, Icon, Label } from "semantic-ui-react";
+import { Tab, Table, Icon, Label, Menu } from "semantic-ui-react";
 
 import RequestData from "./RequestData.js";
 import ResponseData from "./ResponseData.js";
-import { truncate } from ".././utils.js";
+import { truncate, getScoreLabelClass, decimalAdjust } from ".././utils.js";
 
 const DiffRecordRow = ({ record }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +31,16 @@ const DiffRecordRow = ({ record }) => {
   const aPanes = record.pair.a
     ? [
         {
-          menuItem: "Request",
+          menuItem: (
+            <Menu.Item key='request'>
+              Request
+              {record.tag === "diff" &&
+                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.request)} floating>
+                  {decimalAdjust('floor', record.diff.score.by_http_tx_type.request * 100, -1)}%
+                </Label>
+              }
+            </Menu.Item>
+          ),
           render: () => (
             <Tab.Pane>
               <RequestData
@@ -42,7 +51,16 @@ const DiffRecordRow = ({ record }) => {
           ),
         },
         {
-          menuItem: "Response",
+          menuItem: (
+            <Menu.Item key='response'>
+              Response
+              {record.tag === "diff" &&
+                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.response)} floating>
+                  {decimalAdjust('floor', record.diff.score.by_http_tx_type.response * 100, -1)}%
+                </Label>
+              }
+            </Menu.Item>
+          ),
           render: () => (
             <Tab.Pane>
               <ResponseData
@@ -51,6 +69,7 @@ const DiffRecordRow = ({ record }) => {
                 response={record.pair.a.response}
                 diff={record.diff && record.diff.comparisons.response}
                 initialEntry={true}
+                score={record.diff && record.diff.score}
               />
             </Tab.Pane>
           ),
@@ -69,7 +88,16 @@ const DiffRecordRow = ({ record }) => {
   const bPanes = record.pair.b
     ? [
         {
-          menuItem: "Request",
+          menuItem: (
+            <Menu.Item key='request'>
+              Request
+              {record.tag === "diff" &&
+                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.request)} floating>
+                  {decimalAdjust('floor', record.diff.score.by_http_tx_type.request * 100, -1)}%
+                </Label>
+              }
+            </Menu.Item>
+          ),
           render: () => (
             <Tab.Pane>
               <RequestData
@@ -80,7 +108,16 @@ const DiffRecordRow = ({ record }) => {
           ),
         },
         {
-          menuItem: "Response",
+          menuItem: (
+            <Menu.Item key='response'>
+              Response
+              {record.tag === "diff" &&
+                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.response)} floating>
+                  {decimalAdjust('floor', record.diff.score.by_http_tx_type.response * 100, -1)}%
+                </Label>
+              }
+            </Menu.Item>
+          ),
           render: () => (
             <Tab.Pane>
               <ResponseData
@@ -89,6 +126,7 @@ const DiffRecordRow = ({ record }) => {
                 response={record.pair.b.response}
                 diff={record.diff && record.diff.comparisons.response}
                 initialEntry={false}
+                score={record.diff && record.diff.score}
               />
             </Tab.Pane>
           ),
@@ -124,8 +162,15 @@ const DiffRecordRow = ({ record }) => {
             </>
           )}
           {record.is_reordering && (
-            <Icon name="exchange" className="reordering-icon" />
+            <Label className="entry-diff meta-label reordering">
+              <Icon name="exchange" className="reordering-icon" />
+            </Label>
           )}
+          {record.tag === "diff" &&
+            <Label className="entry-diff meta-label">
+              {decimalAdjust('floor', record.diff.score.final * 100, -1)}%
+            </Label>
+          }
         </Table.Cell>
         <Table.Cell>
           {record.pair.b && (

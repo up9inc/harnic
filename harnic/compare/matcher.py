@@ -64,6 +64,7 @@ def _build_files_diff(opcodes, file1, file2):
         PermTag.DIFF: 0,
         PermTag.INSERT: 0,
         PermTag.DELETE: 0,
+        '_diff_scores_sum': 0,
     }
     perms_total = _calculate_permutations_total_number(opcodes)
     with tqdm(total=perms_total, desc='Constructing diff records') as pbar:
@@ -77,6 +78,8 @@ def _build_files_diff(opcodes, file1, file2):
                     dr = DiffRecord(pair, entry_diff, tag_selector)
                     records.append(dr)
                     stats[tag_selector] += 1
+                    if tag_selector == PermTag.DIFF:
+                        stats['_diff_scores_sum'] += entry_diff.score['final']
                     pbar.update()
             elif tag == 'replace':
                 for i in range(i1, i2):
@@ -101,7 +104,8 @@ def _build_files_diff(opcodes, file1, file2):
                     records.append(dr)
                     stats[PermTag.INSERT] += 1
                     pbar.update()
-            stats['ratio'] = 2.0 * stats[PermTag.EQUAL] / (len(file1) + len(file2))
+
+    stats['ratio'] = 2.0 * (stats[PermTag.EQUAL] + stats['_diff_scores_sum']) / (len(file1) + len(file2))
 
     reorders = _calculate_reorders(records)
     reorders_stats = _calculate_reorders_stats(reorders, stats, (file1, file2))
@@ -109,7 +113,6 @@ def _build_files_diff(opcodes, file1, file2):
         'with_reorders': reorders_stats,
         'strict_order': stats,
     }
-
     return records, reorders, stats
 
 
@@ -162,7 +165,9 @@ def _calculate_reorders_stats(reorders, stats, files):
     for reorder in reorders:
         tag_selector = PermTag.EQUAL if reorder['entry_diff'].equal else PermTag.DIFF
         stats[tag_selector] += 1
-    stats['ratio'] = 2.0 * stats[PermTag.EQUAL] / (len(file1) + len(file2))
+        if tag_selector == PermTag.DIFF:
+            stats['_diff_scores_sum'] += reorder['entry_diff'].score['final']
+    stats['ratio'] = 2.0 * (stats[PermTag.EQUAL] + stats['_diff_scores_sum']) / (len(file1) + len(file2))
 
     return stats
 
