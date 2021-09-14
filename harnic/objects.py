@@ -2,6 +2,7 @@ import base64
 import codecs
 import copy
 import json
+import re
 from json import JSONDecodeError
 from urllib.parse import urlparse, parse_qs, urlencode
 
@@ -26,7 +27,11 @@ class Url:
         cleaned_query = urlencode(cleaned_qparams)
         cleaned_result_url = copy.copy(self._parsed_url)
         cleaned_result_url = cleaned_result_url._replace(query=cleaned_query)
+        cleaned_result_url = cleaned_result_url._replace(path=self._url_patterns(self._parsed_url.path))
         return cleaned_result_url.geturl()
+
+    def _url_patterns(self, path):
+        return re.sub(r"\d{2,}", "*", path)
 
 
 class Entry:
