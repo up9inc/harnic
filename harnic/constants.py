@@ -42,7 +42,6 @@ JSON_INDENT = 2
 PARTIAL_MATCH_CUTOFF = 0.5
 FANCY_REPLACE_THRESHOLD_LEN = 256
 
-# TODO: add assert that sum is 1
 SCORE_COEFS = {
     'request': {
         'url': 0.1,
