@@ -161,8 +161,8 @@ def _calculate_reorders(records):
     for pair in pairs:
         from_record, to_record = pair
         record_reorders.append({
-            'from': from_record,
-            'to': to_record,
+            'from': from_record.id,
+            'to': to_record.id,
             'entry_diff': EntryDiff(from_record.pair.partial_entry, to_record.pair.partial_entry)
         })
 
