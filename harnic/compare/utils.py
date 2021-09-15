@@ -1,5 +1,7 @@
 from difflib import _mdiff
 
+import textdistance
+
 
 class Comparison:
     def __init__(self, equal, strict_equal, diff, score):
@@ -73,7 +75,7 @@ def qp_compare(qp1, qp2):
 
 
 def text_compare(t1, t2):
-    return 1
+    return textdistance.levenshtein.normalized_similarity(str(t1).splitlines(), str(t2).splitlines())
 
 
 def content_compare(r1, r2):
