@@ -35,7 +35,7 @@ const DiffRecordRow = ({ record }) => {
             <Menu.Item key='request'>
               Request
               {record.tag === "diff" &&
-                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.request)} floating>
+                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.request)}>
                   {decimalAdjust('floor', record.diff.score.by_http_tx_type.request * 100, -1)}%
                 </Label>
               }
@@ -55,7 +55,7 @@ const DiffRecordRow = ({ record }) => {
             <Menu.Item key='response'>
               Response
               {record.tag === "diff" &&
-                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.response)} floating>
+                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.response)}>
                   {decimalAdjust('floor', record.diff.score.by_http_tx_type.response * 100, -1)}%
                 </Label>
               }
@@ -92,7 +92,7 @@ const DiffRecordRow = ({ record }) => {
             <Menu.Item key='request'>
               Request
               {record.tag === "diff" &&
-                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.request)} floating>
+                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.request)}>
                   {decimalAdjust('floor', record.diff.score.by_http_tx_type.request * 100, -1)}%
                 </Label>
               }
@@ -112,7 +112,7 @@ const DiffRecordRow = ({ record }) => {
             <Menu.Item key='response'>
               Response
               {record.tag === "diff" &&
-                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.response)} floating>
+                <Label className={getScoreLabelClass(record.diff.score.by_http_tx_type.response)}>
                   {decimalAdjust('floor', record.diff.score.by_http_tx_type.response * 100, -1)}%
                 </Label>
               }
