@@ -1,9 +1,4 @@
-import warnings
 from difflib import _mdiff
-
-import spacy
-
-nlp = spacy.load('en_core_web_sm')
 
 
 class Comparison:
@@ -78,12 +73,7 @@ def qp_compare(qp1, qp2):
 
 
 def text_compare(t1, t2):
-    doc1 = nlp(t1)
-    doc2 = nlp(t2)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        score = doc2.similarity(doc1)
-    return score
+    return 1
 
 
 def content_compare(r1, r2):
