@@ -25,7 +25,7 @@ class EntryDiff:
             'response': {},
         }
 
-        cmp = scalars_compare(self.a.request['url'].url, self.b.request['url'].url)
+        cmp = scalars_compare(self.a.request['url'].clean_url, self.b.request['url'].clean_url)
         diff_score['request']['url'] = cmp.score
 
         cmp = scalars_compare(self.a.request['bodySize'], self.b.request['bodySize'])
