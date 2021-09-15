@@ -120,6 +120,11 @@ const ResponseData = ({
       return (
         <List.Item key="text">
           <div className="raw-content">
+            {score && 
+                <Label className={'content-score-label ' + getScoreLabelClass(score.full.response.content)}>
+                  {decimalAdjust('floor', score.full.response.content * 100, -1)}%
+                </Label>
+            }
             <code>
               {textDiff[cmpIdx].map((i, key) => (
                 <div key={key} className={getDiffStringClass(i, key)}>
@@ -160,6 +165,11 @@ const ResponseData = ({
         <>
           <List.Item key="text">
             <div className="raw-content">
+              {score && 
+                  <Label className={'content-score-label ' + getScoreLabelClass(score.full.response.content)}>
+                    {decimalAdjust('floor', score.full.response.content * 100, -1)}%
+                  </Label>
+              }
               <code>
                 {textDiff[cmpIdx].slice(0, 15).map((i, key) => (
                   <div key={key} className={getDiffStringClass(i, key)}>
@@ -274,12 +284,7 @@ const ResponseData = ({
         </List.Item>
         <List.Item>
           <div>
-            <b>Content:</b>
-            {score && 
-                <Label className={getScoreLabelClass(score.full.response.content)}>
-                  {decimalAdjust('floor', score.full.response.content * 100, -1)}%
-                </Label>
-            }            
+            <b>Content:</b>         
           </div>
           <List>
             {Object.entries(response.content).map(([key, value]) => {

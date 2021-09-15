@@ -1,9 +1,6 @@
-import warnings
 from difflib import _mdiff
 
-import spacy
-
-nlp = spacy.load('en_core_web_sm')
+import textdistance
 
 
 class Comparison:
@@ -78,12 +75,14 @@ def qp_compare(qp1, qp2):
 
 
 def text_compare(t1, t2):
-    doc1 = nlp(t1)
-    doc2 = nlp(t2)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        score = doc2.similarity(doc1)
-    return score
+    t1, t2 = str(t1), str(t2)
+    splited1, splited2 = t1.splitlines(), t2.splitlines()
+    # We compare strings as strings (not lists) if text is a single string
+    if len(splited1) == 1 and len(splited2) == 1:
+        cmp1, cmp2 = t1, t2
+    else:
+        cmp1, cmp2 = splited1, splited2
+    return textdistance.levenshtein.normalized_similarity(cmp1, cmp2)
 
 
 def content_compare(r1, r2):

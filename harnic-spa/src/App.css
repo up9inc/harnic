@@ -37,17 +37,17 @@
 }
 
 .label.warning {
-  background: rgba(246, 157, 80, 0.55) !important;
+  background: rgb(250,199,155) !important;
   color: white !important;
 }
 
 .label.positive {
-  background: rgba(70, 149, 74, 0.55) !important;
+  background: rgb(149,194,152) !important;
   color: white !important;
 }
 
 .label.negative {
-  background: rgba(201, 60, 55, 0.55) !important;
+  background: rgb(224,144,141) !important;
   color: white !important;
 }
 
@@ -245,4 +245,10 @@ code {
 
 .diff-modal-header-lablel {
   padding: 0 .4em;
+}
+
+.content-score-label {
+  position: absolute;
+  right: 0.6em;
+  margin-top: -10px !important;
 }

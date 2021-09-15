@@ -64,3 +64,4 @@ docker rm harnic
 - Add contextual context-wrap (*Hard*)
 - Add request postData
 - Handle soft diffs missing or added as soft (*Under question*)
+- Dynamic score ratio
