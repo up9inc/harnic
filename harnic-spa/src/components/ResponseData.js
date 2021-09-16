@@ -94,6 +94,7 @@ const ResponseData = ({
               }
             })}
             <HttpTxBody
+              parent='response'
               request={request}
               response={response}
               initialEntry={initialEntry}

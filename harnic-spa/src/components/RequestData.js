@@ -5,10 +5,18 @@ import {
 } from "semantic-ui-react";
 import { DateTime } from "luxon";
 
+import HttpTxBody from "./HttpTxBody.js";
 import { calculateDiffClass } from ".././utils.js";
 
 
-const RequestData = ({ request, diff }) => {
+const RequestData = ({
+  recordPair,
+  request,
+  response,
+  diff,
+  initialEntry,
+  score,
+}) => {
   return (
     <pre className="har-data">
       <List>
@@ -119,6 +127,15 @@ const RequestData = ({ request, diff }) => {
                   );
                 }
               })}
+              <HttpTxBody
+                parent='request'
+                request={request}
+                response={response}
+                initialEntry={initialEntry}
+                diff={diff}
+                recordPair={recordPair}
+                score={score}
+              />
             </List>
           </List.Item>
         }

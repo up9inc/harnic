@@ -62,12 +62,41 @@ const ContentText = ({ value, request }) => {
 };
 
 
-const HttpTxBody = ({initialEntry, diff, request, response, recordPair, score}) => {
+const HttpTxBody = ({parent, initialEntry, diff, request, response, recordPair, score}) => {
   const cmpIdx = initialEntry ? 0 : 1;
+  let txObj, txKey, txScore, contentText;
+  let textModified = false;
+  if (parent === 'request') {
+    txObj = request;
+    txKey = 'postData';
+    txScore = score && score.full.request.postData;
+    if (
+      "text" in request.post_data &&
+      diff &&
+      "text" in diff["postData"].diff.modified &&
+      diff["postData"].diff.modified["text"] !== null
+    ) {
+      textModified = true;
+    }
+    contentText = txObj.post_data["text"];
+  } else {
+    txObj = response;
+    txKey = 'content';
+    txScore = score && score.full.response.content;
+    if (
+      "text" in response.content &&
+      diff &&
+      "text" in diff["content"].diff.modified &&
+      diff["content"].diff.modified["text"] !== null
+    ) {
+      textModified = true;
+    }
+    contentText = txObj.content["text"];
+  }
 
   const getDiffStringClass = (string, key, diffCmpIdx = cmpIdx) => {
     let cls = "";
-    if (diff["content"].diff.modified["text"][2][key]) {
+    if (diff[txKey].diff.modified["text"][2][key]) {
       cls = diffCmpIdx ? "content-diff-added" : "content-diff-removed";
     }
     return cls;
@@ -98,28 +127,7 @@ const HttpTxBody = ({initialEntry, diff, request, response, recordPair, score}) 
     return string;
   };
 
-  let textModified = false;
-  if (
-    "text" in response.content &&
-    diff &&
-    "text" in diff["content"].diff.modified &&
-    diff["content"].diff.modified["text"] !== null
-  ) {
-    textModified = true;
-  }
-
-  const renderText = (parent) => {
-    let txObj, txKey, txScore;
-    if (parent === 'request') {
-      txObj = request;
-      txKey = 'postData';
-      txScore = score && score.full.request;
-    } else {
-      txObj = response;
-      txKey = 'content';
-      txScore = score && score.full.response;
-    }
-    const contentText = txObj.content["text"];
+  const renderText = () => {
     if (!textModified) {
       if (contentText) {
         return <ContentText value={contentText} request={request} />;
@@ -133,8 +141,8 @@ const HttpTxBody = ({initialEntry, diff, request, response, recordPair, score}) 
         <List.Item key="text">
           <div className="raw-content">
             {score && 
-                <Label className={'content-score-label ' + getScoreLabelClass(txScore.content)}>
-                  {decimalAdjust('floor', txScore.content * 100, -1)}%
+                <Label className={'content-score-label ' + getScoreLabelClass(txScore)}>
+                  {decimalAdjust('floor', txScore * 100, -1)}%
                 </Label>
             }
             <code>
@@ -178,8 +186,8 @@ const HttpTxBody = ({initialEntry, diff, request, response, recordPair, score}) 
           <List.Item key="text">
             <div className="raw-content">
               {score && 
-                  <Label className={'content-score-label ' + getScoreLabelClass(txScore.content)}>
-                    {decimalAdjust('floor', txScore.content * 100, -1)}%
+                  <Label className={'content-score-label ' + getScoreLabelClass(txScore)}>
+                    {decimalAdjust('floor', txScore * 100, -1)}%
                   </Label>
               }
               <code>
@@ -239,7 +247,7 @@ const HttpTxBody = ({initialEntry, diff, request, response, recordPair, score}) 
     }
   };
 
-  return renderText('response');
+  return renderText();
 };
 
 
