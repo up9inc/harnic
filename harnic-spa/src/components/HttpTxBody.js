@@ -109,13 +109,15 @@ const HttpTxBody = ({initialEntry, diff, request, response, recordPair, score}) 
   }
 
   const renderText = (parent) => {
-    let txObj, txKey;
+    let txObj, txKey, txScore;
     if (parent === 'request') {
       txObj = request;
       txKey = 'postData';
+      txScore = score && score.full.request;
     } else {
       txObj = response;
       txKey = 'content';
+      txScore = score && score.full.response;
     }
     const contentText = txObj.content["text"];
     if (!textModified) {
@@ -131,8 +133,8 @@ const HttpTxBody = ({initialEntry, diff, request, response, recordPair, score}) 
         <List.Item key="text">
           <div className="raw-content">
             {score && 
-                <Label className={'content-score-label ' + getScoreLabelClass(score.full.response.content)}>
-                  {decimalAdjust('floor', score.full.response.content * 100, -1)}%
+                <Label className={'content-score-label ' + getScoreLabelClass(txScore.content)}>
+                  {decimalAdjust('floor', txScore.content * 100, -1)}%
                 </Label>
             }
             <code>
@@ -176,8 +178,8 @@ const HttpTxBody = ({initialEntry, diff, request, response, recordPair, score}) 
           <List.Item key="text">
             <div className="raw-content">
               {score && 
-                  <Label className={'content-score-label ' + getScoreLabelClass(score.full.response.content)}>
-                    {decimalAdjust('floor', score.full.response.content * 100, -1)}%
+                  <Label className={'content-score-label ' + getScoreLabelClass(txScore.content)}>
+                    {decimalAdjust('floor', txScore.content * 100, -1)}%
                   </Label>
               }
               <code>
