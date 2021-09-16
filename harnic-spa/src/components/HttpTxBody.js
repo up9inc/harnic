@@ -139,6 +139,7 @@ const HttpTxBody = ({parent, initialEntry, diff, request, response, recordPair, 
     if (textDiff[cmpIdx].length < 50) {
       return (
         <List.Item key="text">
+          <b>text: </b>
           <div className="raw-content">
             {score && 
                 <Label className={'content-score-label ' + getScoreLabelClass(txScore)}>
@@ -184,6 +185,7 @@ const HttpTxBody = ({parent, initialEntry, diff, request, response, recordPair, 
       return (
         <>
           <List.Item key="text">
+            <b>text: </b>
             <div className="raw-content">
               {score && 
                   <Label className={'content-score-label ' + getScoreLabelClass(txScore)}>
