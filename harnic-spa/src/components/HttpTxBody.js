@@ -1,15 +1,8 @@
-import {
-  Button,
-  List,
-  Grid,
-  Popup,
-  Icon,
-  Label,
-} from "semantic-ui-react";
+import { Button, List, Grid, Label } from "semantic-ui-react";
 import regexifyString from "regexify-string";
 
 import ModalScrollingContent from "./ModalScrollingContent.js";
-import { truncate, calculateDiffClass, getScoreLabelClass, decimalAdjust } from ".././utils.js";
+import { truncate, getScoreLabelClass, decimalAdjust } from ".././utils.js";
 
 const ContentText = ({ value, request }) => {
   if (value === null) {
@@ -61,14 +54,21 @@ const ContentText = ({ value, request }) => {
   }
 };
 
-
-const HttpTxBody = ({parent, initialEntry, diff, request, response, recordPair, score}) => {
+const HttpTxBody = ({
+  parent,
+  initialEntry,
+  diff,
+  request,
+  response,
+  recordPair,
+  score,
+}) => {
   const cmpIdx = initialEntry ? 0 : 1;
   let txObj, txKey, txScore, contentText, modalLabel;
   let textModified = false;
-  if (parent === 'request') {
+  if (parent === "request") {
     txObj = request;
-    txKey = 'postData';
+    txKey = "postData";
     txScore = score && score.full.request.postData;
     if (
       "text" in request.post_data &&
@@ -79,10 +79,10 @@ const HttpTxBody = ({parent, initialEntry, diff, request, response, recordPair, 
       textModified = true;
     }
     contentText = txObj.post_data["text"];
-    modalLabel = 'Request';
+    modalLabel = "Request";
   } else {
     txObj = response;
-    txKey = 'content';
+    txKey = "content";
     txScore = score && score.full.response.content;
     if (
       "text" in response.content &&
@@ -93,7 +93,7 @@ const HttpTxBody = ({parent, initialEntry, diff, request, response, recordPair, 
       textModified = true;
     }
     contentText = txObj.content["text"];
-    modalLabel = 'Response';
+    modalLabel = "Response";
   }
 
   const getDiffStringClass = (string, key, diffCmpIdx = cmpIdx) => {
@@ -143,11 +143,13 @@ const HttpTxBody = ({parent, initialEntry, diff, request, response, recordPair, 
         <List.Item key="text">
           <b>text: </b>
           <div className="raw-content">
-            {score && 
-                <Label className={'content-score-label ' + getScoreLabelClass(txScore)}>
-                  {decimalAdjust('floor', txScore * 100, -1)}%
-                </Label>
-            }
+            {score && (
+              <Label
+                className={"content-score-label " + getScoreLabelClass(txScore)}
+              >
+                {decimalAdjust("floor", txScore * 100, -1)}%
+              </Label>
+            )}
             <code>
               {textDiff[cmpIdx].map((i, key) => (
                 <div key={key} className={getDiffStringClass(i, key)}>
@@ -163,15 +165,15 @@ const HttpTxBody = ({parent, initialEntry, diff, request, response, recordPair, 
         <Grid celled="internally">
           <Grid.Row>
             <Grid.Column width={8}>
-              <Label basic horizontal size='large'>
+              <Label basic horizontal size="large">
                 {modalLabel}
               </Label>
-              <span className='diff-modal-header-lablel'>
+              <span className="diff-modal-header-lablel">
                 {truncate(recordPair.a.request.url.url, 75)}
               </span>
             </Grid.Column>
             <Grid.Column width={8}>
-              <Label basic horizontal size='large'>
+              <Label basic horizontal size="large">
                 {modalLabel}
               </Label>
               {truncate(recordPair.b.request.url.url, 75)}
@@ -189,11 +191,15 @@ const HttpTxBody = ({parent, initialEntry, diff, request, response, recordPair, 
           <List.Item key="text">
             <b>text: </b>
             <div className="raw-content">
-              {score && 
-                  <Label className={'content-score-label ' + getScoreLabelClass(txScore)}>
-                    {decimalAdjust('floor', txScore * 100, -1)}%
-                  </Label>
-              }
+              {score && (
+                <Label
+                  className={
+                    "content-score-label " + getScoreLabelClass(txScore)
+                  }
+                >
+                  {decimalAdjust("floor", txScore * 100, -1)}%
+                </Label>
+              )}
               <code>
                 {textDiff[cmpIdx].slice(0, 15).map((i, key) => (
                   <div key={key} className={getDiffStringClass(i, key)}>
@@ -253,6 +259,5 @@ const HttpTxBody = ({parent, initialEntry, diff, request, response, recordPair, 
 
   return renderText();
 };
-
 
 export default HttpTxBody;
