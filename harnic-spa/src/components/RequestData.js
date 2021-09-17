@@ -103,7 +103,7 @@ const RequestData = ({
             </div>
             <List>
               {Object.entries(request.post_data).map(([key, value]) => {
-                if (key === "text") {
+                if (key === "text"  || key === 'params') {
                   return null;
                 } else {
                   const diffClass = calculateDiffClass(diff, "postData", key);
