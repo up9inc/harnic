@@ -48,6 +48,8 @@ docker rm harnic
 - Maybe ignore inner differences of error responses
 - Handle url params
 - Profile stats for big files
+- Dynamic score ratio
+- Handle soft diffs missing or added as soft (*Under question*)
 
 
 **Frontend**:
@@ -56,11 +58,6 @@ docker rm harnic
 - Add D3.js graphics
 - Add collapsing of 'same' content
 - Add loaders
-
-
-**Issues**:
-- Add bytes limit to truncated part
+- Add bytes limit to truncated part (*Hard*)
 - Add horizontal scroll to diff (*Hard*)
 - Add contextual context-wrap (*Hard*)
-- Add request postData
-- Handle soft diffs missing or added as soft (*Under question*)
