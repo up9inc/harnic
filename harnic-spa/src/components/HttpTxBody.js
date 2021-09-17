@@ -64,7 +64,7 @@ const ContentText = ({ value, request }) => {
 
 const HttpTxBody = ({parent, initialEntry, diff, request, response, recordPair, score}) => {
   const cmpIdx = initialEntry ? 0 : 1;
-  let txObj, txKey, txScore, contentText;
+  let txObj, txKey, txScore, contentText, modalLabel;
   let textModified = false;
   if (parent === 'request') {
     txObj = request;
@@ -79,6 +79,7 @@ const HttpTxBody = ({parent, initialEntry, diff, request, response, recordPair, 
       textModified = true;
     }
     contentText = txObj.post_data["text"];
+    modalLabel = 'Request';
   } else {
     txObj = response;
     txKey = 'content';
@@ -92,6 +93,7 @@ const HttpTxBody = ({parent, initialEntry, diff, request, response, recordPair, 
       textModified = true;
     }
     contentText = txObj.content["text"];
+    modalLabel = 'Response';
   }
 
   const getDiffStringClass = (string, key, diffCmpIdx = cmpIdx) => {
@@ -162,7 +164,7 @@ const HttpTxBody = ({parent, initialEntry, diff, request, response, recordPair, 
           <Grid.Row>
             <Grid.Column width={8}>
               <Label basic horizontal size='large'>
-                Response
+                {modalLabel}
               </Label>
               <span className='diff-modal-header-lablel'>
                 {truncate(recordPair.a.request.url.url, 75)}
@@ -170,7 +172,7 @@ const HttpTxBody = ({parent, initialEntry, diff, request, response, recordPair, 
             </Grid.Column>
             <Grid.Column width={8}>
               <Label basic horizontal size='large'>
-                Response
+                {modalLabel}
               </Label>
               {truncate(recordPair.b.request.url.url, 75)}
             </Grid.Column>
