@@ -1,9 +1,6 @@
-from functools import partial
-
-from harnic.compare.utils import content_compare, dict_compare, dict_product, qp_compare, scalars_compare
-from harnic.constants import SCORE_COEFS, SCORE_HTTP_TX_TYPE_COEFS, SOFT_HEADER_KEYS
-
-headers_compare = partial(dict_compare, exceptions=SOFT_HEADER_KEYS, exculde_values=True)
+from harnic.compare.utils import content_compare, dict_product, headers_compare, post_data_compare, qp_compare, \
+    scalars_compare
+from harnic.constants import SCORE_COEFS, SCORE_HTTP_TX_TYPE_COEFS
 
 
 # TODO: may this be a func?
@@ -37,8 +34,8 @@ class EntryDiff:
         cmp = headers_compare(self.a.request['headers'], self.b.request['headers'])
         comparisons['request']['headers'], diff_score['request']['headers'] = cmp, cmp.score
 
-        # TODO: implement postData cmp
-        diff_score['request']['postData'] = 1  # Treat same for now
+        cmp = post_data_compare(self.a.request, self.b.request)
+        comparisons['request']['postData'], diff_score['request']['postData'] = cmp, cmp.score
 
         cmp = scalars_compare(self.a.response['status'], self.b.response['status'])
         comparisons['response']['status'], diff_score['response']['status'] = cmp, cmp.score

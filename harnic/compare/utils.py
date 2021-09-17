@@ -1,6 +1,9 @@
 from difflib import _mdiff
+from functools import partial
 
 import textdistance
+
+from harnic.constants import SOFT_HEADER_KEYS
 
 
 class Comparison:
@@ -62,16 +65,19 @@ def dict_compare(d1, d2, exceptions=(), exculde_values=False):
     return Comparison(equal, d1 == d2, DictDiff(added, removed, modified, same), score)
 
 
-def scalars_compare(s1, s2):
-    equal = strict_equal = s1 == s2
-    return Comparison(equal, strict_equal, None, int(equal))
-
-
 def qp_compare(qp1, qp2):
     # All query params are soft
     keys = set(qp1.keys()).union(set(qp2.keys()))
     cmp = dict_compare(qp1, qp2, exceptions=keys)
     return cmp
+
+
+headers_compare = partial(dict_compare, exceptions=SOFT_HEADER_KEYS, exculde_values=True)
+
+
+def scalars_compare(s1, s2):
+    equal = strict_equal = s1 == s2
+    return Comparison(equal, strict_equal, None, int(equal))
 
 
 def text_compare(t1, t2):
@@ -85,9 +91,9 @@ def text_compare(t1, t2):
     return textdistance.levenshtein.normalized_similarity(cmp1, cmp2)
 
 
-def content_compare(r1, r2):
-    c1, raw1 = r1['content'], r1.get('raw_body')
-    c2, raw2 = r2['content'], r2.get('raw_body')
+def content_compare(r1, r2, content_key='content'):
+    c1, raw1 = r1.get(content_key, {}), r1.get('raw_body')
+    c2, raw2 = r2.get(content_key, {}), r2.get('raw_body')
     # All content keys except 'text' are soft
     keys = set(c1.keys()).union(set(c2.keys()))
     keys.discard('text')
@@ -111,3 +117,6 @@ def content_compare(r1, r2):
             cmp.diff.modified['text'] = None
 
     return cmp
+
+
+post_data_compare = partial(content_compare, content_key='postData')

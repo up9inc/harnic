@@ -1,7 +1,6 @@
 from marshmallow import Schema, fields, pre_dump
 
 from harnic.compare.matcher import PermTag
-from harnic.constants import CONTENT_LONG_SKIP_TYPES
 
 
 class HarSchema(Schema):
@@ -39,7 +38,10 @@ class RequestSchema(MessageSchema):
     url = fields.Nested('UrlSchema')
     http_version = fields.String()
     query_string = fields.List(fields.Dict())
-    post_data = fields.Raw()
+    post_data = fields.Method("get_post_data")
+
+    def get_post_data(self, object):
+        return object.get('postData')
 
 
 class ResponseSchema(MessageSchema):
