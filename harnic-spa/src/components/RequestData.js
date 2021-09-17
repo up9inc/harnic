@@ -5,10 +5,18 @@ import {
 } from "semantic-ui-react";
 import { DateTime } from "luxon";
 
+import HttpTxBody from "./HttpTxBody.js";
 import { calculateDiffClass } from ".././utils.js";
 
 
-const RequestData = ({ request, diff }) => {
+const RequestData = ({
+  recordPair,
+  request,
+  response,
+  diff,
+  initialEntry,
+  score,
+}) => {
   return (
     <pre className="har-data">
       <List>
@@ -88,6 +96,49 @@ const RequestData = ({ request, diff }) => {
             })}
           </List>
         </List.Item>
+        {request.post_data &&
+          <List.Item>
+            <div>
+              <b>Post Data:</b>         
+            </div>
+            <List>
+              {Object.entries(request.post_data).map(([key, value]) => {
+                if (key === "text"  || key === 'params') {
+                  return null;
+                } else {
+                  const diffClass = calculateDiffClass(diff, "postData", key);
+                  const diffIsNew =
+                    diffClass === "insert" || diffClass === "delete";
+                  const diffIsSoft = diffClass === "soft-modified";
+                  return (
+                    <List.Item key={key} className={diffIsNew && diffClass}>
+                      <b>{key}</b>:
+                      <span className={`har-data-value ${diffClass}`}>
+                        {value}
+                      </span>
+                      &nbsp;
+                      {diffIsSoft && (
+                        <Popup
+                          trigger={<Icon name="info" className="diff-label" />}
+                          content="This is a soft difference. It means there is a difference beetwen values but we treat it inconsiderable"
+                        />
+                      )}
+                    </List.Item>
+                  );
+                }
+              })}
+              <HttpTxBody
+                parent='request'
+                request={request}
+                response={response}
+                initialEntry={initialEntry}
+                diff={diff}
+                recordPair={recordPair}
+                score={score}
+              />
+            </List>
+          </List.Item>
+        }
       </List>
     </pre>
   );

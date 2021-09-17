@@ -44,8 +44,12 @@ const DiffRecordRow = ({ record }) => {
           render: () => (
             <Tab.Pane>
               <RequestData
+                recordPair={record.pair}
                 request={record.pair.a.request}
+                response={record.pair.a.response}
                 diff={record.diff && record.diff.comparisons.request}
+                initialEntry={true}
+                score={record.diff && record.diff.score}
               />
             </Tab.Pane>
           ),
@@ -101,8 +105,12 @@ const DiffRecordRow = ({ record }) => {
           render: () => (
             <Tab.Pane>
               <RequestData
+                recordPair={record.pair}
                 request={record.pair.b.request}
+                response={record.pair.b.response}
                 diff={record.diff && record.diff.comparisons.request}
+                initialEntry={false}
+                score={record.diff && record.diff.score}
               />
             </Tab.Pane>
           ),
