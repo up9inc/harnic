@@ -2,6 +2,7 @@ import base64
 import codecs
 import copy
 import json
+import os
 import re
 from json import JSONDecodeError
 from urllib.parse import urlparse, parse_qs, urlencode
@@ -46,7 +47,8 @@ class Entry:
         return f"{self.request['method']} {self.request['url'].clean_url}"
 
     def _key(self):
-        return self.request['method'], self.request['url'].clean_url, self.response['status']
+        status = self.response['status'] if os.getenv("HARNIC_STATUS_DIFFERENTIATES") else None
+        return self.request['method'], self.request['url'].clean_url, status
 
     def __hash__(self):
         return hash(self._key())
