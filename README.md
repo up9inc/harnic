@@ -8,17 +8,6 @@ Compare against traffic from stable version or previous release.
 Alternative case is front-end development, where you can spot the change in frontend communications.
 
 
-Make sure your image is latest:
-```shell
-docker pull gcr.io/mimetic-card-241611/harnic/develop
-```
-
-Run from directory with HAR files substituting `FILE1` and `FILE2` with your file names:
-
-```shell
-docker run -it -v `pwd`:/hars gcr.io/mimetic-card-241611/harnic/develop FILE1 FILE2
-```
-
 As a result, the directory will be created, containing diff report. Open `index.html` in your browser to see the report.
 
 ## Alternative way
@@ -28,11 +17,9 @@ If you want to build the image yourself you can do it with:
 docker build -t harnic .
 ```
 
-Then run with:
-```
-docker run -it --name harnic -v `$PWD`:/hars harnic FILE1 FILE2
-docker cp harnic:/app/harnic-spa/build build
-docker rm harnic
+Run from directory with HAR files substituting `FILE1` and `FILE2` with your file names:
+```shell
+docker run -it -v `pwd`:/hars harnic FILE1 FILE2
 ```
 
 
