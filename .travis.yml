@@ -8,13 +8,9 @@ services:
   - docker
 install:
   - PROJECT_NAME=harnic
-  - echo "Extracting scripts from git..." && CURRENT_DIR=$(pwd) && cd .. && git clone git@github.com:up9inc/env-config.git && cd env-config && cd $CURRENT_DIR
 before_script:
-  - ../env-config/devops/ci/authenticate_gcr.sh
   - sed -ri s/-image_label-/${TRAVIS_BRANCH}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_COMMIT}/ Dockerfile
 script:
   - stty cols 120
-  - travis_fold start "docker_build" && ../env-config/devops/ci/build_docker.sh ${PROJECT_NAME} && travis_fold end "docker_build"
-  - travis_fold start "run_as_job" && docker run gcr.io/${GCP_PROJECT_NAME}/${PROJECT_NAME}/${TRAVIS_BRANCH}:${TRAVIS_BUILD_NUMBER} --help && docker run -v `pwd`:/hars gcr.io/${GCP_PROJECT_NAME}/${PROJECT_NAME}/${TRAVIS_BRANCH}:${TRAVIS_BUILD_NUMBER} harnic/hars/tests/test1_a.har harnic/hars/tests/test1_b.har
-after_success:
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then travis_fold start "docker_push" && ../env-config/devops/ci/push_docker.sh ${PROJECT_NAME} && travis_fold end "docker_push"; fi
+  - travis_fold start "docker_build" && docker build . -t ${PROJECT_NAME} && travis_fold end "docker_build"
+  - travis_fold start "run_as_job" && docker run ${PROJECT_NAME} --help && docker run -v `pwd`:/hars ${PROJECT_NAME} harnic/hars/tests/test1_a.har harnic/hars/tests/test1_b.har
