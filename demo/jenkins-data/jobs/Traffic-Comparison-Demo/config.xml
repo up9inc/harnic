@@ -1,0 +1,248 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>25</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
+    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.32">
+      <autoRebuild>false</autoRebuild>
+      <rebuildDisabled>false</rebuildDisabled>
+    </com.sonyericsson.rebuild.RebuildSettings>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <net.uaznia.lukanus.hudson.plugins.gitparameter.GitParameterDefinition plugin="git-parameter@0.9.13">
+          <name>BRANCH</name>
+          <uuid>c7a81730-de40-4eef-907c-b271fcf7a5c5</uuid>
+          <type>PT_BRANCH</type>
+          <branch></branch>
+          <tagFilter>*</tagFilter>
+          <branchFilter>.*</branchFilter>
+          <sortMode>NONE</sortMode>
+          <defaultValue>origin/main</defaultValue>
+          <selectedValue>NONE</selectedValue>
+          <quickFilterEnabled>false</quickFilterEnabled>
+          <listSize>5</listSize>
+        </net.uaznia.lukanus.hudson.plugins.gitparameter.GitParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.8.2">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/up9inc/mockintosh.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>${BRANCH}</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="empty-list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <hudson.triggers.SCMTrigger>
+      <spec>* * * * *</spec>
+      <ignorePostCommitHooks>false</ignorePostCommitHooks>
+    </hudson.triggers.SCMTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command># PREPARE
+killall python3 || echo Not running
+pip3 install -r requirements.txt
+pip3 install mitmproxy
+(PYTHONPATH=.:./tests_integrated python3 -m mockintosh tests_integrated/integration_config.yaml --interceptor=custom_interceptors.intercept_for_logging --interceptor=custom_interceptors.intercept_for_modifying &gt; ./tests_integrated/server.log 2&gt;&amp;1) &amp;
+sleep 5
+curl -vf http://localhost:8001
+curl -vkf https://localhost:8000
+mkdir traffic
+(~/.local/bin/mitmdump -vvv --mode regular --ssl-insecure --set block-global=false --listen-port 8888 --set hardump=./traffic/captured.har -s $HOME/scripts/har_dump.py &gt; ./traffic/mitmdump.log 2&gt;&amp;1) &amp;
+sleep 5
+HTTP_PROXY=http://localhost:8888 curl -vf http://localhost:8001
+HTTPS_PROXY=http://localhost:8888 curl -vkf https://localhost:8000
+sed -i s/test_conn_status/_test_conn_status/ tests_integrated/tests_integration.py</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command># RUN
+export HTTP_PROXY=http://localhost:8888
+export HTTPS_PROXY=http://localhost:8888
+export NO_PROXY=raw.githubusercontent.com
+python3 -m unittest -v tests_integrated.tests_integration.RESTTests</command>
+      <configuredLocalRules/>
+      <unstableReturn>1</unstableReturn>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command># POST-PROCESS
+killall -SIGUSR1 mitmdump  # supposed to trigger HAR write
+sleep 5
+ls `pwd`/traffic/captured.har  # make sure it was written
+killall python3 || echo Not running # shut down mockintosh server
+
+mkdir -p $HOME/hars/$GIT_BRANCH/
+
+BASELINE=$HOME/hars/origin/main
+
+if ls $BASELINE/latest.har; then
+  python3 -m harnic $BASELINE/latest.har traffic/captured.har
+  cp diff_latest.har_captured.har/kpis.json $HOME/hars/$GIT_BRANCH/
+  w_reorders=`cat diff_latest.har_captured.har/kpis.json | jq .stats.with_reorders.ratio`
+  woreorders=`cat diff_latest.har_captured.har/kpis.json | jq .stats.strict_order.ratio`
+  echo with_reorders,strict_order &gt; kpis.csv
+  echo `python3 -c &quot;print($w_reorders*100)&quot;`,`python3 -c &quot;print($woreorders*100)&quot;` &gt;&gt; kpis.csv
+
+  echo matched,modified,added,removed &gt; entries-r.csv
+  echo `cat diff_latest.har_captured.har/kpis.json | jq .stats.with_reorders.matched`,`cat diff_latest.har_captured.har/kpis.json | jq .stats.with_reorders.modified`,`cat diff_latest.har_captured.har/kpis.json | jq .stats.with_reorders.added`,`cat diff_latest.har_captured.har/kpis.json | jq .stats.with_reorders.removed` &gt;&gt; entries-r.csv
+
+  echo matched,modified,added,removed &gt; entries-n.csv
+  echo `cat diff_latest.har_captured.har/kpis.json | jq .stats.strict_order.matched`,`cat diff_latest.har_captured.har/kpis.json | jq .stats.strict_order.modified`,`cat diff_latest.har_captured.har/kpis.json | jq .stats.strict_order.added`,`cat diff_latest.har_captured.har/kpis.json | jq .stats.strict_order.removed` &gt;&gt; entries-n.csv
+fi
+
+
+cp ./traffic/captured.har $HOME/hars/$GIT_BRANCH/latest.har
+</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.plugins.plot.PlotPublisher plugin="plot@2.1.9">
+      <plots>
+        <hudson.plugins.plot.Plot>
+          <title>Match Score</title>
+          <description></description>
+          <yaxis>%</yaxis>
+          <series>
+            <hudson.plugins.plot.CSVSeries>
+              <file>kpis.csv</file>
+              <label></label>
+              <fileType>csv</fileType>
+              <inclusionFlag>OFF</inclusionFlag>
+              <exclusionValues></exclusionValues>
+              <exclusionValuesList class="java.util.Arrays$ArrayList">
+                <a class="string-array">
+                  <string></string>
+                </a>
+              </exclusionValuesList>
+              <url></url>
+              <displayTableFlag>false</displayTableFlag>
+            </hudson.plugins.plot.CSVSeries>
+          </series>
+          <group>Traffic Diff Stats</group>
+          <numBuilds></numBuilds>
+          <csvFileName>plot-3205114369520422087.csv</csvFileName>
+          <csvLastModification>0</csvLastModification>
+          <style>line</style>
+          <useDescr>false</useDescr>
+          <keepRecords>false</keepRecords>
+          <exclZero>false</exclZero>
+          <logarithmic>false</logarithmic>
+          <yaxisMinimum>50.0</yaxisMinimum>
+          <yaxisMaximum></yaxisMaximum>
+        </hudson.plugins.plot.Plot>
+        <hudson.plugins.plot.Plot>
+          <title>Items: With Reorders</title>
+          <description></description>
+          <yaxis>number of traffic entries</yaxis>
+          <series>
+            <hudson.plugins.plot.CSVSeries>
+              <file>entries-r.csv</file>
+              <label></label>
+              <fileType>csv</fileType>
+              <inclusionFlag>OFF</inclusionFlag>
+              <exclusionValues></exclusionValues>
+              <exclusionValuesList class="java.util.Arrays$ArrayList">
+                <a class="string-array">
+                  <string></string>
+                </a>
+              </exclusionValuesList>
+              <url></url>
+              <displayTableFlag>false</displayTableFlag>
+            </hudson.plugins.plot.CSVSeries>
+          </series>
+          <group>Traffic Diff Stats</group>
+          <numBuilds></numBuilds>
+          <csvFileName>plot-7979134032686517538.csv</csvFileName>
+          <csvLastModification>0</csvLastModification>
+          <style>line</style>
+          <useDescr>false</useDescr>
+          <keepRecords>false</keepRecords>
+          <exclZero>false</exclZero>
+          <logarithmic>false</logarithmic>
+          <yaxisMinimum></yaxisMinimum>
+          <yaxisMaximum></yaxisMaximum>
+        </hudson.plugins.plot.Plot>
+        <hudson.plugins.plot.Plot>
+          <title>Items: Strict Order</title>
+          <description></description>
+          <yaxis>number of traffic entries</yaxis>
+          <series>
+            <hudson.plugins.plot.CSVSeries>
+              <file>entries-n.csv</file>
+              <label></label>
+              <fileType>csv</fileType>
+              <inclusionFlag>OFF</inclusionFlag>
+              <exclusionValues></exclusionValues>
+              <exclusionValuesList class="java.util.Arrays$ArrayList">
+                <a class="string-array">
+                  <string></string>
+                </a>
+              </exclusionValuesList>
+              <url></url>
+              <displayTableFlag>false</displayTableFlag>
+            </hudson.plugins.plot.CSVSeries>
+          </series>
+          <group>Traffic Diff Stats</group>
+          <numBuilds></numBuilds>
+          <csvFileName>plot-2287905576478828014.csv</csvFileName>
+          <csvLastModification>0</csvLastModification>
+          <style>line</style>
+          <useDescr>false</useDescr>
+          <keepRecords>false</keepRecords>
+          <exclZero>false</exclZero>
+          <logarithmic>false</logarithmic>
+          <yaxisMinimum></yaxisMinimum>
+          <yaxisMaximum></yaxisMaximum>
+        </hudson.plugins.plot.Plot>
+      </plots>
+    </hudson.plugins.plot.PlotPublisher>
+    <htmlpublisher.HtmlPublisher plugin="htmlpublisher@1.25">
+      <reportTargets>
+        <htmlpublisher.HtmlPublisherTarget>
+          <reportName>Traffic Comparison Report</reportName>
+          <reportDir>diff_latest.har_captured.har</reportDir>
+          <reportFiles>index.html</reportFiles>
+          <alwaysLinkToLastBuild>true</alwaysLinkToLastBuild>
+          <reportTitles></reportTitles>
+          <keepAll>true</keepAll>
+          <allowMissing>true</allowMissing>
+          <includes>**/*</includes>
+          <escapeUnderscores>true</escapeUnderscores>
+        </htmlpublisher.HtmlPublisherTarget>
+      </reportTargets>
+    </htmlpublisher.HtmlPublisher>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.39">
+      <deleteDirs>false</deleteDirs>
+      <cleanupParameter></cleanupParameter>
+      <externalDelete></externalDelete>
+      <disableDeferredWipeout>false</disableDeferredWipeout>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  </buildWrappers>
+</project>

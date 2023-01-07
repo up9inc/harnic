@@ -1,0 +1,44 @@
+FROM node:14 as frontend
+
+WORKDIR /app
+
+COPY harnic-spa harnic-spa
+WORKDIR /app/harnic-spa
+
+RUN npm install
+RUN npm run build
+
+
+FROM jenkins/jenkins
+
+USER root
+
+RUN apt update && apt install -y build-essential python3 sudo python3-pip mc psmisc procps jq
+RUN usermod -aG sudo jenkins && sed -i s/[!]// /etc/shadow
+# RUN echo "#! /usr/bin/sudo /bin/sh\n/usr/bin/docker \"\$@\"" > /usr/local/bin/docker && chmod +x /usr/local/bin/docker
+# RUN echo "PATH=\$PATH:\$HOME/.local/bin" >> /etc/profile
+# RUN jenkins-plugin-cli --verbose --plugins ws-cleanup git dashboard-view htmlpublisher locale plot
+
+# env var to tell the version
+ENV IMG_LABEL="-image_label-"
+
+# set the working directory in the container
+WORKDIR /app
+
+# copy the dependencies file to the working directory
+COPY --from=frontend /app/harnic-spa harnic-spa
+ENV SPA_LOCATION=/app/harnic-spa
+
+# install dependencies
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
+
+# install backend
+COPY harnic harnic
+COPY setup.py .
+
+RUN pip3 install -e .
+
+WORKDIR /
+ENV JAVA_OPTS='-Dhudson.model.DirectoryBrowserSupport.CSP=""'
+USER jenkins
